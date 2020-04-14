@@ -1,0 +1,35 @@
+.terminal {
+    grid-area: terminal;
+}
+
+.terminal textarea {
+    height: 100%;
+    width: 100%;
+}
+
+.codeEntry {
+    grid-area: codeEntry;
+}
+
+.codeEntry textarea {
+    height: 100%;
+    width: 100%;
+}
+
+.chartArea {
+    grid-area: chartArea;
+}
+
+.interfaceGrid {
+    height: 70vh;
+    display: grid;
+    grid-gap: 5px;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-areas:
+        "codeEntry chartArea chartArea"
+        "codeEntry  chartArea  chartArea"
+        "codeEntry  terminal    terminal";
+        background-color: #fff;
+        color: #444;
+}
+
