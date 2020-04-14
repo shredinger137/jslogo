@@ -5,11 +5,29 @@ export default class Interpreter  {
         if(LogoSendCommands[input]){
             console.log(LogoSendCommands[input]);
             return LogoSendCommands[input]
-        } else {
+        } 
+        if(input.match(/readADC/g))
+        {
+            console.log("conditional");
+            return this.getReadADCCommand(input);
+        }               
             return false;
-        }
+        
     }
+
+    getReadADCCommand(input){
+        console.log("get read " + input);
+        var inputArray = input.split(" ");
+        console.log(inputArray);
+        var command = "0xc" + inputArray[1];
+        console.log(command);
+        return command;
+    }
+
+
 }
+
+
 
 
 var LogoSendCommands = {

@@ -115,10 +115,10 @@ class App extends Component {
     <div className="main">      <br />
     <p>Click 'connect' to start, then select the Arduino device. After that you can use the below buttons, or enter commands in the terminal (bottom right).
       <br /><br />
-      TODO: This'll get some sort of menu at the top. The buttons might go away, but should be replaced with hints on how to get started. A button should be added for the code entry area to 'run'. 
+      This'll get some sort of menu at the top. The buttons might go away, but should be replaced with hints on how to get started. A button should be added for the code entry area to 'run'. 
       Run will come pre-defined as a boilerplate.
       <br /><br />
-      As of this writing the interpreter will only turn LED's on and off, the button can read ADC0. More to come.
+      As of this writing the interpreter will control LEDs and read ADCs. LOGO logic has not been implemented.
     </p>
       <button id="connectButton" type="button" >Connect</button>
       <button id="readADC" type="button" onClick={() => { this.sendToBoard(0xc0) }}>Read ADC0</button>
@@ -130,8 +130,8 @@ class App extends Component {
     </div>
       <div className = "interfaceGrid">
         <div className = "codeEntry" >
-          <textarea id="codeEntryTextbox" value="TODO: This will be a code entry/file editing area"></textarea></div>
-        <div className = "chartArea"><p>TODO: This will be a chart area.</p></div>
+          <textarea id="codeEntryTextbox" value="This will be a code entry/file editing area"></textarea></div>
+        <div className = "chartArea"><p>This will be a chart area.</p></div>
         <div className = "terminal">
           <textarea id="terminalTextbox" onKeyDown={this.handleTerminalEntry.bind(this)} ></textarea>
         </div>
