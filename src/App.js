@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import './css/styles.css';
+import Interpreter from './components/Interpreter';
+var interpreter = new Interpreter();
 
 let port;
 let reader;
@@ -18,7 +20,9 @@ class App extends Component {
     this.sendToBoard = this.sendToBoard.bind(this);
     this.readLoop = this.readLoop.bind(this);
     this.connectAndStartReading = this.connectAndStartReading.bind(this);
+    this.interpretAndSend = this.interpretAndSend.bind(this);
     connectButton.addEventListener('click', this.connectAndStartReading);
+
 
   }
 
@@ -76,6 +80,19 @@ class App extends Component {
     }
   }
 
+  interpretAndSend(){
+    console.log("Running interpret and send");
+    var command = document.getElementById("command").value;
+    console.log(command);
+        if(interpreter.translate(command)){
+          this.sendToBoard(interpreter.translate(command));
+          document.getElementById("send").value = "";
+    } else {
+      console.log("Command not found");
+    }
+   
+  }
+
   async clickConnect() {
     await this.connectAndStartReading();
   }
@@ -92,6 +109,10 @@ class App extends Component {
       <button id="readADC" type="button" onClick={() => { this.sendToBoard(0xc0) }}>Read ADC0</button>
       <button id="dp3on" type="button" onClick={() => { this.sendToBoard(0xe3) }}>dp3on</button>
       <button id="dp3off" type="button" onClick={() => { this.sendToBoard(0xd3) }}>dp3off</button>
+      <br />
+      <input id="command"></input>
+      <br />
+      <button id="send" type="button" onClick={() => { this.interpretAndSend()}}>Send</button>
       <div id="log"></div>
     </div>
     </div>
