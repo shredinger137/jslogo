@@ -2,29 +2,44 @@ import React, { Component } from 'react';
 import './css/styles.css';
 import './css/layout.css';
 import Interpreter from './components/Interpreter';
+
+
+
 var interpreter = new Interpreter();
+
+
 
 let port;
 let reader;
-let outputStream;
 
 class App extends Component {
 
+//In this version, the classes 'procedures' and 'logo' are accessible in the global space by using
+//window.logo, window.procedures. Others should be added in index.html by the same method.
+
+//This only sort of works.
+
+//This is a placeholder. The most correct way to do this is to disentangle the classes and make them into
+//components. The problem is that the classes are not self contained as written. They have to be turned into
+//self contained components and cleaned up to be readable. This might take a while.
 
 
   componentDidMount(){
-    const connectButton = document.getElementById('connectButton');
-    const log = document.getElementById('log');
-    const dp3on = document.getElementById('dp3on');
-    const dp3off = document.getElementById('dp3off');
-    const readADC = document.getElementById('readADC');
+
+    
     this.sendToBoard = this.sendToBoard.bind(this);
     this.readLoop = this.readLoop.bind(this);
     this.connectAndStartReading = this.connectAndStartReading.bind(this);
     this.interpretAndSend = this.interpretAndSend.bind(this);
+
+    const connectButton = document.getElementById('connectButton');
     connectButton.addEventListener('click', this.connectAndStartReading);
+    this.testProcRead("5 + 3");
+    
+  }
 
-
+  testProcRead(string){
+    
   }
 
   componentDidUpdate(){
@@ -124,14 +139,15 @@ class App extends Component {
       <button id="readADC" type="button" onClick={() => { this.sendToBoard(0xc0) }}>Read ADC0</button>
       <button id="dp3on" type="button" onClick={() => { this.sendToBoard(0xe3) }}>dp3on</button>
       <button id="dp3off" type="button" onClick={() => { this.sendToBoard(0xd3) }}>dp3off</button>
+      <button id="gobutton" onClick={() => {window.commandCenter.runLine("go")}}>Go</button>
       <br />
       <br />
       <br />
     </div>
       <div className = "interfaceGrid">
         <div className = "codeEntry" >
-          <textarea id="codeEntryTextbox" value="This will be a code entry/file editing area"></textarea></div>
-        <div className = "chartArea"><p>This will be a chart area.</p></div>
+          <textarea id="procs">This will be a code entry/file editing area</textarea></div>
+        <div className = "chartArea" id = "cc"><p>This will be a chart area.</p></div>
         <div className = "terminal">
           <textarea id="terminalTextbox" onKeyDown={this.handleTerminalEntry.bind(this)} ></textarea>
         </div>

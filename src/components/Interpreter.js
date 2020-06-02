@@ -2,13 +2,13 @@ export default class Interpreter  {
 
     translate(input) {
         console.log(input);
+
         if(LogoSendCommands[input]){
             console.log(LogoSendCommands[input]);
             return LogoSendCommands[input]
         } 
         if(input.match(/readADC/g))
         {
-            console.log("conditional");
             return this.getReadADCCommand(input);
         }               
             return false;
@@ -23,8 +23,6 @@ export default class Interpreter  {
 
 
 }
-
-
 
 
 var LogoSendCommands = {
@@ -50,8 +48,8 @@ var LogoSendCommands = {
 var logoWords = {};
 
 logoWords['repeat'] = {args: 2, flow: true, fcn: function(a,b){this.repeat(a,b);}}
-logoWords['plot'] = {args: 2, fcn: function(a,b){this.makeChart(a,b);}}
-logoWords['plotpush'] = {args: 2, fcn: function(a,b){this.updateChart(a,b);}}
+
+
 logoWords['forever'] = {args: 1, flow: true, fcn: function(a){this.loop(a);}}
 logoWords['loop'] = {args: 1, flow: true, fcn: function(a){this.loop(a);}}
 logoWords['if'] = {args: 2, flow: true, fcn: function(a,b){this.logo_if(this.getbool(a),b);}}
@@ -68,6 +66,8 @@ logoWords['*'] = {args: 2, priority: -2, fcn: function(a,b){return a*b;}}
 logoWords['/'] = {args: 2, priority: -2, fcn: function(a,b){return a/b;}}
 
 /*
+logoWords['plotpush'] = {args: 2, fcn: function(a,b){this.updateChart(a,b);}}
+logoWords['plot'] = {args: 2, fcn: function(a,b){this.makeChart(a,b);}}
 logoWords['='] = {args: 2, priority: -2, fcn: function(a,b){return logo.equals(a,b);}}
 logoWords['!='] = {args: 2, priority: -2, fcn: function(a,b){return !logo.equals(a,b);}}
 logoWords['>'] = {args: 2, priority: -2, fcn: function(a,b){return a>b;}}
