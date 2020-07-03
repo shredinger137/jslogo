@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 import './css/styles.css';
 import './css/layout.css';
+import Megaclass from './components/megaclass';
+//import Comms from './components/Comms';
 import Interpreter from './components/Interpreter';
 
 
-
+var megaclass;
 var interpreter = new Interpreter();
 
 
@@ -25,6 +27,8 @@ class App extends Component {
 
 
   componentDidMount(){
+    megaclass = new Megaclass();
+    megaclass.setup();
 
     
     this.sendToBoard = this.sendToBoard.bind(this);
@@ -43,6 +47,8 @@ class App extends Component {
   }
 
   componentDidUpdate(){
+
+    megaclass.readProcs();
 
   }
 
@@ -121,6 +127,8 @@ class App extends Component {
     }
   }
 
+  //Here's what we removed while trying to get Brian's BS to work
+
   render() {
     return (
     <div>
@@ -139,17 +147,21 @@ class App extends Component {
       <button id="readADC" type="button" onClick={() => { this.sendToBoard(0xc0) }}>Read ADC0</button>
       <button id="dp3on" type="button" onClick={() => { this.sendToBoard(0xe3) }}>dp3on</button>
       <button id="dp3off" type="button" onClick={() => { this.sendToBoard(0xd3) }}>dp3off</button>
-      <button id="gobutton" onClick={() => {window.commandCenter.runLine("go")}}>Go</button>
+      <button id="gobutton" onClick={() => {megaclass.runLine("go")}}>Go</button>
       <br />
       <br />
       <br />
     </div>
       <div className = "interfaceGrid">
         <div className = "codeEntry" >
-          <textarea id="procs">This will be a code entry/file editing area</textarea></div>
-        <div className = "chartArea" id = "cc"><p>This will be a chart area.</p></div>
+          <textarea id="procs" defaultValue={`to go
+print 5
+end`}></textarea></div>
+        <div className = "chartArea" id = "cnvframe">
+          <canvas className="cnv" id="canvas"></canvas>
+        </div>
         <div className = "terminal">
-          <textarea id="terminalTextbox" onKeyDown={this.handleTerminalEntry.bind(this)} ></textarea>
+          <textarea id="cc" ></textarea>
         </div>
       </div>
     </div>

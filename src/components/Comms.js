@@ -1,3 +1,7 @@
+import {prims} from './prims';
+import Logo from './logo';
+const logo = new Logo;
+
 class Comms {
 
 	constructor() {
@@ -10,7 +14,7 @@ class Comms {
 
 	readsensor(n) {
 		logo.hold = true;
-		comms.adread(n, comms.gotsensor);
+		this.adread(n, this.gotsensor);
 	}
 
 	gotsensor(x) {
@@ -22,7 +26,7 @@ class Comms {
 
 	readpin(n) {
 		logo.hold = true;
-		comms.dread(n, comms.gotpin);
+		this.dread(n, this.gotpin);
 	}
 
 	gotpin(x) {
@@ -139,32 +143,32 @@ var port;
 var reader;
 var outputStream;
 
-prims['openport'] = { nargs: 0, fcn: function () { comms.openSerialPort(); } }
+prims['openport'] = { nargs: 0, fcn: function () { this.openSerialPort(); } }
 
-prims['ledon'] = { nargs: 0, fcn: function () { comms.led_on(); this.mwait(1); } }
-prims['ledoff'] = { nargs: 0, fcn: function () { comms.led_off(); this.mwait(1); } }
+prims['ledon'] = { nargs: 0, fcn: function () { this.led_on(); this.mwait(1); } }
+prims['ledoff'] = { nargs: 0, fcn: function () { this.led_off(); this.mwait(1); } }
 
-prims['on3'] = { nargs: 0, fcn: function () { comms.pin_on(3); this.mwait(1); } }
-prims['off3'] = { nargs: 0, fcn: function () { comms.pin_off(3); this.mwait(1); } }
-prims['on4'] = { nargs: 0, fcn: function () { comms.pin_on(4); this.mwait(1); } }
-prims['off4'] = { nargs: 0, fcn: function () { comms.pin_off(4); this.mwait(1); } }
-prims['on5'] = { nargs: 0, fcn: function () { comms.pin_on(5); this.mwait(1); } }
-prims['off5'] = { nargs: 0, fcn: function () { comms.pin_off(5); this.mwait(1); } }
-prims['on6'] = { nargs: 0, fcn: function () { comms.pin_on(6); this.mwait(1); } }
-prims['off6'] = { nargs: 0, fcn: function () { comms.pin_off(6); this.mwait(1); } }
-prims['on7'] = { nargs: 0, fcn: function () { comms.pin_on(7); this.mwait(1); } }
-prims['off7'] = { nargs: 0, fcn: function () { comms.pin_off(7); this.mwait(1); } }
+prims['on3'] = { nargs: 0, fcn: function () { this.pin_on(3); this.mwait(1); } }
+prims['off3'] = { nargs: 0, fcn: function () { this.pin_off(3); this.mwait(1); } }
+prims['on4'] = { nargs: 0, fcn: function () { this.pin_on(4); this.mwait(1); } }
+prims['off4'] = { nargs: 0, fcn: function () { this.pin_off(4); this.mwait(1); } }
+prims['on5'] = { nargs: 0, fcn: function () { this.pin_on(5); this.mwait(1); } }
+prims['off5'] = { nargs: 0, fcn: function () { this.pin_off(5); this.mwait(1); } }
+prims['on6'] = { nargs: 0, fcn: function () { this.pin_on(6); this.mwait(1); } }
+prims['off6'] = { nargs: 0, fcn: function () { this.pin_off(6); this.mwait(1); } }
+prims['on7'] = { nargs: 0, fcn: function () { this.pin_on(7); this.mwait(1); } }
+prims['off7'] = { nargs: 0, fcn: function () { this.pin_off(7); this.mwait(1); } }
 
-prims['sensor0'] = { nargs: 0, fcn: function () { comms.readsensor(0); return this.cfun; } }
-prims['sensor1'] = { nargs: 0, fcn: function () { comms.readsensor(1); return this.cfun; } }
-prims['sensor2'] = { nargs: 0, fcn: function () { comms.readsensor(2); return this.cfun; } }
-prims['sensor3'] = { nargs: 0, fcn: function () { comms.readsensor(3); return this.cfun; } }
-prims['sensor4'] = { nargs: 0, fcn: function () { comms.readsensor(4); return this.cfun; } }
-prims['sensor5'] = { nargs: 0, fcn: function () { comms.readsensor(5); return this.cfun; } }
+prims['sensor0'] = { nargs: 0, fcn: function () { this.readsensor(0); return this.cfun; } }
+prims['sensor1'] = { nargs: 0, fcn: function () { this.readsensor(1); return this.cfun; } }
+prims['sensor2'] = { nargs: 0, fcn: function () { this.readsensor(2); return this.cfun; } }
+prims['sensor3'] = { nargs: 0, fcn: function () { this.readsensor(3); return this.cfun; } }
+prims['sensor4'] = { nargs: 0, fcn: function () { this.readsensor(4); return this.cfun; } }
+prims['sensor5'] = { nargs: 0, fcn: function () { this.readsensor(5); return this.cfun; } }
 
-prims['connected8'] = { nargs: 0, fcn: function () { comms.readpin(8); return this.cfun; } }
-prims['connected9'] = { nargs: 0, fcn: function () { comms.readpin(9); return this.cfun; } }
-prims['connected10'] = { nargs: 0, fcn: function () { comms.readpin(10); return this.cfun; } }
-prims['connected11'] = { nargs: 0, fcn: function () { comms.readpin(11); return this.cfun; } }
-prims['connected12'] = { nargs: 0, fcn: function () { comms.readpin(12); return this.cfun; } }
+prims['connected8'] = { nargs: 0, fcn: function () { this.readpin(8); return this.cfun; } }
+prims['connected9'] = { nargs: 0, fcn: function () { this.readpin(9); return this.cfun; } }
+prims['connected10'] = { nargs: 0, fcn: function () { this.readpin(10); return this.cfun; } }
+prims['connected11'] = { nargs: 0, fcn: function () { this.readpin(11); return this.cfun; } }
+prims['connected12'] = { nargs: 0, fcn: function () { this.readpin(12); return this.cfun; } }
 

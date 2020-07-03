@@ -6,7 +6,7 @@
 
 var runner;
 
-class CommandCenter {
+export class CommandCenter {
 
 insert(str){
 	var startpos = cc.selectionStart;

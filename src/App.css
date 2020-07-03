@@ -36,3 +36,186 @@
     transform: rotate(360deg);
   }
 }
+
+
+body {
+  font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+  font-size: 10px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+div.frame {
+  position: absolute;
+  background: #f2f4f6;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+textarea.cc {
+  position: absolute;
+  background: white;
+  font-family: courier;
+  font-size: 16px;
+  margin: 0px;
+  padding: 5px 10px 5px;
+  resize: none;
+  bottom: 10px;
+  right: 10px;
+  width: 589px;
+  height: 82px;
+  outline: none !important;
+  color: #4c4c4c;
+  border: solid 1px #ccc;
+  -webkit-border-radius: 4px;
+  -webkit-box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.2);
+}
+
+textarea.procs {
+  position: absolute;
+  background: white;
+  font-family: courier;
+  font-size: 16px;
+  margin: 0px;
+  padding: 5px 10px 5px;
+  resize: none;
+  top: 40px;
+  left: 10px;
+  width: 318px;
+  height: 580px;
+  outline: none !important;
+  color: #4c4c4c;
+  border: solid 1px #ccc;
+  -webkit-border-radius: 4px;
+  -webkit-box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.2);
+}
+
+textarea.jsprocs {
+  position: absolute;
+  background: #1e1e1e;
+  font-family: courier;
+  color: white;
+  font-size: 16px;
+  margin: 0px;
+  padding: 5px 10px 5px;
+  resize: none;
+  top: 40px;
+  left: 10px;
+  width: 318px;
+  height: 580px;
+  outline: none !important;
+  border: solid 1px #ccc;
+  -webkit-border-radius: 4px;
+  -webkit-box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.2);
+}
+
+.cnvframe {
+  position: absolute;
+  margin: 0px;
+  padding: 0px;
+  width: 700px;
+  height: 560px;
+  top: 10px;
+  right: 10px;
+  overflow: hidden;
+  border: solid 1px #ccc;
+  outline: none;
+}
+
+.cnv {
+  position: absolute;
+  width: 700px;
+  height: 560px;
+}
+
+.cnvjs {
+  position: absolute;
+  width: 700px;
+  height: 560px;
+}
+
+button.load {
+  position: absolute;
+  width: 65px;
+  height: 25px;
+  top: 10px;
+  left: 10px;
+}
+
+button.save {
+  position: absolute;
+  width: 65px;
+  height: 25px;
+  top: 10px;
+  left: 80px;
+}
+
+button.saveas {
+  position: absolute;
+  width: 65px;
+  height: 25px;
+  top: 10px;
+  left: 150px;
+}
+
+button.go {
+  position: absolute;
+  width: 65px;
+  height: 25px;
+  top: 10px;
+  left: 450px;
+}
+
+.mainMenuItem {
+  color: black;
+  width: 20vw;
+  font-size: 2em;
+  text-decoration: none;
+}
+
+.mainMenuItem > img {
+  width: 20vw;
+}
+
+.mainMenu {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  text-align: center;
+  width: 75vw;
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.experimentWrapper {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  z-index: 5;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.experimentPicker {
+  margin: 0 auto;
+  z-index: 6;
+  margin-top: 5vh;
+  background: white;
+  height: 90vh;
+  width: 90vw;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+

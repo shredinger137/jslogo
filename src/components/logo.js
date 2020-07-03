@@ -3,8 +3,14 @@
 // Logo Evaluator
 //
 /////////////////////////
+import {prims, constants} from './prims';
+import CommandCenter from './cc.js'
+import Turtle from './turtle';
 
-export class Logo {
+const turtle = new Turtle;
+const commandCenter = new CommandCenter;
+
+export default class Logo {
 
 constructor(){
 this.evline = [];
@@ -26,11 +32,13 @@ this.arglist = [];
 this.priority = 0;
 this.stack = [];
 this.frame = [];
-this.locals = [last(this.locals)];
+this.locals = this.last(this.locals);
 this.hold = false;
 if(this.timeout!=undefined) clearTimeout(this.timeout);
 this.timeout = undefined;
 }
+
+lprint(x){commandCenter.insert(x+'\n');}
 
 evalNext(){
 	var t = this;
@@ -49,7 +57,7 @@ evalNext(){
 		else t.pushResult(token);
 	} 
 	catch(e){
-		lprint(e);
+		this.lprint(e);
 		t.stack = [];
 		t.evline = [];
 	}
@@ -345,7 +353,8 @@ seconds(){
 }
 
 getDate(){
-	return new Date(t0+(now()-t0)*this.clockspeed);
+	//return new Date(t0+(now()-t0)*this.clockspeed);
+	return new Date();
 }
 
 twoDigit(n){
@@ -378,7 +387,7 @@ textAlign(str){
 mwait(n){
 	if(n<=0) return;
 	this.hold=true;
-	this.timeout = setTimeout(function(){logo.timeout=undefined; logo.hold=false;}, n);
+	this.timeout = setTimeout(function(){this.timeout=undefined; this.hold=false;}, n);
 }
 
 printstr(x){
