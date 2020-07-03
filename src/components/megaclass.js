@@ -6,6 +6,7 @@ var port;
 var reader;
 var outputStream;
 var flushtime = 200;
+var hold = false;
 
 
 export default class Megaclass {
@@ -761,7 +762,7 @@ export default class Megaclass {
         if(!this.isDone()){
             var end = this.now()+flushtime;
             while(this.now()<end){
-                if(this.hold) break;
+                if(hold) break;
                 if(this.isDone()) break;
                 this.evalNext();
             }
@@ -817,7 +818,7 @@ export default class Megaclass {
         this.stack = [];
         this.frame = [];
         this.locals = this.last(this.locals);
-        this.hold = false;
+        hold = false;
         if(this.timeout!=undefined) clearTimeout(this.timeout);
         this.timeout = undefined;
         }
@@ -1183,8 +1184,8 @@ export default class Megaclass {
             console.log("mwait: " + n);
             if(n<=0) return;
             console.log("mwait continued");
-            this.hold=true;
-            this.timeout = setTimeout(function(){this.timeout=undefined; this.hold=false;}, n);
+            hold=true;
+            this.timeout = setTimeout(function(){this.timeout=undefined; hold=false; console.log("timeout");}, n);
         }
         
         printstr(x){
