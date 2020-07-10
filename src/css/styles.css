@@ -29,6 +29,9 @@
     justify-content: flex-start;
   }
   
+  #canvas {
+    position: absolute;
+  }
 
   .header {
     align-content: center;

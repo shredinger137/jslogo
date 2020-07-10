@@ -4,9 +4,10 @@ var constants = {
 } 
 var port;
 var reader;
-var outputStream;
+//var outputStream;
 var flushtime = 200;
 var hold = false;
+
 
 
 export default class Megaclass {
@@ -17,6 +18,41 @@ export default class Megaclass {
         this.isDone = this.isDone.bind(this);
         this.parse = this.parse.bind(this);
         this.procs = document.getElementById("procs");
+
+        //turtle
+        this.datapoints = [];
+        this.cnvWidth = 700;
+        this.cnvHeight = 220;
+       // this.img;
+        //this.ctx = document.getElementById('canvas');
+        this.xcor = 0;
+        this.ycor = 0;
+        //this.element;
+        this.heading = 0;
+        this.color = 0;
+        this.shade = 50;
+        this.opacity = 1;
+        this.pendown = true;
+        this.pensize = 1;
+        this.size = 70;
+        this.font = "sans-serif";
+        this.fontsize = 30;
+        this.dpi = 2;
+        this.zoom = 1;
+        this.snaps = {};
+        this.scatterChart = "";
+        this.colors = [
+            0xFF0000, 0xFF0D00, 0xFF1A00, 0xFF2600, 0xFF3300, 0xFF4000, 0xFF4D00, 0xFF5900, 0xFF6600, 0xFF7300, 
+            0xFF8000, 0xFF8C00, 0xFF9900, 0xFFA600, 0xFFB300, 0xFFBF00, 0xFFCC00, 0xFFD900, 0xFFE600, 0xFFF200, 
+            0xFFFF00, 0xE6FF00, 0xCCFF00, 0xB3FF00, 0x99FF00, 0x80FF00, 0x66FF00, 0x4DFF00, 0x33FF00, 0x1AFF00, 
+            0x00FF00, 0x00FF0D, 0x00FF1A, 0x00FF26, 0x00FF33, 0x00FF40, 0x00FF4D, 0x00FF59, 0x00FF66, 0x00FF73, 
+            0x00FF80, 0x00FF8C, 0x00FF99, 0x00FFA6, 0x00FFB3, 0x00FFBF, 0x00FFCC, 0x00FFD9, 0x00FFE6, 0x00FFF2, 
+            0x00FFFF, 0x00F2FF, 0x00E6FF, 0x00D9FF, 0x00CCFF, 0x00BFFF, 0x00B3FF, 0x00A6FF, 0x0099FF, 0x008CFF, 
+            0x0080FF, 0x0073FF, 0x0066FF, 0x0059FF, 0x004DFF, 0x0040FF, 0x0033FF, 0x0026FF, 0x001AFF, 0x000DFF, 
+            0x0000FF, 0x0D00FF, 0x1A00FF, 0x2600FF, 0x3300FF, 0x4000FF, 0x4D00FF, 0x5900FF, 0x6600FF, 0x7300FF, 
+            0x8000FF, 0x8C00FF, 0x9900FF, 0xA600FF, 0xB300FF, 0xBF00FF, 0xCC00FF, 0xD900FF, 0xE600FF, 0xF200FF, 
+            0xFF00FF, 0xFF00E6, 0xFF00CC, 0xFF00B3, 0xFF0099, 0xFF0080, 0xFF0066, 0xFF004D, 0xFF0033, 0xFF001A, 
+            0xFF0000];
 
         //tokenizer
         this.str = s;
@@ -53,54 +89,24 @@ export default class Megaclass {
         this.clockspeed = 1;
 
         //cc js
-        this.autocapitalize = 'off';
-        this.autocorrect = 'off';
-        this.autocomplete = 'off';
-        this.spellcheck = false;
-        this.onkeydown = function (e) { handleCCKeyDown(e); }
-        this.focused = false;
-        this.onfocus = function () { this.focused = true; };
-        this.onblur = function () { this.focused = false; };
-        this.value = 'Welcome to Logo!\n';
-        this.selectionStart = this.value.length + 1;
-        this.selectionEnd = this.value.length + 1;
+        this.commandConsole = document.getElementById('cc');
+        this.commandConsole.autocapitalize = 'off';
+        this.commandConsole.autocorrect = 'off';
+        this.commandConsole.autocomplete = 'off';
+        this.commandConsole.spellcheck = false;
+        //this.commandConsole.onkeydown = function (e) { handleCCKeyDown(e); }
+        this.commandConsole.focused = false;
+       // this.commandConsole.onfocus = function () { this.commandConsole.focused = true; };
+      //  this.commandConsole.onblur = function () { this.commandConsole.focused = false; };
+      //  this.commandConsole.value = 'Welcome to Logo!\n';
+      
+        
+        this.commandConsole.selectionStart = this.commandConsole.value.length + 1;
+        this.commandConsole.selectionEnd = this.commandConsole.value.length + 1;
+
         //this.focus();
 
 
-        function handleCCKeyDown(e) {
-            var k = e.keyCode;
-            if (k == 13) {
-                if (e.shiftKey) insertcr(e);
-                else handlecr(e);
-            }
-            if (e.ctrlKey) {
-                //if(e.keyCode==70) {e.preventDefault(); e.stopPropagation(); procs.focus();}
-                if (e.keyCode == 71) { e.preventDefault(); e.stopPropagation(); this.runLine('go'); }
-                if (e.keyCode == 190) { this.insert('stopped!\n'); this.reset([]); }
-            }
-        }
-
-        function handlecr(e) {
-            var pos = this.selectionStart;
-            var t = this.value;
-            var start = t.lastIndexOf('\n', pos - 1), end = t.indexOf('\n', pos);
-            if (end < 0) end = t.length;
-            this.selectionStart = end + 1;
-            if (end != t.length) e.preventDefault();
-            var str = t.substring(start + 1, end);
-            this.runLine(str);
-        }
-
-        function insertcr(e) {
-            e.preventDefault();
-            var pos = this.selectionStart;
-            var t = this.value;
-            var before = t.substring(0, pos);
-            var after = t.substring(pos);
-            this.value = before + '\n' + after;
-            this.selectionStart = pos + 1;
-            this.selectionEnd = pos + 1;
-        }
 
         //comms js
         this.respfcn = undefined;
@@ -131,6 +137,7 @@ export default class Megaclass {
 
 
         function handleFile(file) {
+            var procs = document.getElementById('procs');
             if (file == undefined) return;
             var filename = file.name.split('.')[0];
             if (file.type == 'text/plain') {
@@ -221,27 +228,38 @@ export default class Megaclass {
     }
 
     //turtle js
+    sindeg(x){return Math.sin(x*2*Math.PI/360);}
+    
+    rad(a){return a*2*Math.PI/360;}
+    deg(a){return a*360/(2*Math.PI);}
+    sindeg(x){return Math.sin(x*2*Math.PI/360);}
+    cosdeg(x){return Math.cos(x*2*Math.PI/360);}
     
     //replacing 'setup' for now so it doesn't conflict
     setuptl(){
     //setup(){
-        console.log("turtle setup???")
+        console.log("turtle setup")
+        
         var t = this;
         t.element = document.createElement('div');
         t.element.setAttribute ('class', 'turtle');
-        //cnvframe.appendChild(t.element);
+        var cnvframe = document.getElementById('cnvframe');
+        cnvframe.appendChild(t.element);
         t.img = document.createElement('img');
+        t.img.src = 'turtle.svg';
         t.element.appendChild (t.img);
-        t.img.src = 'this.svg';
         t.img.onload = imgLoaded;
-        //t.ctx = canvas.getContext('2d');
-        //canvas.width = t.cnvWidth*t.dpi;
-        //canvas.height = t.cnvHeight*t.dpi;
-        //t.ctx.scale(t.dpi,t.dpi);
-        //t.ctx.textBaseline="middle"; 
-        t.clean();
+        var canvas = document.getElementById('canvas');
+        t.ctx = canvas.getContext('2d');
+        console.log(t.ctx);
+        canvas.width = t.cnvWidth*t.dpi;
+        canvas.height = t.cnvHeight*t.dpi;
+        t.ctx.scale(t.dpi,t.dpi);
+        t.ctx.textBaseline="middle"; 
+
     
         function imgLoaded(){
+            console.log("imgLoaded");
             t.img.width = t.size;
             t.img.height = t.size;
             t.element.style.width = t.size+'px';
@@ -251,7 +269,47 @@ export default class Megaclass {
     
     }
     
+    //CC moved
     
+    handleCCKeyDown(e) {
+        console.log("handleCCkeydown");
+        var k = e.keyCode;
+        if (k == 13) {
+            console.log("got 13");
+            if (e.shiftKey) this.insertcr(e);
+            else this.handlecr(e);
+        }
+        if (e.ctrlKey) {
+            //if(e.keyCode==70) {e.preventDefault(); e.stopPropagation(); procs.focus();}
+            if (e.keyCode == 71) { e.preventDefault(); e.stopPropagation(); this.runLine('go'); }
+            if (e.keyCode == 190) { this.insert('stopped!\n'); this.reset([]); }
+        }
+    }
+
+    handlecr(e) {
+        console.log("handlecr");
+        var pos = document.getElementById('cc').selectionStart;
+        var t = document.getElementById('cc').value;
+        console.log(t);
+        var start = t.lastIndexOf('\n', pos - 1), end = t.indexOf('\n', pos);
+        if (end < 0) end = t.length;
+        document.getElementById('cc').selectionStart = end + 1;
+        if (end != t.length) e.preventDefault();
+        var str = t.substring(start + 1, end);
+        this.runLine(str);
+    }
+
+    insertcr(e) {
+        console.log("insertcr");
+        e.preventDefault();
+        var pos = document.getElementById('cc').selectionStart;
+        var t = document.getElementById('cc').value;
+        var before = t.substring(0, pos);
+        var after = t.substring(pos);
+        document.getElementById('cc').value = before + '\n' + after;
+        document.getElementById('cc').selectionStart = pos + 1;
+        document.getElementById('cc').selectionEnd = pos + 1;
+    }
     /////////////////////////
     //
     // Turtle
@@ -260,10 +318,17 @@ export default class Megaclass {
     
         
     forward(n){
+
+        console.log("forward: " + n);
         var t = this;
         if(t.pendown){
+            console.log("pendown cond");
+            console.log("t.xcor: " + t.xcor + ", t.cnvWidth: " + t.cnvWidth);
+            console.log((t.xcor+t.cnvWidth/2) + ", " + (t.cnvHeight/2-t.ycor));
             t.ctx.beginPath();
             t.ctx.moveTo(t.xcor+t.cnvWidth/2, t.cnvHeight/2-t.ycor);
+            var ctx = t.ctx
+            
         }
         t.xcor+=n*this.sindeg(t.heading);
         t.ycor+=n*this.cosdeg(t.heading);
@@ -272,11 +337,14 @@ export default class Megaclass {
             if(n>=.1)t.ctx.lineTo(sx,sy);
             else t.ctx.lineTo(sx, sy+.1);
             if(t.pensize!=0) t.ctx.stroke();
+            console.log("second pendown sx/xy: " + sx + ", " + sy);
+            console.log("pensize: " + t.pensize);
             if(t.fillpath) t.fillpath.push(function(){this.ctx.lineTo(sx,sy);});
         }
     }
     
     lineto(x,y){
+        console.log("linto: " + x + ", " + y);
         var t = this;
         if(t.pendown){
             t.ctx.beginPath();
@@ -285,7 +353,9 @@ export default class Megaclass {
         t.xcor = x;
         t.ycor = y;
         if(t.pendown){
+            
             var sx=t.xcor+t.cnvWidth/2, sy=t.cnvHeight/2-t.ycor;
+            console.log("pendown in lineto:" + sx + sy);
             if((x+y)>=.1)t.ctx.lineTo(sx,sy);
             else t.ctx.lineTo(sx, sy+.1);
             if(t.pensize!=0) t.ctx.stroke();
@@ -294,6 +364,7 @@ export default class Megaclass {
     }
     
     setxy(x,y){
+        console.log("setxy: " + x + ", " + y);
         var t = this;
         t.xcor = x;
         t.ycor = y;
@@ -303,7 +374,11 @@ export default class Megaclass {
     
     right(n){this.seth(this.heading+n);}
     left(n){this.seth(this.heading-n);}
-    seth(a){this.heading=a; this.heading=this.heading.mod(360);}
+    seth(a){
+        console.log("seth: " + a);
+        this.heading=a; 
+        this.heading=(this.heading % 360);
+    }
     
     arc(a,r){
         var t = this;
@@ -369,6 +444,7 @@ export default class Megaclass {
     /////////////////////////
     
     fillscreen(c,s){
+        console.log("fillscreen " + c + ", " + s);
         var oldcolor = this.color, oldshade=this.shade;
         if((typeof c)=='object') c = c[0];
         this.setCtxColorShade(c, s);
@@ -448,29 +524,57 @@ export default class Megaclass {
     /////////////////////////
     
     move(){
+        console.log("move");
         var t = this;
         if(!t.img.complete) return;
         var img = t.element.firstChild;
+        console.log(img);
         var dx = screenLeft();
         var dy = screenTop();
-        var s = 10;
+        var s = 1;
         //var s = canvas.offsetHeight/t.cnvHeight*t.zoom;
-        t.element.style.webkitTransform = 'translate('+dx+'px, '+ dy+ 'px) rotate(' + t.heading + 'deg)'+' scale('+s+','+s+')';
+        console.log("dx: " + dx + "px, " + dy + " scale: " + s);
+        t.element.style.webkitTransform = 'translate(' + dx + 'px, '+ dy + 'px) rotate(' + t.heading + 'deg)'+' scale('+s+','+s+')';
         t.element.left = dx; 
         t.element.top = dy; 
     
-        function screenLeft() {return -img.width/2+(t.xcor+t.cnvWidth/2)* 20 ;}
-        function screenTop() {return -img.height/2+(t.cnvHeight/2-t.ycor)* 20 ;}
+        //TODO: This had a * 20 on the end of each return for some reason. The numbers that are hardcoded are a bit confusing, not sure what they're for.
+        //The return 450 and all that was added for troubleshooting.
+
+        //Currently the coordinates 0,0 don't correspond to the center of the canvas.
+
+        
+        function screenLeft() {
+          // return 450
+            return -img.width/2+(t.xcor+t.cnvWidth/2)* 2 ;
+        }
+        function screenTop() {
+          //  return 0
+            return -img.height/2+(t.cnvHeight/2-t.ycor)* 2 ;
+        }
     
     }
     
     clean(){
+
+        //TODO: This makes a dark background, FAFAFA. Not sure why. It shouldn't.
+        //TODO TOO: I commented out a bunch of stuff that was probably important.
+        //The color was set by fillstyle, which is set in setCtxColorShade, and is done through some algorithm I don't know.
+        //So that needs to be analyzed for errors.
+
+
+        console.log("clean");
+        
         var t = this;
-    //	t.xcor=0, t.ycor=0, t.heading=0;
-        t.setCtxColorShade(-9999, 98); // #FAFAFA
+        console.log(t.ctx);
+        this.xcor=0;
+        t.ycor=0;
+        t.heading=0;
+        //t.setCtxColorShade(-9999, 98); // #FAFAFA
         t.ctx.fillRect(0,0,t.cnvWidth,t.cnvHeight);
-        //t.color=0, t.shade=50;
-        t.setCtxColorShade(t.color, t.shade);
+        //t.color=0;
+        //t.shade=50;
+        //t.setCtxColorShade(t.color, t.shade);
         t.pensize = 4;
         t.ctx.lineWidth=t.pensize;
         t.opacity = 1;
@@ -500,6 +604,7 @@ export default class Megaclass {
         img.src = dataurl;
     
         function drawImageToFit(){
+            console.log("drawImageToFit");
         var s = t.cnvWidth/img.naturalWidth;
             ctx.save();
             ctx.scale(s,s);
@@ -549,23 +654,32 @@ export default class Megaclass {
     
     
     setCtxColorShade(color, shade){
+        console.log("setCtxColorShade2: " + color + ", " + shade);
         var t = this;
         setCtxColor(mergeColorShade(color, shade));
     
         function mergeColorShade(color, shade){
-            var sh = Math.abs(shade.mod(200));
+            console.log(shade)
+            var shade = 200;
+            var sh = Math.abs((shade % 200));
+            console.log("sh1: " + sh);
+            //var sh = Math.abs((shade).mod(200));
+
             if(sh>100) sh = 200 - sh;
             if(color==-9999) return blend(0x000000, 0xffffff, sh/100);
             var c = colorFromNumber(color);
+            console.log("c: " + c);
             if(sh==50) return c;
             else if (sh<50) return blend(c, 0x000000, (50-sh)/60);
             else return blend(c, 0xffffff, (sh-50)/53);
         }
     
         function colorFromNumber (c){
-            var mc = c.mod(100);
+            console.log("colorFromNumber");
+            var mc = c % 100;
             var ic = Math.floor(mc);
             var fract = mc - ic;
+            console.log(blend(t.colors[ic], t.colors[ic+1], fract));
             return blend(t.colors[ic], t.colors[ic+1], fract);
         }
     
@@ -579,10 +693,13 @@ export default class Megaclass {
         }
     
         function setCtxColor(c){
+            
+            console.log("setCtxColor1" + c);
             var cc = '#'+(c+0x1000000).toString(16).substring(1);
             t.ctx.strokeStyle = cc;
-        //  console.log ('ctx color:',cc);
+          console.log ('ctx color:',cc);
             t.ctx.fillStyle = cc; 
+            console.log(t.ctx);
         } 
     
     }
@@ -766,7 +883,7 @@ export default class Megaclass {
                 if(this.isDone()) break;
                 this.evalNext();
             }
-         //   this.move();
+            this.move();
         }
         window.requestAnimationFrame(this.ticker);
     }
@@ -1256,21 +1373,28 @@ export default class Megaclass {
 
     //cc js
     insert(str) {
+        //NOTE: I commented out all of the original code that was here.
+        //It is very unclear what the intention was of any of this, but I imagine scrolling is a portion of this.
+        //Rather than try to reason through it, creating a new terminal, following UNIX terminal logic, may be best.
+        //It remains confusing to students when they can edit the terminal commands above the current new line. So, we should make the parts above the current entry uneditable,
+        //and maybe add a '>' or something so they can tell where they're supposed to be.
+
         console.log("insert");
         var cc = document.getElementById("cc");
-        var startpos = this.selectionStart;
-        var endpos = this.selectionEnd;
-        var t = cc.value;
-        var before = t.substring(0, startpos);
-        var after = t.substring(endpos);
-        var oldtop = cc.scrollTop;
-        cc.value = before + str;
-        var halfscroll = this.scrollHeight - this.scrollTop - this.offsetHeight;
-        cc.value = before + str + after;
-        cc.selectionStart = startpos + str.length;
-        this.selectionEnd = startpos + str.length;
-        if (halfscroll > 0) cc.scrollTop += halfscroll;
-        else cc.scrollTop = oldtop;
+        cc.value = cc.value + str;
+       // var startpos = this.selectionStart;
+       // var endpos = this.selectionEnd;
+       // var t = cc.value;
+       // var before = t.substring(0, startpos);
+       // var after = t.substring(endpos);
+       // var oldtop = cc.scrollTop;
+      //  cc.value = before + str;
+      //  var halfscroll = this.scrollHeight - this.scrollTop - this.offsetHeight;
+      //  cc.value = before + str + after;
+      //  cc.selectionStart = startpos + str.length;
+       // this.selectionEnd = startpos + str.length;
+       // if (halfscroll > 0) cc.scrollTop += halfscroll;
+       // else cc.scrollTop = oldtop;
     }
 
     runLine(str) {

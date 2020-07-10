@@ -28,6 +28,7 @@ class App extends Component {
 
   componentDidMount(){
     megaclass = new Megaclass();
+    megaclass.setuptl();
     megaclass.setup();
 
     
@@ -120,28 +121,25 @@ class App extends Component {
 
   handleTerminalEntry(e){
     if(e && e.keyCode === 13){
-      var terminalAllContent = document.getElementById("terminalTextbox").value.split('\n').reverse();
+      var terminalAllContent = document.getElementById("cc").value.split('\n').reverse();
       var terminalLastLine = terminalAllContent[0];
       this.interpretAndSend(terminalLastLine);
-      //TODO: get the entered line and submit to interpreter
+
     }
   }
 
-  //Here's what we removed while trying to get Brian's BS to work
+
 
   render() {
     return (
     <div>
       <header className="header">
-      <h1>LbyM: Web Serial</h1>
+      <h1>Learning by Making</h1>
     </header>
     <div className="main">      <br />
-    <p>Click 'connect' to start, then select the Arduino device. After that you can use the below buttons, or enter commands in the terminal (bottom right).
-      <br /><br />
-      This'll get some sort of menu at the top. The buttons might go away, but should be replaced with hints on how to get started. A button should be added for the code entry area to 'run'. 
-      Run will come pre-defined as a boilerplate.
-      <br /><br />
-      As of this writing the interpreter will control LEDs and read ADCs. LOGO logic has not been implemented.
+    <p>Click 'connect' to start, then select the Arduino device. After that you can use the below buttons, or enter commands in the terminal (bottom right). Defining a 'go' word allows you to run
+      things by clicking 'go'. Note that this only works in Chrome.
+      <br />
     </p>
       <button id="connectButton" type="button" >Connect</button>
       <button id="readADC" type="button" onClick={() => { this.sendToBoard(0xc0) }}>Read ADC0</button>
@@ -161,7 +159,7 @@ end`}></textarea></div>
           <canvas className="cnv" id="canvas"></canvas>
         </div>
         <div className = "terminal">
-          <textarea id="cc" ></textarea>
+          <textarea id="cc" onKeyDown={(e) => megaclass.handleCCKeyDown(e)} ></textarea>
         </div>
       </div>
     </div>
