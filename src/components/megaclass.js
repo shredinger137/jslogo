@@ -1,10 +1,19 @@
+import TurtleLogo from './turtlelogo';
+
+
+const turtleLogo = new TurtleLogo;
+console.log(turtleLogo.sindeg);
+
+
+Number.prototype.mod = function(n) {return ((this%n)+n)%n;}
+
+
 var constants = {
 	black: '-9999&0', white: '-9999&100', red: '0&50',  green: '30&50', blue: '70&50',
 	cyan: '50&50', magenta: '90&50', yellow: '20&50', orange: '14&50'
 } 
 var port;
 var reader;
-//var outputStream;
 var flushtime = 200;
 var hold = false;
 
@@ -21,7 +30,7 @@ export default class Megaclass {
 
         //turtle
         this.datapoints = [];
-        this.cnvWidth = 700;
+        this.cnvWidth = 600;
         this.cnvHeight = 220;
        // this.img;
         //this.ctx = document.getElementById('canvas');
@@ -30,7 +39,8 @@ export default class Megaclass {
         //this.element;
         this.heading = 0;
         this.color = 0;
-        this.shade = 50;
+        //shade started off at 50 in the previous version. Unclear on why. Zero works a lot better, 50 kept giving us red.
+        this.shade = 0;
         this.opacity = 1;
         this.pendown = true;
         this.pensize = 1;
@@ -124,6 +134,8 @@ export default class Megaclass {
         //window.addEventListener('resize', resize);
         //cnvframe.addEventListener('click', paneToggle);
         //setTimeout(resize, 100);
+
+        
 
         function load() {
             // this.focus();
@@ -228,11 +240,10 @@ export default class Megaclass {
     }
 
     //turtle js
-    sindeg(x){return Math.sin(x*2*Math.PI/360);}
-    
+
     rad(a){return a*2*Math.PI/360;}
     deg(a){return a*360/(2*Math.PI);}
-    sindeg(x){return Math.sin(x*2*Math.PI/360);}
+
     cosdeg(x){return Math.cos(x*2*Math.PI/360);}
     
     //replacing 'setup' for now so it doesn't conflict
@@ -241,16 +252,16 @@ export default class Megaclass {
         console.log("turtle setup")
         
         var t = this;
-        t.element = document.createElement('div');
-        t.element.setAttribute ('class', 'turtle');
+        this.element = document.createElement('div');
+        this.element.setAttribute ('class', 'turtle');
         var cnvframe = document.getElementById('cnvframe');
         cnvframe.appendChild(t.element);
-        t.img = document.createElement('img');
-        t.img.src = 'turtle.svg';
-        t.element.appendChild (t.img);
-        t.img.onload = imgLoaded;
+        this.img = document.createElement('img');
+        this.img.src = 'turtle.svg';
+        this.element.appendChild (t.img);
+        this.img.onload = imgLoaded;
         var canvas = document.getElementById('canvas');
-        t.ctx = canvas.getContext('2d');
+        this.ctx = canvas.getContext('2d');
         console.log(t.ctx);
         canvas.width = t.cnvWidth*t.dpi;
         canvas.height = t.cnvHeight*t.dpi;
@@ -330,7 +341,7 @@ export default class Megaclass {
             var ctx = t.ctx
             
         }
-        t.xcor+=n*this.sindeg(t.heading);
+        t.xcor+=n*turtleLogo.sindeg(t.heading);
         t.ycor+=n*this.cosdeg(t.heading);
         if(t.pendown){
             var sx=t.xcor+t.cnvWidth/2, sy=t.cnvHeight/2-t.ycor;
@@ -391,7 +402,7 @@ export default class Megaclass {
             var sgn = r/Math.abs(r);
             var ar = Math.abs(r);
             var dx = ar*this.cosdeg(t.heading);
-            var dy = ar*this.sindeg(t.heading);
+            var dy = ar*turtleLogo.sindeg(t.heading);
             var cx = t.xcor+dx;
             var cy = t.ycor-dy;
             if(t.pendown){
@@ -407,14 +418,14 @@ export default class Megaclass {
             }
             t.seth(t.heading+a*sgn);
             t.xcor = cx-ar*this.cosdeg(t.heading);
-            t.ycor = cy+ar*this.sindeg(t.heading);
+            t.ycor = cy+ar*turtleLogo.sindeg(t.heading);
         } 
     
         function leftArc(a,r){
             var sgn = r/Math.abs(r);
             var ar = Math.abs(r);
             var dx = ar*this.cosdeg(t.heading);
-            var dy = ar*this.sindeg(t.heading);
+            var dy = ar*turtleLogo.sindeg(t.heading);
             var cx = t.xcor-dx;
             var cy = t.ycor+dy;
             if(t.pendown){
@@ -430,7 +441,7 @@ export default class Megaclass {
             }
             t.seth(t.heading+a*sgn);
             t.xcor = cx+ar*this.cosdeg(t.heading);
-            t.ycor = cy-ar*this.sindeg(t.heading);
+            t.ycor = cy-ar*turtleLogo.sindeg(t.heading);
         }
     }
     
@@ -453,6 +464,8 @@ export default class Megaclass {
     }
     
     setcolor(c){
+        console.log("setcolor");
+        console.log(c);
         if((typeof c)=='object'){this.color = c[0]; this.shade = c[1];}
         else this.color = c;
         this.setCtxColorShade(this.color, this.shade);
@@ -557,25 +570,20 @@ export default class Megaclass {
     
     clean(){
 
-        //TODO: This makes a dark background, FAFAFA. Not sure why. It shouldn't.
-        //TODO TOO: I commented out a bunch of stuff that was probably important.
-        //The color was set by fillstyle, which is set in setCtxColorShade, and is done through some algorithm I don't know.
-        //So that needs to be analyzed for errors.
-
 
         console.log("clean");
-        
+
         var t = this;
         console.log(t.ctx);
         this.xcor=0;
         t.ycor=0;
         t.heading=0;
-        //t.setCtxColorShade(-9999, 98); // #FAFAFA
+        t.setCtxColorShade(-9999, 98); // #FAFAFA
         t.ctx.fillRect(0,0,t.cnvWidth,t.cnvHeight);
-        //t.color=0;
-        //t.shade=50;
-        //t.setCtxColorShade(t.color, t.shade);
-        t.pensize = 4;
+        t.color=0;
+        t.shade=0;
+        t.setCtxColorShade(t.color, t.shade);
+        t.pensize = 1;
         t.ctx.lineWidth=t.pensize;
         t.opacity = 1;
         t.pendown = true;
@@ -588,6 +596,7 @@ export default class Megaclass {
         t.ctx.textAlign = 'center';
         t.ctx.setLineDash([]);	
         t.showTurtle();
+        console.log(t.color + ":" + t.shade);
     }
     
     /////////////////////////
@@ -654,32 +663,23 @@ export default class Megaclass {
     
     
     setCtxColorShade(color, shade){
-        console.log("setCtxColorShade2: " + color + ", " + shade);
         var t = this;
         setCtxColor(mergeColorShade(color, shade));
     
         function mergeColorShade(color, shade){
-            console.log(shade)
-            var shade = 200;
-            var sh = Math.abs((shade % 200));
-            console.log("sh1: " + sh);
-            //var sh = Math.abs((shade).mod(200));
-
+            var sh = Math.abs(shade.mod(200));
             if(sh>100) sh = 200 - sh;
             if(color==-9999) return blend(0x000000, 0xffffff, sh/100);
             var c = colorFromNumber(color);
-            console.log("c: " + c);
             if(sh==50) return c;
             else if (sh<50) return blend(c, 0x000000, (50-sh)/60);
             else return blend(c, 0xffffff, (sh-50)/53);
         }
     
         function colorFromNumber (c){
-            console.log("colorFromNumber");
-            var mc = c % 100;
+            var mc = c.mod(100);
             var ic = Math.floor(mc);
             var fract = mc - ic;
-            console.log(blend(t.colors[ic], t.colors[ic+1], fract));
             return blend(t.colors[ic], t.colors[ic+1], fract);
         }
     
@@ -693,13 +693,10 @@ export default class Megaclass {
         }
     
         function setCtxColor(c){
-            
-            console.log("setCtxColor1" + c);
             var cc = '#'+(c+0x1000000).toString(16).substring(1);
             t.ctx.strokeStyle = cc;
-          console.log ('ctx color:',cc);
+        //  console.log ('ctx color:',cc);
             t.ctx.fillStyle = cc; 
-            console.log(t.ctx);
         } 
     
     }
@@ -1368,6 +1365,7 @@ export default class Megaclass {
             if (req.status != 200) return;
             this.procString(req.responseText, 'startup');
             if (prims['startup']) this.runLine('startup');
+            console.log("read startup");
         }
     }
 
@@ -1493,7 +1491,7 @@ export default class Megaclass {
             while (true) {
                 const { value, done } = await reader.read();
                 if (value) {
-                    onrecc(value);
+                    handleReceiveData(value);
                     if (value[1] != 0) {
                         var newValue = value[0] + 256 * value[1]
                     } else {
@@ -1510,10 +1508,10 @@ export default class Megaclass {
         }
 
 
-        function onrecc(r) {
-            var l = Array.from(new Uint8Array(r));
-            for (var i in l) {
-                gotChar(l[i]);
+        function handleReceiveData(receivedValue) {
+            var value = Array.from(new Uint8Array(receivedValue));
+            for (var i in value) {
+                gotChar(value[i]);
             }
         }
 
@@ -1531,11 +1529,6 @@ export default class Megaclass {
         }
 
         //turtle, outside of class
-
-        function rad(a){return a*2*Math.PI/360;}
-        function deg(a){return a*360/(2*Math.PI);}
-        function sindeg(x){return Math.sin(x*2*Math.PI/360);}
-        function cosdeg(x){return Math.cos(x*2*Math.PI/360);}
 
     }
 
@@ -1567,7 +1560,7 @@ prims['remainder'] = {nargs: 2, fcn: function(a,b){return this.getnum(a).mod(thi
 prims['round'] = {nargs: 1, fcn: function(a){return Math.round(this.getnum(a));}}
 prims['int'] = {nargs: 1, fcn: function(a){return Math.floor(this.getnum(a));}}
 prims['minus'] = {nargs: 1, fcn: function(a){return -a;}}
-prims['sin'] = {nargs: 1, fcn: function(a){return  this.sindeg(this.getnum(a));}}
+prims['sin'] = {nargs: 1, fcn: function(a){return  turtleLogo.sindeg(this.getnum(a));}}
 prims['cos'] = {nargs: 1, fcn: function(a){return  this.cosdeg(this.getnum(a));}}
 prims['sqrt'] = {nargs: 1, fcn: function(a){return Math.sqrt(this.getnum(a));}}
 prims['random2'] = {nargs: 2, fcn: function(a,b){return  this.random.pickRandom(a,b);}}

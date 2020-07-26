@@ -18,17 +18,20 @@
 
 .chartArea {
     grid-area: chartArea;
+    border-style: solid; 
 }
 
 .interfaceGrid {
-    height: 70vh;
+    max-width: 98vw;
+    margin: 0 auto;
+    height: 75vh;
     display: grid;
-    grid-gap: 5px;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-gap: 0px;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
     grid-template-areas:
-        "codeEntry chartArea chartArea"
-        "codeEntry  chartArea  chartArea"
-        "codeEntry  terminal    terminal";
+        "codeEntry chartArea chartArea chartArea"
+        "codeEntry  chartArea  chartArea chartArea"
+        "codeEntry  terminal    terminal terminal";
         background-color: #fff;
         color: #444;
 }
