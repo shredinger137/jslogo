@@ -38,7 +38,7 @@ class App extends Component {
     this.interpretAndSend = this.interpretAndSend.bind(this);
 
     const connectButton = document.getElementById('connectButton');
-    connectButton.addEventListener('click', megaclass.openSerialPort);
+    connectButton.addEventListener('click', megaclass.openSerialPort.bind(megaclass));
     this.testProcRead("5 + 3");
     
   }

@@ -1410,6 +1410,7 @@ export default class Megaclass {
 
 
     readsensor(n) {
+        console.log("readSensor");
         this.hold = true;
         this.adread(n, this.gotsensor);
     }
@@ -1473,6 +1474,8 @@ export default class Megaclass {
         writer.write(message);
         writer.releaseLock();
 
+        
+
     }
 
 
@@ -1490,57 +1493,62 @@ export default class Megaclass {
 
 
     async openSerialPort() {
-        var t = this;
         port = await navigator.serial.requestPort();
         await port.open({ baudrate: 115200 });
         reader = port.readable.getReader();
         outputStream = port.writable;
-        startReading();
-
-        async function startReading() {
-            while (true) {
-                const { value, done } = await reader.read();
-                if (value) {
-                    handleReceiveData(value);
-                    if (value[1] != 0) {
-                        var newValue = value[0] + 256 * value[1]
-                    } else {
-                        var newValue = value[0];
-                    }
-
-                }
-                if (done) {
-                    reader.releaseLock();
-                    break;
-                }
-            }
-
-        }
-
-
-        function handleReceiveData(receivedValue) {
-            var value = Array.from(new Uint8Array(receivedValue));
-            for (var i in value) {
-                gotChar(value[i]).bind(this);
-            }
-        }
-
-        function gotChar(c) {
-            if (this.respCount == 0) return;
-            else {
-                this.resp.push(c);
-                if (this.respCount > t.resp.length) return;
-                if (this.respfcn) {
-                    this.respfcn(t.resp);
-                    this.respCount = 0;
-                    this.resp = [];
-                }
-            }
-        }
-
-        //turtle, outside of class
-
+        console.log(this);
+        this.startReading();
     }
+
+
+   async startReading() {
+    console.log(this);
+    while (true) {
+        const { value, done } = await reader.read();
+        if (value) {
+            this.handleReceiveData(value);
+            if (value[1] != 0) {
+                var newValue = value[0] + 256 * value[1]
+            } else {
+                var newValue = value[0];
+            }
+            this.lprint(newValue); //This is temporary. Current version does't handle variable values correctly, so we're just outputting for the sake of demo.
+        }
+        if (done) {
+            reader.releaseLock();
+            break;
+        }
+    }
+
+}
+
+
+handleReceiveData(receivedValue) {
+    var value = Array.from(new Uint8Array(receivedValue));
+    for (var i in value) {
+        this.gotChar(value[i]);
+    }
+}
+
+
+
+gotChar(c) {
+    console.log("gotChar");
+    console.log(this.resp);
+    // return;
+    if (this.respCount == 0) return;
+    else {
+        console.log("gotChar conditional");
+        this.resp.push(c);
+        if (this.respCount > this.resp.length) return;
+        if (this.respfcn) {
+            this.respfcn(this.resp);
+            this.respCount = 0;
+            this.resp = [];
+        }
+    }
+}
 
 
 }
