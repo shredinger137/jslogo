@@ -94,7 +94,7 @@ export default class Megaclass {
         this.priority = 0;
         this.stack = [];
         this.frame = [];
-        this.locals = [{}];
+        this.locals = [{test: 5}];
         this.hold = false;
         this.timeout = undefined;
         this.clockspeed = 1;
@@ -933,8 +933,12 @@ export default class Megaclass {
         this.priority = 0;
         this.stack = [];
         this.frame = [];
-        this.locals = this.last(this.locals);
-        hold = false;
+       
+        //TODO: uncommment this maybe? I don't know what it does, or why
+        //but it broke make
+       // this.locals = this.last(this.locals);
+        
+       hold = false;
         if (this.timeout != undefined) clearTimeout(this.timeout);
         this.timeout = undefined;
     }
@@ -1059,17 +1063,24 @@ export default class Megaclass {
     }
 
     setValue(name, value) {
+        console.log(this);
+        console.log(this.locals);
+        console.log("setValue " + name + " " + value);
         var t = this;
         for (var i in t.locals) {
             if (t.locals[i][name] != undefined) {
                 t.locals[i][name] = value;
+                console.log("conditional in setValue");
+                console.log(t.locals);
                 return;
             }
         }
         t.locals[t.locals.length - 1][name] = value;
+        console.log(t.locals);
+        console.log("Outside of conditional in setValue");
     }
 
-    makeLocal(name) { this.locals[0][name] = 0; }
+    makeLocal(name) { this.locals[0][name] = 0; console.log("makeLocal");}
 
     procOutput(t, x) {
         if (t.frame.length == 0) {
@@ -1691,7 +1702,7 @@ prims['scale'] = { nargs: 2, fcn: function (n, l) { return this.scale(this.getnu
 prims['true'] = { nargs: 0, fcn: function () { return true; } }
 prims['false'] = { nargs: 0, fcn: function () { return false; } }
 
-prims['make'] = { nargs: 2, fcn: function (a, b) { this.setValue(a, b); } }
+prims['make'] = { nargs: 2, fcn: function (a, b) { this.setValue(a, b); console.log("prim make");} }
 prims['local'] = { nargs: 1, fcn: function (a, b) { this.makeLocal(a); } }
 prims['openport'] = { nargs: 0, fcn: function () { this.openSerialPort(); } }
 
