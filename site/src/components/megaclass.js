@@ -24,6 +24,7 @@ export default class Megaclass {
 
 
     constructor(s) {
+        this.allReceivedData = [0];
         this.ticker = this.ticker.bind(this);
         this.isDone = this.isDone.bind(this);
         this.parse = this.parse.bind(this);
@@ -94,7 +95,7 @@ export default class Megaclass {
         this.priority = 0;
         this.stack = [];
         this.frame = [];
-        this.locals = [{test: 5}];
+        this.locals = [{ test: 5 }];
         this.hold = false;
         this.timeout = undefined;
         this.clockspeed = 1;
@@ -933,12 +934,12 @@ export default class Megaclass {
         this.priority = 0;
         this.stack = [];
         this.frame = [];
-       
+
         //TODO: uncommment this maybe? I don't know what it does, or why
         //but it broke make
-       // this.locals = this.last(this.locals);
-        
-       hold = false;
+        // this.locals = this.last(this.locals);
+
+        hold = false;
         if (this.timeout != undefined) clearTimeout(this.timeout);
         this.timeout = undefined;
     }
@@ -1080,7 +1081,7 @@ export default class Megaclass {
         console.log("Outside of conditional in setValue");
     }
 
-    makeLocal(name) { this.locals[0][name] = 0; console.log("makeLocal");}
+    makeLocal(name) { this.locals[0][name] = 0; console.log("makeLocal"); }
 
     procOutput(t, x) {
         if (t.frame.length == 0) {
@@ -1419,6 +1420,32 @@ export default class Megaclass {
 
     //comms js
 
+    //TODO: New sensor read function. Still needs to pull the data.
+
+    readFromPin(n) {
+
+        //TODO: Because this reads the values list before it updates, the respose
+        //will always be off by one. SetTimeOut didn't work so well last time. Async
+        //functions might work here with that, but unclear at this time.
+       
+        this.hold = true;
+        var startingResponseCount = this.allReceivedData.length;
+        // this.respfcn = fcn;
+        this.resp = [];
+        this.respCount = n;
+        var globalThis = this;
+
+        var sendMessage = [0xc0 + n];
+        var message = new Uint8Array([sendMessage])
+        const writer = outputStream.getWriter();
+        writer.write(message);
+        writer.releaseLock();
+        this.hold = false;
+        var reversedData = this.allReceivedData.reverse();
+        console.log(reversedData[0]);
+        return reversedData[0];    
+
+    }
 
     readsensor(n) {
         console.log("readSensor");
@@ -1467,7 +1494,7 @@ export default class Megaclass {
     led_on() { this.sendl([0xef]); }
     led_off() { this.sendl([0xdf]); }
 
-    adread(n, fcn) { this.sendReceive([0xc0 + n], 2, fcn); }
+    adread(n, fcn) { return this.sendReceive([0xc0 + n], 2, fcn); }
     dread(n, fcn) { this.sendReceive([0xc0 + n], 1, fcn); }
 
     redraw(l) { this.sendl([].concat(0xb0, l)); }
@@ -1477,6 +1504,7 @@ export default class Megaclass {
     twobytes(n) { return [n & 0xff, (n >> 8) & 0xff]; }
 
     sendReceive(sendMessage, n, fcn) {
+        console.log("running sendReceive");
         this.respfcn = fcn;
         this.resp = [];
         this.respCount = n;
@@ -1485,7 +1513,7 @@ export default class Megaclass {
         writer.write(message);
         writer.releaseLock();
 
-        
+        //TODO: Needs code to get the next read values from the stream and return it        
 
     }
 
@@ -1513,53 +1541,56 @@ export default class Megaclass {
     }
 
 
-   async startReading() {
-    console.log(this);
-    while (true) {
-        const { value, done } = await reader.read();
-        if (value) {
-            this.handleReceiveData(value);
-            if (value[1] != 0) {
-                var newValue = value[0] + 256 * value[1]
-            } else {
-                var newValue = value[0];
+    async startReading() {
+        console.log(this);
+        while (true) {
+            const { value, done } = await reader.read();
+            if (value) {
+                console.log("got response from device");
+                this.handleReceiveData(value);
+                if (value[1] != 0) {
+                    var newValue = value[0] + 256 * value[1]
+                } else {
+                    var newValue = value[0];
+                }
+                //this.lprint(newValue); //This is temporary. In the current form reading a sensor doesn't return, so it doesn't get used as a value. TODO.
+                this.allReceivedData.push(newValue);
+                
             }
-            this.lprint(newValue); //This is temporary. Current version does't handle variable values correctly, so we're just outputting for the sake of demo.
+            if (done) {
+                reader.releaseLock();
+                break;
+            }
         }
-        if (done) {
-            reader.releaseLock();
-            break;
-        }
+
     }
 
-}
 
-
-handleReceiveData(receivedValue) {
-    var value = Array.from(new Uint8Array(receivedValue));
-    for (var i in value) {
-        this.gotChar(value[i]);
-    }
-}
-
-
-
-gotChar(c) {
-    console.log("gotChar");
-    console.log(this.resp);
-    // return;
-    if (this.respCount == 0) return;
-    else {
-        console.log("gotChar conditional");
-        this.resp.push(c);
-        if (this.respCount > this.resp.length) return;
-        if (this.respfcn) {
-            this.respfcn(this.resp);
-            this.respCount = 0;
-            this.resp = [];
+    handleReceiveData(receivedValue) {
+        var value = Array.from(new Uint8Array(receivedValue));
+        for (var i in value) {
+            this.gotChar(value[i]);
         }
     }
-}
+
+
+
+    gotChar(c) {
+        console.log("gotChar");
+        console.log(this.resp);
+        // return;
+        if (this.respCount == 0) return;
+        else {
+            console.log("gotChar conditional");
+            this.resp.push(c);
+            if (this.respCount > this.resp.length) return;
+            if (this.respfcn) {
+                this.respfcn(this.resp);
+                this.respCount = 0;
+                this.resp = [];
+            }
+        }
+    }
 
 
 }
@@ -1702,7 +1733,7 @@ prims['scale'] = { nargs: 2, fcn: function (n, l) { return this.scale(this.getnu
 prims['true'] = { nargs: 0, fcn: function () { return true; } }
 prims['false'] = { nargs: 0, fcn: function () { return false; } }
 
-prims['make'] = { nargs: 2, fcn: function (a, b) { this.setValue(a, b); console.log("prim make");} }
+prims['make'] = { nargs: 2, fcn: function (a, b) { this.setValue(a, b); console.log("prim make"); } }
 prims['local'] = { nargs: 1, fcn: function (a, b) { this.makeLocal(a); } }
 prims['openport'] = { nargs: 0, fcn: function () { this.openSerialPort(); } }
 
@@ -1726,6 +1757,7 @@ prims['sensor2'] = { nargs: 0, fcn: function () { this.readsensor(2); return thi
 prims['sensor3'] = { nargs: 0, fcn: function () { this.readsensor(3); return this.cfun; } }
 prims['sensor4'] = { nargs: 0, fcn: function () { this.readsensor(4); return this.cfun; } }
 prims['sensor5'] = { nargs: 0, fcn: function () { this.readsensor(5); return this.cfun; } }
+prims['read0'] = { nargs: 0, fcn: function () { return this.readFromPin(0); } }
 
 prims['connected8'] = { nargs: 0, fcn: function () { this.readpin(8); return this.cfun; } }
 prims['connected9'] = { nargs: 0, fcn: function () { this.readpin(9); return this.cfun; } }

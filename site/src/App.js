@@ -137,8 +137,8 @@ class App extends Component {
       <h1>Learning by Making</h1>
     </header>
     <div className="main">
-    <p>Click 'connect' to start, then select the Arduino device. After that you can use the below buttons, or enter commands in the terminal (bottom right). Defining a 'go' word allows you to run
-      things by clicking 'go'. Note that this only works in Chrome.
+    <p>Click 'connect' to start, then select the Arduino device. Defining a 'go' word allows you to run
+      things by clicking 'go', or you can use the terminal at the bottom. The only input that works is read0 on ADC0, and in its current form it will always be off by one reading. Note that this only works in Chrome.
       <br />
     </p>
       <button id="connectButton" type="button" >Connect</button>
