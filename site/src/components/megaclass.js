@@ -1313,7 +1313,7 @@ export default class Megaclass {
         console.log("mwait: " + n);
         if (n <= 0) return;
         console.log("mwait continued");
-        hold = true;
+        this.hold = true;
         this.timeout = setTimeout(function () { this.timeout = undefined; hold = false; console.log("timeout"); }, n);
     }
 
