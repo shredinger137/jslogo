@@ -1762,6 +1762,8 @@ prims['openport'] = { nargs: 0, fcn: function () { this.openSerialPort(); } }
 prims['ledon'] = { nargs: 0, fcn: function () { this.led_on(); this.mwait(1); } }
 prims['ledoff'] = { nargs: 0, fcn: function () { this.led_off(); this.mwait(1); } }
 
+prims['dp2on'] = { nargs: 0, fcn: function () { this.pin_on(2); this.mwait(1); } }
+prims['dp2off'] = { nargs: 0, fcn: function () { this.pin_off(2); this.mwait(1); } }
 prims['dp3on'] = { nargs: 0, fcn: function () { this.pin_on(3); this.mwait(1); } }
 prims['dp3off'] = { nargs: 0, fcn: function () { this.pin_off(3); this.mwait(1); } }
 prims['dp4on'] = { nargs: 0, fcn: function () { this.pin_on(4); this.mwait(1); } }
