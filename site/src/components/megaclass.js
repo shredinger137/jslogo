@@ -879,7 +879,7 @@ export default class Megaclass {
         if (!this.isDone()) {
             var end = this.now() + flushtime;
             while (this.now() < end) {
-                if (hold) break;
+                if (this.hold) break;
                 if (this.isDone()) break;
                 this.evalNext();
             }
@@ -1567,6 +1567,7 @@ export default class Megaclass {
 
 
     handleReceiveData(receivedValue) {
+        console.log("handleReceiveData");
         var value = Array.from(new Uint8Array(receivedValue));
         for (var i in value) {
             this.gotChar(value[i]);
@@ -1751,13 +1752,12 @@ prims['dp6off'] = { nargs: 0, fcn: function () { this.pin_off(6); this.mwait(1);
 prims['dp7on'] = { nargs: 0, fcn: function () { this.pin_on(7); this.mwait(1); } }
 prims['dp7off'] = { nargs: 0, fcn: function () { this.pin_off(7); this.mwait(1); } }
 
-prims['sensor0'] = { nargs: 0, fcn: function () { this.readsensor(0); return this.cfun; } }
-prims['sensor1'] = { nargs: 0, fcn: function () { this.readsensor(1); return this.cfun; } }
-prims['sensor2'] = { nargs: 0, fcn: function () { this.readsensor(2); return this.cfun; } }
-prims['sensor3'] = { nargs: 0, fcn: function () { this.readsensor(3); return this.cfun; } }
-prims['sensor4'] = { nargs: 0, fcn: function () { this.readsensor(4); return this.cfun; } }
-prims['sensor5'] = { nargs: 0, fcn: function () { this.readsensor(5); return this.cfun; } }
-prims['read0'] = { nargs: 0, fcn: function () { return this.readFromPin(0); } }
+prims['read0'] = { nargs: 0, fcn: function () { this.readsensor(0); return this.cfun; } }
+prims['read1'] = { nargs: 0, fcn: function () { this.readsensor(1); return this.cfun; } }
+prims['read2'] = { nargs: 0, fcn: function () { this.readsensor(2); return this.cfun; } }
+prims['read3'] = { nargs: 0, fcn: function () { this.readsensor(3); return this.cfun; } }
+prims['read4'] = { nargs: 0, fcn: function () { this.readsensor(4); return this.cfun; } }
+prims['read5'] = { nargs: 0, fcn: function () { this.readsensor(5); return this.cfun; } }
 
 prims['connected8'] = { nargs: 0, fcn: function () { this.readpin(8); return this.cfun; } }
 prims['connected9'] = { nargs: 0, fcn: function () { this.readpin(9); return this.cfun; } }

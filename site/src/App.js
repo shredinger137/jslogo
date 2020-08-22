@@ -138,7 +138,7 @@ class App extends Component {
     </header>
     <div className="main">
     <p>Click 'connect' to start, then select the Arduino device. Defining a 'go' word allows you to run
-      things by clicking 'go', or you can use the terminal at the bottom. The only input that works is read0 on ADC0, and in its current form it will always be off by one reading. Note that this only works in Chrome.
+      things by clicking 'go', or you can use the terminal at the bottom. Use dp3on to turn on pin 3, read0 to read the sensor on A0. Requires Chrome.
       <br />
     </p>
       <button id="connectButton" type="button" >Connect</button>
