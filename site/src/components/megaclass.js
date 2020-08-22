@@ -1314,7 +1314,7 @@ export default class Megaclass {
         if (n <= 0) return;
         console.log("mwait continued");
         this.hold = true;
-        this.timeout = setTimeout(function () { this.timeout = undefined; hold = false; console.log("timeout"); }, n);
+        this.timeout = setTimeout(function () { this.timeout = undefined; this.hold = false; console.log("timeout"); }, n);
     }
 
     printstr(x) {
