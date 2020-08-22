@@ -1427,7 +1427,7 @@ export default class Megaclass {
         //TODO: Because this reads the values list before it updates, the respose
         //will always be off by one. SetTimeOut didn't work so well last time. Async
         //functions might work here with that, but unclear at this time.
-       
+
         this.hold = true;
         var startingResponseCount = this.allReceivedData.length;
         // this.respfcn = fcn;
@@ -1443,7 +1443,7 @@ export default class Megaclass {
         this.hold = false;
         var reversedData = this.allReceivedData.reverse();
         console.log(reversedData[0]);
-        return reversedData[0];    
+        return reversedData[0];
 
     }
 
@@ -1530,14 +1530,35 @@ export default class Megaclass {
         } else { console.log("outputStream false"); }
     }
 
+//TODO: There's no error handling for disconnect/reconnect events. This assumes everything works perfectly.
+//Add a state to track if the connection is live. 
 
     async openSerialPort() {
         port = await navigator.serial.requestPort();
         await port.open({ baudrate: 115200 });
         reader = port.readable.getReader();
         outputStream = port.writable;
-        console.log(this);
+        document.getElementById("connectButton").style.display = "none";
+        document.getElementById("disconnectButton").style.display = "inline-block";
         this.startReading();
+    }
+
+    async disconnectSerialPort() {
+        if (port) {
+            if (reader) {
+                await reader.cancel();
+                reader = null;
+            }
+            if (outputStream) {
+                await outputStream.getWriter().close();
+                outputStream = null;
+            }
+            await port.close();
+            port = null;
+            document.getElementById("connectButton").style.display = "inline-block";
+            document.getElementById("disconnectButton").style.display = "none";
+        } else {console.log("no port");}
+
     }
 
 
@@ -1555,7 +1576,7 @@ export default class Megaclass {
                 }
                 //this.lprint(newValue); //This is temporary. In the current form reading a sensor doesn't return, so it doesn't get used as a value. TODO.
                 this.allReceivedData.push(newValue);
-                
+
             }
             if (done) {
                 reader.releaseLock();

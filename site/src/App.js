@@ -39,7 +39,9 @@ class App extends Component {
 
     const connectButton = document.getElementById('connectButton');
     connectButton.addEventListener('click', megaclass.openSerialPort.bind(megaclass));
-    this.testProcRead("5 + 3");
+
+    const disconnectButton = document.getElementById('disconnectButton');
+    disconnectButton.addEventListener('click', megaclass.disconnectSerialPort.bind(megaclass));
     
   }
 
@@ -142,6 +144,7 @@ class App extends Component {
       <br />
     </p>
       <button id="connectButton" type="button" >Connect</button>
+      <button id="disconnectButton" type="button" style={{display: "none"}}>Disconnect</button>
       <button id="gobutton" onClick={() => {megaclass.runLine("go")}}>Go</button>
       <br />
       <br />
