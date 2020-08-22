@@ -879,6 +879,7 @@ export default class Megaclass {
         if (!this.isDone()) {
             var end = this.now() + flushtime;
             while (this.now() < end) {
+                if(this.hold){console.log("hold true");}
                 if (this.hold) break;
                 if (this.isDone()) break;
                 this.evalNext();
@@ -1314,7 +1315,7 @@ export default class Megaclass {
         if (n <= 0) return;
         console.log("mwait continued");
         this.hold = true;
-        this.timeout = setTimeout(function () { this.timeout = undefined; this.hold = false; console.log("timeout"); }, n);
+        this.timeout = setTimeout(function () { this.timeout = undefined; this.hold = false; console.log("timeout"); }.bind(this), n);
     }
 
     printstr(x) {
