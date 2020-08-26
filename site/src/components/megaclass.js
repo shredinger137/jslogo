@@ -1,9 +1,9 @@
+/* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off" */
+
 import TurtleLogo from './turtlelogo';
 
 
-const turtleLogo = new TurtleLogo;
-console.log(turtleLogo.sindeg);
-
+const turtleLogo = new TurtleLogo();
 
 Number.prototype.mod = function (n) { return ((this % n) + n) % n; }
 
@@ -15,7 +15,6 @@ var constants = {
 var port;
 var reader;
 var flushtime = 200;
-var hold = false;
 var outputStream;
 
 
@@ -155,13 +154,13 @@ export default class Megaclass {
             if (file == undefined) return;
             var filename = file.name.split('.')[0];
             if (file.type == 'text/plain') {
-                var reader = new FileReader();
-                reader.onload = readprocs;
-                reader.readAsText(file);
+                var fileReader = new FileReader();
+                fileReader.onload = readprocs;
+                fileReader.readAsText(file);
             } else if (file.type == 'image/png') {
-                var reader = new FileReader();
-                reader.onload = readimage;
-                reader.readAsDataURL(file);
+                var fileReader = new FileReader();
+                fileReader.onload = readimage;
+                fileReader.readAsDataURL(file);
             }
 
             function readprocs() {
@@ -251,8 +250,6 @@ export default class Megaclass {
     //replacing 'setup' for now so it doesn't conflict
     setuptl() {
         //setup(){
-        console.log("turtle setup")
-
         var t = this;
         this.element = document.createElement('div');
         this.element.setAttribute('class', 'turtle');
@@ -264,7 +261,6 @@ export default class Megaclass {
         this.img.onload = imgLoaded;
         var canvas = document.getElementById('canvas');
         this.ctx = canvas.getContext('2d');
-        console.log(t.ctx);
         canvas.width = t.cnvWidth * t.dpi;
         canvas.height = t.cnvHeight * t.dpi;
         t.ctx.scale(t.dpi, t.dpi);
@@ -272,7 +268,6 @@ export default class Megaclass {
 
 
         function imgLoaded() {
-            console.log("imgLoaded");
             t.img.width = t.size;
             t.img.height = t.size;
             t.element.style.width = t.size + 'px';
@@ -285,10 +280,8 @@ export default class Megaclass {
     //CC moved
 
     handleCCKeyDown(e) {
-        console.log("handleCCkeydown");
         var k = e.keyCode;
         if (k == 13) {
-            console.log("got 13");
             if (e.shiftKey) this.insertcr(e);
             else this.handlecr(e);
         }
@@ -300,10 +293,8 @@ export default class Megaclass {
     }
 
     handlecr(e) {
-        console.log("handlecr");
         var pos = document.getElementById('cc').selectionStart;
         var t = document.getElementById('cc').value;
-        console.log(t);
         var start = t.lastIndexOf('\n', pos - 1), end = t.indexOf('\n', pos);
         if (end < 0) end = t.length;
         document.getElementById('cc').selectionStart = end + 1;
@@ -313,7 +304,6 @@ export default class Megaclass {
     }
 
     insertcr(e) {
-        console.log("insertcr");
         e.preventDefault();
         var pos = document.getElementById('cc').selectionStart;
         var t = document.getElementById('cc').value;
@@ -332,12 +322,8 @@ export default class Megaclass {
 
     forward(n) {
 
-        console.log("forward: " + n);
         var t = this;
         if (t.pendown) {
-            console.log("pendown cond");
-            console.log("t.xcor: " + t.xcor + ", t.cnvWidth: " + t.cnvWidth);
-            console.log((t.xcor + t.cnvWidth / 2) + ", " + (t.cnvHeight / 2 - t.ycor));
             t.ctx.beginPath();
             t.ctx.moveTo(t.xcor + t.cnvWidth / 2, t.cnvHeight / 2 - t.ycor);
             var ctx = t.ctx
@@ -350,14 +336,11 @@ export default class Megaclass {
             if (n >= .1) t.ctx.lineTo(sx, sy);
             else t.ctx.lineTo(sx, sy + .1);
             if (t.pensize != 0) t.ctx.stroke();
-            console.log("second pendown sx/xy: " + sx + ", " + sy);
-            console.log("pensize: " + t.pensize);
             if (t.fillpath) t.fillpath.push(function () { this.ctx.lineTo(sx, sy); });
         }
     }
 
     lineto(x, y) {
-        console.log("linto: " + x + ", " + y);
         var t = this;
         if (t.pendown) {
             t.ctx.beginPath();
@@ -368,7 +351,6 @@ export default class Megaclass {
         if (t.pendown) {
 
             var sx = t.xcor + t.cnvWidth / 2, sy = t.cnvHeight / 2 - t.ycor;
-            console.log("pendown in lineto:" + sx + sy);
             if ((x + y) >= .1) t.ctx.lineTo(sx, sy);
             else t.ctx.lineTo(sx, sy + .1);
             if (t.pensize != 0) t.ctx.stroke();
@@ -377,7 +359,6 @@ export default class Megaclass {
     }
 
     setxy(x, y) {
-        console.log("setxy: " + x + ", " + y);
         var t = this;
         t.xcor = x;
         t.ycor = y;
@@ -388,7 +369,6 @@ export default class Megaclass {
     right(n) { this.seth(this.heading + n); }
     left(n) { this.seth(this.heading - n); }
     seth(a) {
-        console.log("seth: " + a);
         this.heading = a;
         this.heading = (this.heading % 360);
     }
@@ -457,7 +437,7 @@ export default class Megaclass {
     /////////////////////////
 
     fillscreen(c, s) {
-        console.log("fillscreen " + c + ", " + s);
+
         var oldcolor = this.color, oldshade = this.shade;
         if ((typeof c) == 'object') c = c[0];
         this.setCtxColorShade(c, s);
@@ -466,8 +446,7 @@ export default class Megaclass {
     }
 
     setcolor(c) {
-        console.log("setcolor");
-        console.log(c);
+
         if ((typeof c) == 'object') { this.color = c[0]; this.shade = c[1]; }
         else this.color = c;
         this.setCtxColorShade(this.color, this.shade);
@@ -539,16 +518,16 @@ export default class Megaclass {
     /////////////////////////
 
     move() {
-        console.log("move");
+
         var t = this;
         if (!t.img.complete) return;
         var img = t.element.firstChild;
-        console.log(img);
+
         var dx = screenLeft();
         var dy = screenTop();
         var s = 1;
         //var s = canvas.offsetHeight/t.cnvHeight*t.zoom;
-        console.log("dx: " + dx + "px, " + dy + " scale: " + s);
+
         t.element.style.webkitTransform = 'translate(' + dx + 'px, ' + dy + 'px) rotate(' + t.heading + 'deg)' + ' scale(' + s + ',' + s + ')';
         t.element.left = dx;
         t.element.top = dy;
@@ -572,11 +551,7 @@ export default class Megaclass {
 
     clean() {
 
-
-        console.log("clean");
-
         var t = this;
-        console.log(t.ctx);
         this.xcor = 0;
         t.ycor = 0;
         t.heading = 0;
@@ -598,7 +573,6 @@ export default class Megaclass {
         t.ctx.textAlign = 'center';
         t.ctx.setLineDash([]);
         t.showTurtle();
-        console.log(t.color + ":" + t.shade);
     }
 
     /////////////////////////
@@ -615,7 +589,6 @@ export default class Megaclass {
         img.src = dataurl;
 
         function drawImageToFit() {
-            console.log("drawImageToFit");
             var s = t.cnvWidth / img.naturalWidth;
             ctx.save();
             ctx.scale(s, s);
@@ -697,7 +670,6 @@ export default class Megaclass {
         function setCtxColor(c) {
             var cc = '#' + (c + 0x1000000).toString(16).substring(1);
             t.ctx.strokeStyle = cc;
-            //  console.log ('ctx color:',cc);
             t.ctx.fillStyle = cc;
         }
 
@@ -707,12 +679,10 @@ export default class Megaclass {
     //tokenizer
 
     tokenize() {
-        console.log("running tokenize");
         var t = this;
         return readList();
 
         function readList() {
-            console.log("readList");
             var a = new Array();
             skipSpace();
             while (true) {
@@ -725,19 +695,16 @@ export default class Megaclass {
         }
 
         function readToken() {
-            console.log("running readToken");
             var s = next();
             var n = Number(s);
             if (!isNaN(n)) return n;
             var first = s.charAt(0);
             if (first == "]") return null;
             if (first == "[") return readList();
-            console.log(s);
             return s;
         }
 
         function next() {
-            console.log("running next");
             if (peekChar() == "'") return readString();
             var res = '';
             if (delim()) res = nextChar();
@@ -749,7 +716,6 @@ export default class Megaclass {
                 }
             }
             skipSpace();
-            console.log(res);
             return res;
         }
 
@@ -776,7 +742,6 @@ export default class Megaclass {
         }
 
         function skipSpace() {
-            console.log("skipSpace");
             while (true) {
                 if (eof()) return;
                 var c = peekChar();
@@ -801,14 +766,14 @@ export default class Megaclass {
 
     }
 
-    parse(s) { console.log("parse"); console.log(s); return new Megaclass(s).tokenize(); }
+    parse(s) { return new Megaclass(s).tokenize(); }
 
     //procs js
     readProcs() {
-        console.log("readProcs");
+
         var procs = document.getElementById("procs");
         this.procString(procs.value, 'normal');
-        console.log(procs.value);
+
     }
 
     procString(str, type) {
@@ -816,8 +781,7 @@ export default class Megaclass {
         parseProcs();
 
         function gatherSource() {
-            console.log("gatherSource running: " + str + type);
-            function parse(s) { console.log("parse"); console.log(s); return new Megaclass(s).tokenize(); }
+            function parse(s) { return new Megaclass(s).tokenize(); }
 
             var thisproc = undefined;
             for (var i in prims) if ((prims[i].type) == 'normal') delete prims[i];
@@ -825,7 +789,6 @@ export default class Megaclass {
             for (var i = 0; i < lines.length; i++) procLines(lines[i]);
 
             function procLines(l) {
-                console.log("proclines: " + l);
                 var sl = parse(l);
                 if ((sl[0] == 'to') && (sl[1] != undefined)) {
                     thisproc = sl[1];
@@ -842,19 +805,17 @@ export default class Megaclass {
         }
 
         function parseProcs() {
-            console.log("parseProcs");
-            function parse(s) { console.log("parse"); console.log(s); return new Megaclass(s).tokenize(); }
+            function parse(s) { return new Megaclass(s).tokenize(); }
             for (var p in prims) {
                 var prim = prims[p];
                 var fcn = prim.fcn;
                 if ((typeof fcn) != 'string') continue;
-                console.log("cont1");
+
                 // if(prim.parsed) continue;
                 prim.parsed = parse(fcn);
-                console.log(prim.parsed);
+
 
                 for (var i in prim.inputs) {
-                    console.log("running loop on prim.inputs");
                     if (prim.inputs[i].substring(0, 1) == ':') prim.inputs[i] = prim.inputs[i].substring(1);
                 }
             }
@@ -863,7 +824,6 @@ export default class Megaclass {
 
     //i3-logo js from tlogo site
     setup() {
-        console.log("setup");
         this.openText();
         window.requestAnimationFrame(this.ticker);
     }
@@ -879,7 +839,6 @@ export default class Megaclass {
         if (!this.isDone()) {
             var end = this.now() + flushtime;
             while (this.now() < end) {
-                if(this.hold){console.log("hold true");}
                 if (this.hold) break;
                 if (this.isDone()) break;
                 this.evalNext();
@@ -940,15 +899,14 @@ export default class Megaclass {
         //but it broke make
         // this.locals = this.last(this.locals);
 
-        hold = false;
+        this.hold = false;
         if (this.timeout != undefined) clearTimeout(this.timeout);
         this.timeout = undefined;
     }
 
-    lprint(x) { console.log("lprint"); this.insert(x + '\n'); }
+    lprint(x) { this.insert(x + '\n'); }
 
     evalNext() {
-        console.log("evalNext");
         var t = this;
         try {
             if (t.cfun) {
@@ -971,7 +929,6 @@ export default class Megaclass {
         }
 
         function evalString() {
-            console.log("evalString");
             if (token.substring(0, 1) == ':') t.pushResult(t.getValue(token.substring(1)));
             else if (token.substring(0, 1) == '"') t.pushResult(token.substring(1));
             else if ((token.substring(0, 1) == "'") && (token.slice(-1) == "'")) t.pushResult(token.substring(1, token.length - 1));
@@ -994,7 +951,6 @@ export default class Megaclass {
         }
 
         function funcall() {
-            console.log("funcall");
             if (prims[t.cfun].flow) prims[t.cfun].fcn.apply(t, t.arglist);
             else if ((typeof prims[t.cfun].fcn) == 'function') primCall();
             else if ((typeof prims[t.cfun].fcn) == 'string') procCall();
@@ -1002,7 +958,6 @@ export default class Megaclass {
 
 
         function primCall() {
-            console.log("primCall");
             var arglist = t.arglist;
             var prim = t.cfun;
             var res = prims[t.cfun].fcn.apply(t, arglist);
@@ -1014,7 +969,6 @@ export default class Megaclass {
         }
 
         function procCall() {
-            console.log("proccall");
             var cfun = t.cfun, arglist = t.arglist;
             t.stack.push(t.evline);
             t.stack.push(t.frame);
@@ -1032,7 +986,6 @@ export default class Megaclass {
     }
 
     pushResult(res) {
-        console.log("pushResult");
         var t = this;
         if (res == undefined) return;
         if (t.cfun == undefined) throw "you don't say what to do with " + t.printstr(res);
@@ -1065,24 +1018,17 @@ export default class Megaclass {
     }
 
     setValue(name, value) {
-        console.log(this);
-        console.log(this.locals);
-        console.log("setValue " + name + " " + value);
         var t = this;
         for (var i in t.locals) {
             if (t.locals[i][name] != undefined) {
                 t.locals[i][name] = value;
-                console.log("conditional in setValue");
-                console.log(t.locals);
                 return;
             }
         }
         t.locals[t.locals.length - 1][name] = value;
-        console.log(t.locals);
-        console.log("Outside of conditional in setValue");
     }
 
-    makeLocal(name) { this.locals[0][name] = 0; console.log("makeLocal"); }
+    makeLocal(name) { this.locals[0][name] = 0; }
 
     procOutput(t, x) {
         if (t.frame.length == 0) {
@@ -1101,7 +1047,6 @@ export default class Megaclass {
     }
 
     evalLine(l, next) {
-        console.log("evalLine");
         var t = this;
         t.stack.push(t.cfun);
         t.stack.push(t.arglist);
@@ -1113,7 +1058,6 @@ export default class Megaclass {
     }
 
     evalEOL() {
-        console.log("evalEOL");
         var t = this;
         if (t.stack.length == 0) return;
         var next = t.stack.pop();
@@ -1133,7 +1077,6 @@ export default class Megaclass {
     }
 
     repeat(n, l) {
-        console.log("repeat");
         n = Math.round(this.getnum(n));
         this.stack.push(n);
         this.stack.push(l);
@@ -1311,11 +1254,9 @@ export default class Megaclass {
 
 
     mwait(n) {
-        console.log("mwait: " + n);
         if (n <= 0) return;
-        console.log("mwait continued");
         this.hold = true;
-        this.timeout = setTimeout(function () { this.timeout = undefined; this.hold = false; console.log("timeout"); }.bind(this), n);
+        this.timeout = setTimeout(function () { this.timeout = undefined; this.hold = false; }.bind(this), n);
     }
 
     printstr(x) {
@@ -1370,7 +1311,6 @@ export default class Megaclass {
 
     //extensions js
     loadStartup() {
-        console.log("loadStartup");
         var req = new XMLHttpRequest();
         req.onreadystatechange = next;
         req.open('GET', 'startup.logo');
@@ -1381,7 +1321,6 @@ export default class Megaclass {
             if (req.status != 200) return;
             this.procString(req.responseText, 'startup');
             if (prims['startup']) this.runLine('startup');
-            console.log("read startup");
         }
     }
 
@@ -1393,7 +1332,6 @@ export default class Megaclass {
         //It remains confusing to students when they can edit the terminal commands above the current new line. So, we should make the parts above the current entry uneditable,
         //and maybe add a '>' or something so they can tell where they're supposed to be.
 
-        console.log("insert");
         var cc = document.getElementById("cc");
         cc.value = cc.value + str;
         // var startpos = this.selectionStart;
@@ -1412,8 +1350,6 @@ export default class Megaclass {
     }
 
     runLine(str) {
-        console.log("runline");
-        console.log(str);
         var line = this.parse(str);
         this.reset(line);
     }
@@ -1421,37 +1357,11 @@ export default class Megaclass {
 
     //comms js
 
-    //TODO: New sensor read function. Still needs to pull the data.
 
-    readFromPin(n) {
-
-        //TODO: Because this reads the values list before it updates, the respose
-        //will always be off by one. SetTimeOut didn't work so well last time. Async
-        //functions might work here with that, but unclear at this time.
-
+    readSensor(n) {
         this.hold = true;
-        var startingResponseCount = this.allReceivedData.length;
-        // this.respfcn = fcn;
-        this.resp = [];
-        this.respCount = n;
-        var globalThis = this;
-
-        var sendMessage = [0xc0 + n];
-        var message = new Uint8Array([sendMessage])
-        const writer = outputStream.getWriter();
-        writer.write(message);
-        writer.releaseLock();
-        this.hold = false;
-        var reversedData = this.allReceivedData.reverse();
-        console.log(reversedData[0]);
-        return reversedData[0];
-
-    }
-
-    readsensor(n) {
-        console.log("readSensor");
-        this.hold = true;
-        this.adread(n, this.gotsensor);
+        this.sendReceive([0xc0 + n], 2, this.gotsensor);
+        //   this.readADC(n, this.gotsensor);  readADC didn't seem necessary here
     }
 
     gotsensor(x) {
@@ -1461,7 +1371,7 @@ export default class Megaclass {
         this.hold = false;
     }
 
-    readpin(n) {
+    readPin(n) {
         this.hold = true;
         this.dread(n, this.gotpin);
     }
@@ -1487,15 +1397,16 @@ export default class Megaclass {
         this.sendl(cmd);
     }
 
-    pin_on(n) {
-        console.log("pin_on " + n);
+    pinOn(n) {
         this.sendl([0xe0 + n]);
     }
-    pin_off(n) { this.sendl([0xd0 + n]); }
-    led_on() { this.sendl([0xef]); }
-    led_off() { this.sendl([0xdf]); }
+    pinOff(n) { this.sendl([0xd0 + n]); }
+    ledOn() { this.sendl([0xef]); }
+    ledOff() { this.sendl([0xdf]); }
 
-    adread(n, fcn) { return this.sendReceive([0xc0 + n], 2, fcn); }
+    readADC(n, fcn) {
+        return this.sendReceive([0xc0 + n], 2, fcn);
+    }
     dread(n, fcn) { this.sendReceive([0xc0 + n], 1, fcn); }
 
     redraw(l) { this.sendl([].concat(0xb0, l)); }
@@ -1505,34 +1416,36 @@ export default class Megaclass {
     twobytes(n) { return [n & 0xff, (n >> 8) & 0xff]; }
 
     sendReceive(sendMessage, n, fcn) {
-        console.log("running sendReceive");
-        this.respfcn = fcn;
-        this.resp = [];
-        this.respCount = n;
-        var message = new Uint8Array([sendMessage])
-        const writer = outputStream.getWriter();
-        writer.write(message);
-        writer.releaseLock();
 
-        //TODO: Needs code to get the next read values from the stream and return it        
+        if (port && port.readable) {
+            console.log("readable conditional");
 
+            this.respfcn = fcn;
+            this.resp = [];
+            this.respCount = n;
+            var message = new Uint8Array([sendMessage])
+            const writer = outputStream.getWriter();
+            writer.write(message);
+            writer.releaseLock();
+        } else {
+            throw "not connected";
+        }
     }
 
 
     sendl(command) {
-        console.log("sendl with " + command);
         if (outputStream) {
             var message = new Uint8Array([command])
-            console.log("sendl conditional");
-            console.log(message);
             const writer = outputStream.getWriter();
             writer.write(message);
             writer.releaseLock();
-        } else { console.log("outputStream false"); }
+        } else {
+            throw "not connected";
+        }
     }
 
-//TODO: There's no error handling for disconnect/reconnect events. This assumes everything works perfectly.
-//Add a state to track if the connection is live. 
+    //TODO: There's no error handling for disconnect/reconnect events. This assumes everything works perfectly.
+    //Add a state to track if the connection is live. 
 
     async openSerialPort() {
         port = await navigator.serial.requestPort();
@@ -1558,24 +1471,21 @@ export default class Megaclass {
             port = null;
             document.getElementById("connectButton").style.display = "inline-block";
             document.getElementById("disconnectButton").style.display = "none";
-        } else {console.log("no port");}
+        } else { }
 
     }
 
 
     async startReading() {
-        console.log(this);
         while (true) {
             const { value, done } = await reader.read();
             if (value) {
-                console.log("got response from device");
                 this.handleReceiveData(value);
                 if (value[1] != 0) {
                     var newValue = value[0] + 256 * value[1]
                 } else {
                     var newValue = value[0];
                 }
-                //this.lprint(newValue); //This is temporary. In the current form reading a sensor doesn't return, so it doesn't get used as a value. TODO.
                 this.allReceivedData.push(newValue);
 
             }
@@ -1589,7 +1499,6 @@ export default class Megaclass {
 
 
     handleReceiveData(receivedValue) {
-        console.log("handleReceiveData");
         var value = Array.from(new Uint8Array(receivedValue));
         for (var i in value) {
             this.gotChar(value[i]);
@@ -1599,12 +1508,8 @@ export default class Megaclass {
 
 
     gotChar(c) {
-        console.log("gotChar");
-        console.log(this.resp);
-        // return;
         if (this.respCount == 0) return;
         else {
-            console.log("gotChar conditional");
             this.resp.push(c);
             if (this.respCount > this.resp.length) return;
             if (this.respfcn) {
@@ -1756,35 +1661,35 @@ prims['scale'] = { nargs: 2, fcn: function (n, l) { return this.scale(this.getnu
 prims['true'] = { nargs: 0, fcn: function () { return true; } }
 prims['false'] = { nargs: 0, fcn: function () { return false; } }
 
-prims['make'] = { nargs: 2, fcn: function (a, b) { this.setValue(a, b); console.log("prim make"); } }
+prims['make'] = { nargs: 2, fcn: function (a, b) { this.setValue(a, b); } }
 prims['local'] = { nargs: 1, fcn: function (a, b) { this.makeLocal(a); } }
 prims['openport'] = { nargs: 0, fcn: function () { this.openSerialPort(); } }
 
-prims['ledon'] = { nargs: 0, fcn: function () { this.led_on(); this.mwait(1); } }
-prims['ledoff'] = { nargs: 0, fcn: function () { this.led_off(); this.mwait(1); } }
+prims['ledon'] = { nargs: 0, fcn: function () { this.ledOn(); this.mwait(1); } }
+prims['ledoff'] = { nargs: 0, fcn: function () { this.ledOff(); this.mwait(1); } }
 
-prims['dp2on'] = { nargs: 0, fcn: function () { this.pin_on(2); this.mwait(1); } }
-prims['dp2off'] = { nargs: 0, fcn: function () { this.pin_off(2); this.mwait(1); } }
-prims['dp3on'] = { nargs: 0, fcn: function () { this.pin_on(3); this.mwait(1); } }
-prims['dp3off'] = { nargs: 0, fcn: function () { this.pin_off(3); this.mwait(1); } }
-prims['dp4on'] = { nargs: 0, fcn: function () { this.pin_on(4); this.mwait(1); } }
-prims['dp4off'] = { nargs: 0, fcn: function () { this.pin_off(4); this.mwait(1); } }
-prims['dp5on'] = { nargs: 0, fcn: function () { this.pin_on(5); this.mwait(1); } }
-prims['dp5off'] = { nargs: 0, fcn: function () { this.pin_off(5); this.mwait(1); } }
-prims['dp6on'] = { nargs: 0, fcn: function () { this.pin_on(6); this.mwait(1); } }
-prims['dp6off'] = { nargs: 0, fcn: function () { this.pin_off(6); this.mwait(1); } }
-prims['dp7on'] = { nargs: 0, fcn: function () { this.pin_on(7); this.mwait(1); } }
-prims['dp7off'] = { nargs: 0, fcn: function () { this.pin_off(7); this.mwait(1); } }
+prims['dp2on'] = { nargs: 0, fcn: function () { this.pinOn(2); this.mwait(1); } }
+prims['dp2off'] = { nargs: 0, fcn: function () { this.pinOff(2); this.mwait(1); } }
+prims['dp3on'] = { nargs: 0, fcn: function () { this.pinOn(3); this.mwait(1); } }
+prims['dp3off'] = { nargs: 0, fcn: function () { this.pinOff(3); this.mwait(1); } }
+prims['dp4on'] = { nargs: 0, fcn: function () { this.pinOn(4); this.mwait(1); } }
+prims['dp4off'] = { nargs: 0, fcn: function () { this.pinOff(4); this.mwait(1); } }
+prims['dp5on'] = { nargs: 0, fcn: function () { this.pinOn(5); this.mwait(1); } }
+prims['dp5off'] = { nargs: 0, fcn: function () { this.pinOff(5); this.mwait(1); } }
+prims['dp6on'] = { nargs: 0, fcn: function () { this.pinOn(6); this.mwait(1); } }
+prims['dp6off'] = { nargs: 0, fcn: function () { this.pinOff(6); this.mwait(1); } }
+prims['dp7on'] = { nargs: 0, fcn: function () { this.pinOn(7); this.mwait(1); } }
+prims['dp7off'] = { nargs: 0, fcn: function () { this.pinOff(7); this.mwait(1); } }
 
-prims['read0'] = { nargs: 0, fcn: function () { this.readsensor(0); return this.cfun; } }
-prims['read1'] = { nargs: 0, fcn: function () { this.readsensor(1); return this.cfun; } }
-prims['read2'] = { nargs: 0, fcn: function () { this.readsensor(2); return this.cfun; } }
-prims['read3'] = { nargs: 0, fcn: function () { this.readsensor(3); return this.cfun; } }
-prims['read4'] = { nargs: 0, fcn: function () { this.readsensor(4); return this.cfun; } }
-prims['read5'] = { nargs: 0, fcn: function () { this.readsensor(5); return this.cfun; } }
+prims['read0'] = { nargs: 0, fcn: function () { this.readSensor(0); return this.cfun; } }
+prims['read1'] = { nargs: 0, fcn: function () { this.readSensor(1); return this.cfun; } }
+prims['read2'] = { nargs: 0, fcn: function () { this.readSensor(2); return this.cfun; } }
+prims['read3'] = { nargs: 0, fcn: function () { this.readSensor(3); return this.cfun; } }
+prims['read4'] = { nargs: 0, fcn: function () { this.readSensor(4); return this.cfun; } }
+prims['read5'] = { nargs: 0, fcn: function () { this.readSensor(5); return this.cfun; } }
 
-prims['connected8'] = { nargs: 0, fcn: function () { this.readpin(8); return this.cfun; } }
-prims['connected9'] = { nargs: 0, fcn: function () { this.readpin(9); return this.cfun; } }
-prims['connected10'] = { nargs: 0, fcn: function () { this.readpin(10); return this.cfun; } }
-prims['connected11'] = { nargs: 0, fcn: function () { this.readpin(11); return this.cfun; } }
-prims['connected12'] = { nargs: 0, fcn: function () { this.readpin(12); return this.cfun; } }
+prims['connected8'] = { nargs: 0, fcn: function () { this.readPin(8); return this.cfun; } }
+prims['connected9'] = { nargs: 0, fcn: function () { this.readPin(9); return this.cfun; } }
+prims['connected10'] = { nargs: 0, fcn: function () { this.readPin(10); return this.cfun; } }
+prims['connected11'] = { nargs: 0, fcn: function () { this.readPin(11); return this.cfun; } }
+prims['connected12'] = { nargs: 0, fcn: function () { this.readPin(12); return this.cfun; } }

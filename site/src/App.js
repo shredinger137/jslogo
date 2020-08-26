@@ -42,6 +42,11 @@ class App extends Component {
 
     const disconnectButton = document.getElementById('disconnectButton');
     disconnectButton.addEventListener('click', megaclass.disconnectSerialPort.bind(megaclass));
+
+    this.setState({
+      canvasHeight: document.getElementById("cnvframe").offsetHeight,
+      canvasWidth: document.getElementById("cnvframe").offsetWidth
+    }); 
     
   }
 
@@ -80,9 +85,9 @@ class App extends Component {
     while (true) {
       const { value, done } = await reader.read();
       if (value) {
-        if(value[1] != 0){        
+        if(value[1] !== 0){        
           var newValue = value[0] + 256 * value[1]
-        } else {var newValue = value[0];
+        } else { newValue = value[0];
             }
       terminal.value += "\n>" + newValue + "\n";
 
