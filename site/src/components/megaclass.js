@@ -1,6 +1,7 @@
 /* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off" */
 
 import TurtleLogo from './turtlelogo';
+import Tokenizer from './tokenizer';
 
 
 const turtleLogo = new TurtleLogo();
@@ -22,17 +23,18 @@ var outputStream;
 export default class Megaclass {
 
 
-    constructor(s) {
+    constructor(canvasHeight, canvasWidth, addToChart) {
         this.allReceivedData = [0];
         this.ticker = this.ticker.bind(this);
         this.isDone = this.isDone.bind(this);
         this.parse = this.parse.bind(this);
         this.procs = document.getElementById("procs");
+        this.addToChart = addToChart;
 
         //turtle
         this.datapoints = [];
-        this.cnvWidth = 600;
-        this.cnvHeight = 220;
+        this.cnvWidth = canvasWidth;
+        this.cnvHeight = canvasHeight;
         // this.img;
         //this.ctx = document.getElementById('canvas');
         this.xcor = 0;
@@ -48,7 +50,7 @@ export default class Megaclass {
         this.size = 70;
         this.font = "sans-serif";
         this.fontsize = 30;
-        this.dpi = 2;
+        this.dpi = 1;
         this.zoom = 1;
         this.snaps = {};
         this.scatterChart = "";
@@ -65,9 +67,7 @@ export default class Megaclass {
             0xFF00FF, 0xFF00E6, 0xFF00CC, 0xFF00B3, 0xFF0099, 0xFF0080, 0xFF0066, 0xFF004D, 0xFF0033, 0xFF001A,
             0xFF0000];
 
-        //tokenizer
-        this.str = s;
-        this.offset = 0;
+
         //procs js
         var t = this;
         this.procs.autocapitalize = 'off';
@@ -249,6 +249,8 @@ export default class Megaclass {
 
     //replacing 'setup' for now so it doesn't conflict
     setuptl() {
+        this.addToChart(20, 25);
+        console.log(this.addToChart);
         //setup(){
         var t = this;
         this.element = document.createElement('div');
@@ -526,25 +528,17 @@ export default class Megaclass {
         var dx = screenLeft();
         var dy = screenTop();
         var s = 1;
-        //var s = canvas.offsetHeight/t.cnvHeight*t.zoom;
 
         t.element.style.webkitTransform = 'translate(' + dx + 'px, ' + dy + 'px) rotate(' + t.heading + 'deg)' + ' scale(' + s + ',' + s + ')';
         t.element.left = dx;
         t.element.top = dy;
 
-        //TODO: This had a * 20 on the end of each return for some reason. The numbers that are hardcoded are a bit confusing, not sure what they're for.
-        //The return 450 and all that was added for troubleshooting.
-
-        //Currently the coordinates 0,0 don't correspond to the center of the canvas.
-
 
         function screenLeft() {
-            // return 450
-            return -img.width / 2 + (t.xcor + t.cnvWidth / 2) * 2;
+            return -img.width / 2 + (t.xcor + t.cnvWidth / 2);
         }
         function screenTop() {
-            //  return 0
-            return -img.height / 2 + (t.cnvHeight / 2 - t.ycor) * 2;
+            return -img.height / 2 + (t.cnvHeight / 2 - t.ycor);
         }
 
     }
@@ -675,98 +669,7 @@ export default class Megaclass {
 
     }
 
-
-    //tokenizer
-
-    tokenize() {
-        var t = this;
-        return readList();
-
-        function readList() {
-            var a = new Array();
-            skipSpace();
-            while (true) {
-                if (eof()) break;
-                var token = readToken();
-                if (token == null) break;
-                a.push(token);
-            }
-            return a;
-        }
-
-        function readToken() {
-            var s = next();
-            var n = Number(s);
-            if (!isNaN(n)) return n;
-            var first = s.charAt(0);
-            if (first == "]") return null;
-            if (first == "[") return readList();
-            return s;
-        }
-
-        function next() {
-            if (peekChar() == "'") return readString();
-            var res = '';
-            if (delim()) res = nextChar();
-            else {
-                while (true) {
-                    if (eof()) break;
-                    if (delim()) break;
-                    else res += nextChar();
-                }
-            }
-            skipSpace();
-            return res;
-        }
-
-        function readString() {
-            nextChar();
-            var res = "'";
-            while (true) {
-                if (eof()) return res + "'";
-                var c = nextChar();
-                res += c;
-                if (c == "'") { skipSpace(); return res; }
-            }
-            return null;
-        }
-
-        function nextLine() {
-            var res = '';
-            while (true) {
-                if (eof()) return res;
-                var c = nextChar();
-                if (c == '\n') return res;
-                res += c;
-            }
-        }
-
-        function skipSpace() {
-            while (true) {
-                if (eof()) return;
-                var c = peekChar();
-                if (c == ';') { skipComment(); continue; }
-                if (" \t\r\n,".indexOf(c) == -1) return;
-                nextChar();
-            }
-        }
-
-        function skipComment() {
-            while (true) {
-                var c = nextChar();
-                if (eof()) return;
-                if (c == '\n') return;
-            }
-        }
-
-        function delim() { return "()[] \t\r\n".indexOf(peekChar()) != -1; }
-        function peekChar() { return t.str.charAt(t.offset); }
-        function nextChar() { return t.str.charAt(t.offset++); }
-        function eof() { return t.str.length == t.offset; }
-
-    }
-
-    parse(s) { return new Megaclass(s).tokenize(); }
+    parse(s) { return new Tokenizer(s).tokenize(); }
 
     //procs js
     readProcs() {
@@ -781,7 +684,7 @@ export default class Megaclass {
         parseProcs();
 
         function gatherSource() {
-            function parse(s) { return new Megaclass(s).tokenize(); }
+            function parse(s) { return new Tokenizer(s).tokenize(); }
 
             var thisproc = undefined;
             for (var i in prims) if ((prims[i].type) == 'normal') delete prims[i];
@@ -805,7 +708,7 @@ export default class Megaclass {
         }
 
         function parseProcs() {
-            function parse(s) { return new Megaclass(s).tokenize(); }
+            function parse(s) { return new Tokenizer(s).tokenize(); }
             for (var p in prims) {
                 var prim = prims[p];
                 var fcn = prim.fcn;
@@ -834,6 +737,8 @@ export default class Megaclass {
         procs.focus();
     }
 
+    //Ticker is the main loop - it continuously runs and updates movement, evaluating as it goes. Similar to frame updates in game frameworks.
+    //'Hold' freezes evaluation and shows up in other functions; move is turtle specific.
 
     ticker() {
         if (!this.isDone()) {
@@ -1693,3 +1598,4 @@ prims['connected9'] = { nargs: 0, fcn: function () { this.readPin(9); return thi
 prims['connected10'] = { nargs: 0, fcn: function () { this.readPin(10); return this.cfun; } }
 prims['connected11'] = { nargs: 0, fcn: function () { this.readPin(11); return this.cfun; } }
 prims['connected12'] = { nargs: 0, fcn: function () { this.readPin(12); return this.cfun; } }
+prims['chartpush'] = { nargs: 2, fcn: function (a, b) { this.addToChart(a, b);} }
