@@ -249,7 +249,6 @@ export default class Megaclass {
 
     //replacing 'setup' for now so it doesn't conflict
     setuptl() {
-        this.addToChart(20, 25);
         console.log(this.addToChart);
         //setup(){
         var t = this;
@@ -1323,8 +1322,6 @@ export default class Megaclass {
     sendReceive(sendMessage, n, fcn) {
 
         if (port && port.readable) {
-            console.log("readable conditional");
-
             this.respfcn = fcn;
             this.resp = [];
             this.respCount = n;

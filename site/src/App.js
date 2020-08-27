@@ -153,6 +153,9 @@ end`}></textarea></div>
                 width={200}
                 height={this.state.canvasHeight / 2}
                 options={{
+                  animation: {
+                    duration: 0
+                  },
                   maintainAspectRatio: false,
                   elements: {
                     point: {
