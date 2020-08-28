@@ -1192,7 +1192,8 @@ export default class Megaclass {
 
     //extensions js
     //TODO: This doesn't actually load Startup. And you wouldn't expect it to.... so... there's that.
-    //Rather than whatever send is for, 
+    //We're now going to place this in 'Includes' in the main app, at least for now, and evaluate both that and 'procs' added together.
+    //Delete 'loadStartup' if this becomes how things stay.
 
     loadStartup() {
         var contextThis = this;

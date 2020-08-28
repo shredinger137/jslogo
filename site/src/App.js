@@ -122,7 +122,7 @@ class App extends Component {
         </header>
         <div className="main">
           <p>Click 'connect' to start, then select the Arduino device. Defining a 'go' word allows you to run
-          things by clicking 'go', or you can use the terminal at the bottom. Use dp3on to turn on pin 3, read0 to read the sensor on A0. Requires Chrome. The chart can be updated with chartpush x y. Non-primitive functions can't take arguments right now.
+          things by clicking 'go', or you can use the terminal at the bottom. Use dp3on to turn on pin 3, read0 to read the sensor on A0. Requires Chrome. The chart can be updated with chartpush x y.
       <br />
           </p>
           <button id="connectButton" type="button" >Connect</button>
