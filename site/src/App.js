@@ -136,7 +136,11 @@ class App extends Component {
         <div className="interfaceGrid">
           <div className="codeEntry" id="codeEntryDiv">
             <textarea id="procs" defaultValue={`to go
-print 5
+something 5
+end
+
+to something :n
+print :n
 end`}>
             </textarea>
           </div>

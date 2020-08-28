@@ -27,7 +27,7 @@ export default class Megaclass {
         this.allReceivedData = [0];
         this.ticker = this.ticker.bind(this);
         this.isDone = this.isDone.bind(this);
-        this.parse = this.parse.bind(this);
+
         this.procs = document.getElementById("procs");
         this.addToChart = addToChart;
 
@@ -94,7 +94,7 @@ export default class Megaclass {
         this.priority = 0;
         this.stack = [];
         this.frame = [];
-        this.locals = [{ test: 5 }];
+        this.locals = [{}];
         this.hold = false;
         this.timeout = undefined;
         this.clockspeed = 1;
@@ -105,36 +105,17 @@ export default class Megaclass {
         this.commandConsole.autocorrect = 'off';
         this.commandConsole.autocomplete = 'off';
         this.commandConsole.spellcheck = false;
-        //this.commandConsole.onkeydown = function (e) { handleCCKeyDown(e); }
         this.commandConsole.focused = false;
-        // this.commandConsole.onfocus = function () { this.commandConsole.focused = true; };
-        //  this.commandConsole.onblur = function () { this.commandConsole.focused = false; };
-        //  this.commandConsole.value = 'Welcome to Logo!\n';
-
 
         this.commandConsole.selectionStart = this.commandConsole.value.length + 1;
         this.commandConsole.selectionEnd = this.commandConsole.value.length + 1;
 
-        //this.focus();
-        //comms js
         this.respfcn = undefined;
         this.respCount = 0;
         this.resp = [];
         this.respStr = '';
-        this.serialID = undefined;
-
-
-
-
-        //extensions js
         this.fe = undefined;
-        //loadbutton.onclick = load;
-        //saveasbutton.onclick = function(e){saveas(e)};
-        //savebutton.onclick = save;
-        //gobutton.onclick = function(){ this.focus(); this.runLine('go');}
-        //window.addEventListener('resize', resize);
-        //cnvframe.addEventListener('click', paneToggle);
-        //setTimeout(resize, 100);
+
 
 
 
@@ -214,30 +195,6 @@ export default class Megaclass {
 
             function next2(writer) { writer.write(blob); }
         }
-
-        function paneToggle() {
-            if (this.style.visibility == 'hidden') onepane();
-            else threepanes();
-        }
-
-        function onepane() {
-            //loadbutton.style.visibility = 'hidden';
-            //savebutton.style.visibility = 'hidden';
-            //saveasbutton.style.visibility = 'hidden';
-            //gobutton.style.visibility = 'hidden';
-        }
-
-        function threepanes() {
-            //loadbutton.style.visibility = 'visible';
-            //savebutton.style.visibility = 'visible';
-            //	saveasbutton.style.visibility = 'visible';
-            //	gobutton.style.visibility = 'visible';
-        }
-
-        function resize() {
-            if (!procs) { var procs = { offsetWidth: "null" } }
-            //gobutton.style.left = (procs.offsetWidth+10-67)+'px';
-        }
     }
 
     //turtle js
@@ -249,7 +206,6 @@ export default class Megaclass {
 
     //replacing 'setup' for now so it doesn't conflict
     setuptl() {
-        console.log(this.addToChart);
         //setup(){
         this.loadStartup();
         var t = this;
@@ -684,20 +640,23 @@ export default class Megaclass {
 
     }
 
+    //The only difference I saw so far was that Tokenize was called from the class before, and that's been replaced. Still not evaluating arguments passed to words.
+
     procString(str, type) {
         gatherSource();
         parseProcs();
 
         function gatherSource() {
-            function parse(s) { return new Tokenizer(s).tokenize(); }
-
             var thisproc = undefined;
             for (var i in prims) if ((prims[i].type) == 'normal') delete prims[i];
             var lines = str.split('\n');
             for (var i = 0; i < lines.length; i++) procLines(lines[i]);
+            
+
+            //TODO: This isn't passing values as arguments when words are defined. Meaning 'to something :n' doesn't see :n as having a value when you call 'something 5'.
 
             function procLines(l) {
-                var sl = parse(l);
+                var sl = Tokenizer.parse(l);
                 if ((sl[0] == 'to') && (sl[1] != undefined)) {
                     thisproc = sl[1];
                     prims[thisproc] = { nargs: sl.length - 2 };
@@ -709,18 +668,22 @@ export default class Megaclass {
                 else if (sl[0] == 'end') { thisproc = undefined; return; }
                 if (thisproc == undefined) return;
                 prims[thisproc].fcn += (l + '\n');
+                if(thisproc == "something"){
+                console.log(prims[thisproc]);
+                console.log(prims['print'])
+            }
+              //  console.log(prims['print'])
             }
         }
 
         function parseProcs() {
-            function parse(s) { return new Tokenizer(s).tokenize(); }
             for (var p in prims) {
                 var prim = prims[p];
                 var fcn = prim.fcn;
                 if ((typeof fcn) != 'string') continue;
 
-                // if(prim.parsed) continue;
-                prim.parsed = parse(fcn);
+                if(prim.parsed) continue;
+                prim.parsed = Tokenizer.parse(fcn);
 
 
                 for (var i in prim.inputs) {
@@ -804,10 +767,13 @@ export default class Megaclass {
         this.priority = 0;
         this.stack = [];
         this.frame = [];
-
-        //TODO: uncommment this maybe? I don't know what it does, or why
-        //but it broke make
-        // this.locals = this.last(this.locals);
+        console.log(this.last(this.locals))
+        
+        
+        //This locals line had previously been commented out, as it broke make, but it seems to be working now. Delete this comment if it doesn't come up again.
+        //Commented August 2020
+        //NOTE: This locals line is still very suspicious. I still don't know why it exists or what, exactly, it's for.
+        this.locals = [this.last(this.locals)];
 
         this.hold = false;
         if (this.timeout != undefined) clearTimeout(this.timeout);
@@ -818,6 +784,7 @@ export default class Megaclass {
 
     evalNext() {
         var t = this;
+        console.log(t.arglist);
         try {
             if (t.cfun) {
                 if (t.arglist.length == prims[t.cfun].nargs) { funcall(); return; }
@@ -890,7 +857,7 @@ export default class Megaclass {
                 var bindings = {};
                 var inputs = prims[cfun].inputs;
                 for (var i in inputs) bindings[inputs[i]] = arglist[i];
-                // t.locals.unshift(bindings);
+                 t.locals.unshift(bindings);
             }
         }
     }
@@ -921,6 +888,8 @@ export default class Megaclass {
     }
 
     getValue(name) {
+
+        console.log(this.locals);
         for (var i in this.locals) {
             if (this.locals[i][name] != undefined) return this.locals[i][name];
         }
@@ -1065,8 +1034,10 @@ export default class Megaclass {
     }
 
     last(l) {
-        if ((typeof l) == 'object') return l[l.length - 1];
-        return String(l).substring(String(l).length - 1);
+        console.log(l)
+       if (l && (typeof l) == 'object') return l[l.length - 1];
+       return String(l).substring(String(l).length - 1);
+    return
     }
 
     butlast(l) {

@@ -4,8 +4,9 @@ export default class Tokenizer {
         this.offset = 0;
     }
 
+    static parse(s){return new Tokenizer(s).tokenize();}
+
     tokenize() {
-        console.log(this.stringToEvaluate);
         var t = this;
         return readList();
 
