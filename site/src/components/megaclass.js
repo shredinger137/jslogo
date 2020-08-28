@@ -1546,11 +1546,14 @@ prims['true'] = { nargs: 0, fcn: function () { return true; } }
 prims['false'] = { nargs: 0, fcn: function () { return false; } }
 
 prims['make'] = { nargs: 2, fcn: function (a, b) { this.setValue(a, b); } }
+prims['let'] = { nargs: 2, fcn: function (a, b) { this.setValue(a, b); } }
+//This is only for backwards compatability. Let is not different from make right now.
+
 prims['local'] = { nargs: 1, fcn: function (a, b) { this.makeLocal(a); } }
 prims['openport'] = { nargs: 0, fcn: function () { this.openSerialPort(); } }
 
-prims['ledon'] = { nargs: 0, fcn: function () { this.ledOn(); this.mwait(1); } }
-prims['ledoff'] = { nargs: 0, fcn: function () { this.ledOff(); this.mwait(1); } }
+prims['ob1on'] = { nargs: 0, fcn: function () { this.ledOn(); this.mwait(1); } }
+prims['ob1off'] = { nargs: 0, fcn: function () { this.ledOff(); this.mwait(1); } }
 
 prims['dp2on'] = { nargs: 0, fcn: function () { this.pinOn(2); this.mwait(1); } }
 prims['dp2off'] = { nargs: 0, fcn: function () { this.pinOff(2); this.mwait(1); } }
