@@ -3,6 +3,7 @@ import './css/styles.css';
 import './css/layout.css';
 import Megaclass from './components/megaclass';
 import { Scatter } from 'react-chartjs-2';
+import includes from './components/includes.js'
 
 var megaclass;
 
@@ -25,7 +26,6 @@ class App extends Component {
 
 
   componentDidMount() {
-
     var canvasHeight = document.getElementById("cnvframe").clientHeight;
     var canvasWidth = document.getElementById("cnvframe").clientWidth;
 
@@ -45,8 +45,6 @@ class App extends Component {
     const disconnectButton = document.getElementById('disconnectButton');
     disconnectButton.addEventListener('click', megaclass.disconnectSerialPort.bind(megaclass));
 
-
-    console.log(this.state);
   }
 
 
@@ -62,18 +60,13 @@ class App extends Component {
     var newData = this.state.chartData;
     newData.push({ x: x, y: y });
     this.setState({ chartData: newData });
-    //console.log(x + y);
-    console.log(newData);
-    //console.log(this.state.chartData);
 
   }
 
   checkIfSerialCapable = () => {
     if ('serial' in navigator) {
-      console.log("serial")
       return true;
     } else {
-      console.log("not serial");
       return false
     }
   }
@@ -109,6 +102,16 @@ class App extends Component {
 
   }
 
+  showCode() {
+    document.getElementById('includesWrapper').style.display = "none";
+    document.getElementById('codeEntryDiv').style.display = "block";
+  }
+
+  showIncludes(){
+    document.getElementById('includesWrapper').style.display = "block";
+    document.getElementById('codeEntryDiv').style.display = "none";
+  }
+
 
 
   render() {
@@ -119,21 +122,28 @@ class App extends Component {
         </header>
         <div className="main">
           <p>Click 'connect' to start, then select the Arduino device. Defining a 'go' word allows you to run
-          things by clicking 'go', or you can use the terminal at the bottom. Use dp3on to turn on pin 3, read0 to read the sensor on A0. Requires Chrome. The chart can be updated with chartpush x y, but doesn't take data by time yet.
+          things by clicking 'go', or you can use the terminal at the bottom. Use dp3on to turn on pin 3, read0 to read the sensor on A0. Requires Chrome. The chart can be updated with chartpush x y. Non-primitive functions can't take arguments right now.
       <br />
           </p>
           <button id="connectButton" type="button" >Connect</button>
           <button id="disconnectButton" type="button" style={{ display: "none" }}>Disconnect</button>
           <button id="gobutton" onClick={() => { megaclass.runLine("go") }}>Go</button>
           <button id="chartToggle" onClick={() => this.chartToggle()}>Toggle Chart</button>
-          <br />
+          <br /><br />
+          <span style={{float: "left", marginRight: "20px"}} onClick={() => {this.showCode()}}>Code</span><span style={{float: "left"}} onClick={() => {this.showIncludes()}}>Includes</span>
           <br />
         </div>
         <div className="interfaceGrid">
-          <div className="codeEntry" >
+          <div className="codeEntry" id="codeEntryDiv">
             <textarea id="procs" defaultValue={`to go
 print 5
-end`}></textarea></div>
+end`}>
+            </textarea>
+          </div>
+          <div className="codeEntry" id="includesWrapper" style={{ display: "none" }}>
+            <textarea  id="includes" defaultValue={includes}
+            />
+          </div>
           <div className="chartArea" id="cnvframe">
             <canvas className="cnv" id="canvas"></canvas>
           </div>

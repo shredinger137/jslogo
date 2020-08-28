@@ -251,6 +251,7 @@ export default class Megaclass {
     setuptl() {
         console.log(this.addToChart);
         //setup(){
+        this.loadStartup();
         var t = this;
         this.element = document.createElement('div');
         this.element.setAttribute('class', 'turtle');
@@ -672,9 +673,14 @@ export default class Megaclass {
 
     //procs js
     readProcs() {
+        var includes = document.getElementById("includes").value;
+        var procs = document.getElementById("procs").value;
+        var toBeEvaluated = procs + "\n" + includes;
 
-        var procs = document.getElementById("procs");
-        this.procString(procs.value, 'normal');
+        //TODO: Add includes here. It can be a different div maybe, if we want to go that route, and it can be added to procs.value.
+        //Then the thing submitted to procString would be the entire procs area + the includes.
+
+        this.procString(toBeEvaluated, 'normal');
 
     }
 
@@ -1214,7 +1220,11 @@ export default class Megaclass {
 
 
     //extensions js
+    //TODO: This doesn't actually load Startup. And you wouldn't expect it to.... so... there's that.
+    //Rather than whatever send is for, 
+
     loadStartup() {
+        var contextThis = this;
         var req = new XMLHttpRequest();
         req.onreadystatechange = next;
         req.open('GET', 'startup.logo');
@@ -1223,8 +1233,8 @@ export default class Megaclass {
         function next() {
             if (req.readyState != 4) return;
             if (req.status != 200) return;
-            this.procString(req.responseText, 'startup');
-            if (prims['startup']) this.runLine('startup');
+            contextThis.procString(req.responseText, 'startup');
+            if (prims['startup']) contextThis.runLine('startup');
         }
     }
 
@@ -1235,6 +1245,7 @@ export default class Megaclass {
         //Rather than try to reason through it, creating a new terminal, following UNIX terminal logic, may be best.
         //It remains confusing to students when they can edit the terminal commands above the current new line. So, we should make the parts above the current entry uneditable,
         //and maybe add a '>' or something so they can tell where they're supposed to be.
+        //Let's call that a TODO.
 
         var cc = document.getElementById("cc");
         cc.value = cc.value + str;
