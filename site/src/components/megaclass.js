@@ -341,13 +341,13 @@ export default class Megaclass {
         function rightArc(a, r) {
             var sgn = r / Math.abs(r);
             var ar = Math.abs(r);
-            var dx = ar * this.cosdeg(t.heading);
+            var dx = ar * t.cosdeg(t.heading);
             var dy = ar * turtleLogo.sindeg(t.heading);
             var cx = t.xcor + dx;
             var cy = t.ycor - dy;
             if (t.pendown) {
                 var sx = t.cnvWidth / 2 + cx, sy = t.cnvHeight / 2 - cy;
-                var astart = this.rad(t.heading + 180.0), aend = this.rad(t.heading + 180 + a * sgn);
+                var astart = t.rad(t.heading + 180.0), aend = t.rad(t.heading + 180 + a * sgn);
                 if ((a % 360) == 0) aend += .0001;
                 var dir = r < 0;
                 t.ctx.beginPath();
@@ -357,7 +357,7 @@ export default class Megaclass {
                 if (t.fillpath) t.fillpath.push(function () { this.ctx.arc(sx, sy, ar, astart, aend, dir); });
             }
             t.seth(t.heading + a * sgn);
-            t.xcor = cx - ar * this.cosdeg(t.heading);
+            t.xcor = cx - ar * t.cosdeg(t.heading);
             t.ycor = cy + ar * turtleLogo.sindeg(t.heading);
         }
 

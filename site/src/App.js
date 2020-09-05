@@ -29,6 +29,8 @@ class App extends Component {
     var canvasHeight = document.getElementById("cnvframe").clientHeight;
     var canvasWidth = document.getElementById("cnvframe").clientWidth;
 
+    document.getElementById('chartFrame').style.height = canvasHeight + "px";
+
     this.setState({
       canvasHeight: canvasHeight,
       canvasWidth: canvasWidth
@@ -151,8 +153,7 @@ end`}>
           <div className="chartArea" id="cnvframe">
             <canvas className="cnv" id="canvas"></canvas>
           </div>
-          <div className="chartArea" id="chartFrame" style={{ display: "none" }}>
-            <div id="chartWrapper" style={{ height: this.state.canvasHeight, width: this.state.canvasWidth }}>
+          <div className="chartArea" id="chartFrame" style={{ display: "none"}}>
               <Scatter
                 data={{
                   datasets:
@@ -164,8 +165,8 @@ end`}>
 
                     ]
                 }}
-                width={200}
-                height={this.state.canvasHeight / 2}
+     
+                height={this.state.canvasHeight}
                 options={{
                   animation: {
                     duration: 0
@@ -182,9 +183,8 @@ end`}>
                 redraw={true}
                 ref={this.chartReference}
               />
-            </div>
           </div>
-          <div className="terminal">
+          <div className="terminal" id="terminal">
             <textarea id="cc" onKeyDown={(e) => megaclass.handleCCKeyDown(e)} ></textarea>
           </div>
         </div>
