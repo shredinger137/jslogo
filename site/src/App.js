@@ -16,8 +16,6 @@ class App extends Component {
 
   chartRef = {}
   state = {
-    canvasHeight: 400,
-    canvasWidth: 900,
     showChartFrame: false,
     chartData:
       [
@@ -26,14 +24,11 @@ class App extends Component {
 
 
   componentDidMount() {
-    var canvasHeight = document.getElementById("cnvframe").clientHeight;
-    var canvasWidth = document.getElementById("cnvframe").clientWidth;
 
-    document.getElementById('chartFrame').style.height = canvasHeight + "px";
+
 
     this.setState({
-      canvasHeight: canvasHeight,
-      canvasWidth: canvasWidth
+
     });
 
 
@@ -89,18 +84,10 @@ class App extends Component {
 
   chartToggle() {
     this.setState({ chartToggle: !this.state.chartToggle });
-    var chartFrame = document.getElementById("chartFrame");
-    var turtleFrame = document.getElementById("cnvframe");
+    document.getElementById("chartFrame").classList.toggle("hide");
+    document.getElementById("cnvframe").classList.toggle("hide");
 
-    if (this.state.showChartFrame) {
-      chartFrame.style.display = "none";
-      turtleFrame.style.display = "block";
-      this.setState({ showChartFrame: false });
-    } else {
-      chartFrame.style.display = "block";
-      turtleFrame.style.display = "none";
-      this.setState({ showChartFrame: true });
-    }
+
 
   }
 
@@ -109,7 +96,7 @@ class App extends Component {
     document.getElementById('codeEntryDiv').style.display = "block";
   }
 
-  showIncludes(){
+  showIncludes() {
     document.getElementById('includesWrapper').style.display = "block";
     document.getElementById('codeEntryDiv').style.display = "none";
   }
@@ -132,7 +119,7 @@ class App extends Component {
           <button id="gobutton" onClick={() => { megaclass.runLine("go") }}>Go</button>
           <button id="chartToggle" onClick={() => this.chartToggle()}>Toggle Chart</button>
           <br /><br />
-          <span style={{float: "left", marginRight: "20px"}} onClick={() => {this.showCode()}}>Code</span><span style={{float: "left"}} onClick={() => {this.showIncludes()}}>Includes</span>
+          <span style={{ float: "left", marginRight: "20px" }} onClick={() => { this.showCode() }}>Code</span><span style={{ float: "left" }} onClick={() => { this.showIncludes() }}>Includes</span>
           <br />
         </div>
         <div className="interfaceGrid">
@@ -147,14 +134,15 @@ end`}>
             </textarea>
           </div>
           <div className="codeEntry" id="includesWrapper" style={{ display: "none" }}>
-            <textarea  id="includes" defaultValue={includes}
+            <textarea id="includes" defaultValue={includes}
             />
           </div>
-          <div className="chartArea" id="cnvframe">
-            <canvas className="cnv" id="canvas"></canvas>
-          </div>
-          <div className="chartArea" id="chartFrame" style={{ display: "none"}}>
-              <Scatter
+          <div className="chartArea">
+            <div id="cnvframe" style={{height: "100%", width: "100%" }}>
+              <canvas className="cnv" id="canvas" ></canvas>
+            </div>
+            <div id="chartFrame"  className="hide" style={{  height: "100%", width: "100%" }}>
+            <Scatter
                 data={{
                   datasets:
                     [
@@ -166,12 +154,13 @@ end`}>
                     ]
                 }}
      
-                height={this.state.canvasHeight}
+
                 options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
                   animation: {
                     duration: 0
                   },
-                  maintainAspectRatio: false,
                   elements: {
                     point: {
                       radius: 4,
@@ -183,7 +172,10 @@ end`}>
                 redraw={true}
                 ref={this.chartReference}
               />
+
+            </div>
           </div>
+
           <div className="terminal" id="terminal">
             <textarea id="cc" onKeyDown={(e) => megaclass.handleCCKeyDown(e)} ></textarea>
           </div>

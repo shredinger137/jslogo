@@ -1,5 +1,6 @@
 .terminal {
     grid-area: terminal;
+    height: 25vh;
 }
 
 .terminal textarea {
@@ -19,6 +20,7 @@
 .chartArea {
     grid-area: chartArea;
     border-style: solid; 
+    height: 50vh;
 }
 
 .interfaceGrid {
@@ -36,3 +38,6 @@
         color: #444;
 }
 
+.hide {
+    display: none;
+}
