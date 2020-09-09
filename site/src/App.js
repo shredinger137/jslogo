@@ -16,6 +16,8 @@ class App extends Component {
 
   chartRef = {}
   state = {
+    canvasHeight: 400,
+    canvasWidth: 900,
     showChartFrame: false,
     chartData:
       [
@@ -24,7 +26,14 @@ class App extends Component {
 
 
   componentDidMount() {
-
+    console.log(this.checkIfSerialCapable());
+    console.log(navigator);
+    var canvasHeight = document.getElementById("cnvframe").clientHeight;
+    var canvasWidth = document.getElementById("cnvframe").clientWidth;
+    this.setState({
+      canvasHeight: canvasHeight,
+      canvasWidth: canvasWidth
+    });
 
 
     this.setState({
@@ -49,7 +58,7 @@ class App extends Component {
   componentDidUpdate() {
 
     megaclass.readProcs();
-    console.log(this.chartRef);
+
 
   }
 

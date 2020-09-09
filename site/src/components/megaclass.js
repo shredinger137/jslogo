@@ -669,10 +669,7 @@ export default class Megaclass {
                 if (thisproc == undefined) return;
                 prims[thisproc].fcn += (l + '\n');
                 if(thisproc == "something"){
-                console.log(prims[thisproc]);
-                console.log(prims['print'])
             }
-              //  console.log(prims['print'])
             }
         }
 
@@ -767,8 +764,7 @@ export default class Megaclass {
         this.priority = 0;
         this.stack = [];
         this.frame = [];
-        console.log(this.last(this.locals))
-        
+       
         
         //This locals line had previously been commented out, as it broke make, but it seems to be working now. Delete this comment if it doesn't come up again.
         //Commented August 2020
@@ -784,7 +780,6 @@ export default class Megaclass {
 
     evalNext() {
         var t = this;
-        console.log(t.arglist);
         try {
             if (t.cfun) {
                 if (t.arglist.length == prims[t.cfun].nargs) { funcall(); return; }
@@ -889,7 +884,6 @@ export default class Megaclass {
 
     getValue(name) {
 
-        console.log(this.locals);
         for (var i in this.locals) {
             if (this.locals[i][name] != undefined) return this.locals[i][name];
         }
@@ -1034,7 +1028,6 @@ export default class Megaclass {
     }
 
     last(l) {
-        console.log(l)
        if (l && (typeof l) == 'object') return l[l.length - 1];
        return String(l).substring(String(l).length - 1);
     return
