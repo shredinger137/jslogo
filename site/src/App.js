@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import './css/styles.css';
 import './css/layout.css';
-import Megaclass from './components/megaclass';
+import Interpreter from './components/interpreter/Interpreter';
 import { Scatter } from 'react-chartjs-2';
-import includes from './components/includes.js'
+import includes from './components/interpreter/includes.js'
 
-var megaclass;
+var interpreter;
 
 class App extends Component {
 
@@ -26,8 +26,8 @@ class App extends Component {
 
 
   componentDidMount() {
+    console.log("Serial API Check:");
     console.log(this.checkIfSerialCapable());
-    console.log(navigator);
     var canvasHeight = document.getElementById("cnvframe").clientHeight;
     var canvasWidth = document.getElementById("cnvframe").clientWidth;
     this.setState({
@@ -41,15 +41,15 @@ class App extends Component {
     });
 
 
-    megaclass = new Megaclass(document.getElementById("cnvframe").offsetHeight, document.getElementById("cnvframe").offsetWidth, this.addToChart.bind(this));
-    megaclass.setuptl();
-    megaclass.setup();
+    interpreter = new Interpreter(document.getElementById("cnvframe").offsetHeight, document.getElementById("cnvframe").offsetWidth, this.addToChart.bind(this));
+    interpreter.setuptl();
+    interpreter.setup();
 
     const connectButton = document.getElementById('connectButton');
-    connectButton.addEventListener('click', megaclass.openSerialPort.bind(megaclass));
+    connectButton.addEventListener('click', interpreter.openSerialPort.bind(interpreter));
 
     const disconnectButton = document.getElementById('disconnectButton');
-    disconnectButton.addEventListener('click', megaclass.disconnectSerialPort.bind(megaclass));
+    disconnectButton.addEventListener('click', interpreter.disconnectSerialPort.bind(interpreter));
 
   }
 
@@ -57,7 +57,7 @@ class App extends Component {
 
   componentDidUpdate() {
 
-    megaclass.readProcs();
+    interpreter.readProcs();
 
 
   }
@@ -125,7 +125,7 @@ class App extends Component {
           </p>
           <button id="connectButton" type="button" >Connect</button>
           <button id="disconnectButton" type="button" style={{ display: "none" }}>Disconnect</button>
-          <button id="gobutton" onClick={() => { megaclass.runLine("go") }}>Go</button>
+          <button id="gobutton" onClick={() => { interpreter.runLine("go") }}>Go</button>
           <button id="chartToggle" onClick={() => this.chartToggle()}>Toggle Chart</button>
           <br /><br />
           <span style={{ float: "left", marginRight: "20px" }} onClick={() => { this.showCode() }}>Code</span><span style={{ float: "left" }} onClick={() => { this.showIncludes() }}>Includes</span>
@@ -186,7 +186,7 @@ end`}>
           </div>
 
           <div className="terminal" id="terminal">
-            <textarea id="cc" onKeyDown={(e) => megaclass.handleCCKeyDown(e)} ></textarea>
+            <textarea id="cc" onKeyDown={(e) => interpreter.handleCCKeyDown(e)} ></textarea>
           </div>
         </div>
       </div>

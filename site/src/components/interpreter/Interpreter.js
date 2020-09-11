@@ -1,10 +1,7 @@
 /* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off" */
 
-import TurtleLogo from './turtlelogo';
-import Tokenizer from './tokenizer';
-
-
-const turtleLogo = new TurtleLogo();
+import Tokenizer from './Tokenizer';
+import turtleMath from './turtleMath';
 
 Number.prototype.mod = function (n) { return ((this % n) + n) % n; }
 
@@ -20,7 +17,7 @@ var outputStream;
 
 
 
-export default class Megaclass {
+export default class Interpreter {
 
 
     constructor(canvasHeight, canvasWidth, addToChart) {
@@ -32,7 +29,7 @@ export default class Megaclass {
         this.addToChart = addToChart;
 
         //turtle
-        this.datapoints = [];
+
         this.cnvWidth = canvasWidth;
         this.cnvHeight = canvasHeight;
         // this.img;
@@ -116,94 +113,9 @@ export default class Megaclass {
         this.respStr = '';
         this.fe = undefined;
 
-
-
-
-        function load() {
-            // this.focus();
-            var fr = new FileReader();
-            fr.onload = function (e) { this.value = e.target.result; this.readProcs(); };
-
-            function next(fe) { this.fe = fe; fe.file(next2); }
-
-            function next2(file) { handleFile(file); }
-        }
-
-
-        function handleFile(file) {
-            var procs = document.getElementById('procs');
-            if (file == undefined) return;
-            var filename = file.name.split('.')[0];
-            if (file.type == 'text/plain') {
-                var fileReader = new FileReader();
-                fileReader.onload = readprocs;
-                fileReader.readAsText(file);
-            } else if (file.type == 'image/png') {
-                var fileReader = new FileReader();
-                fileReader.onload = readimage;
-                fileReader.readAsDataURL(file);
-            }
-
-            function readprocs() {
-                if (!procs) { var procs = { value: "null" } }
-                procs.value = reader.result;
-                this.readProcs();
-            }
-
-            function readimage() {
-                this.loadpng(reader.result, this.createDragImage);
-            }
-        }
-
-        function saveas(e) {
-            this.focus();
-            if (!e.shiftKey) saveAsText();
-            else saveAsPNG()
-
-            function saveAsText() {
-                if (!procs) { var procs = { value: "null" } }
-                var name = (this.fe) ? this.fe.name : 'untitled.txt';
-                var blob = new Blob([procs.value], { type: 'plain/text' });
-                // chrome.fileSystem.chooseEntry({type: "saveFile", suggestedName: name}, next1)
-
-                function next1(fe) { if (fe) { this.fe = fe; fe.createWriter(function (w) { w.truncate(0); }); fe.createWriter(next2); } }
-                function next2(writer) { writer.write(blob); }
-            }
-
-            function saveAsPNG() {
-                if (!procs) { var procs = { value: "null" } }
-                var name = (this.fe) ? this.fe.name.replace('.txt', '.png') : 'untitled.png';
-                // chrome.fileSystem.chooseEntry({type: "saveFile", suggestedName: name}, next1)
-
-                function next1(fe) { if (fe) { fe.createWriter(function (w) { w.truncate(0); }); fe.createWriter(next2); } }
-                function next2(writer) {
-                    ImageData.setImageData(this.ctx, procs.value);
-                    //canvas.toBlob(function(blob){next3(writer,blob);});
-                }
-                function next3(writer, blob) { writer.write(blob); }
-            }
-        }
-
-        function save() {
-            this.focus();
-            if (!procs) { var procs = { value: "null" } }
-            var blob = new Blob([procs.value], { type: 'plain/text' });
-            if (this.fe) {
-                this.fe.createWriter(function (w) { w.truncate(0); });
-                this.fe.createWriter(next2);
-            }
-
-            function next2(writer) { writer.write(blob); }
-        }
     }
 
-    //turtle js
-
-    rad(a) { return a * 2 * Math.PI / 360; }
-    deg(a) { return a * 360 / (2 * Math.PI); }
-
-    cosdeg(x) { return Math.cos(x * 2 * Math.PI / 360); }
-
+    
     //replacing 'setup' for now so it doesn't conflict
     setuptl() {
         //setup(){
@@ -284,11 +196,10 @@ export default class Megaclass {
         if (t.pendown) {
             t.ctx.beginPath();
             t.ctx.moveTo(t.xcor + t.cnvWidth / 2, t.cnvHeight / 2 - t.ycor);
-            var ctx = t.ctx
 
         }
-        t.xcor += n * turtleLogo.sindeg(t.heading);
-        t.ycor += n * this.cosdeg(t.heading);
+        t.xcor += n * turtleMath.sindeg(t.heading);
+        t.ycor += n * turtleMath.cosdeg(t.heading);
         if (t.pendown) {
             var sx = t.xcor + t.cnvWidth / 2, sy = t.cnvHeight / 2 - t.ycor;
             if (n >= .1) t.ctx.lineTo(sx, sy);
@@ -341,13 +252,13 @@ export default class Megaclass {
         function rightArc(a, r) {
             var sgn = r / Math.abs(r);
             var ar = Math.abs(r);
-            var dx = ar * t.cosdeg(t.heading);
-            var dy = ar * turtleLogo.sindeg(t.heading);
+            var dx = ar * turtleMath.cosdeg(t.heading);
+            var dy = ar * turtleMath.sindeg(t.heading);
             var cx = t.xcor + dx;
             var cy = t.ycor - dy;
             if (t.pendown) {
                 var sx = t.cnvWidth / 2 + cx, sy = t.cnvHeight / 2 - cy;
-                var astart = t.rad(t.heading + 180.0), aend = t.rad(t.heading + 180 + a * sgn);
+                var astart = turtleMath.rad(t.heading + 180.0), aend = turtleMath.rad(t.heading + 180 + a * sgn);
                 if ((a % 360) == 0) aend += .0001;
                 var dir = r < 0;
                 t.ctx.beginPath();
@@ -357,20 +268,20 @@ export default class Megaclass {
                 if (t.fillpath) t.fillpath.push(function () { this.ctx.arc(sx, sy, ar, astart, aend, dir); });
             }
             t.seth(t.heading + a * sgn);
-            t.xcor = cx - ar * t.cosdeg(t.heading);
-            t.ycor = cy + ar * turtleLogo.sindeg(t.heading);
+            t.xcor = cx - ar * turtleMath.cosdeg(t.heading);
+            t.ycor = cy + ar * turtleMath.sindeg(t.heading);
         }
 
         function leftArc(a, r) {
             var sgn = r / Math.abs(r);
             var ar = Math.abs(r);
-            var dx = ar * this.cosdeg(t.heading);
-            var dy = ar * turtleLogo.sindeg(t.heading);
+            var dx = ar * turtleMath.cosdeg(t.heading);
+            var dy = ar * turtleMath.sindeg(t.heading);
             var cx = t.xcor - dx;
             var cy = t.ycor + dy;
             if (t.pendown) {
                 var sx = t.cnvWidth / 2 + cx, sy = t.cnvHeight / 2 - cy;
-                var astart = this.rad(t.heading), aend = this.rad(t.heading + a * sgn);
+                var astart = turtleMath.rad(t.heading), aend = turtleMath.rad(t.heading + a * sgn);
                 var dir = r >= 0;
                 if ((a % 360) == 0) aend += .0001;
                 t.ctx.beginPath();
@@ -380,8 +291,8 @@ export default class Megaclass {
                 if (t.fillpath) t.fillpath.push(function () { this.ctx.arc(sx, sy, ar, astart, aend, dir); });
             }
             t.seth(t.heading + a * sgn);
-            t.xcor = cx + ar * this.cosdeg(t.heading);
-            t.ycor = cy - ar * turtleLogo.sindeg(t.heading);
+            t.xcor = cx + ar * turtleMath.cosdeg(t.heading);
+            t.ycor = cy - ar * turtleMath.sindeg(t.heading);
         }
     }
 
@@ -396,7 +307,6 @@ export default class Megaclass {
 
     fillscreen(c, s) {
 
-        var oldcolor = this.color, oldshade = this.shade;
         if ((typeof c) == 'object') c = c[0];
         this.setCtxColorShade(c, s);
         this.ctx.fillRect(0, 0, this.cnvWidth, this.cnvHeight);
@@ -421,7 +331,7 @@ export default class Megaclass {
     }
 
     startfill() {
-        this.fillpath = new Array();
+        this.fillpath = [];
         var sx = this.xcor + this.cnvWidth / 2, sy = this.cnvHeight / 2 - this.ycor;
         this.fillpath.push(function () { this.ctx.moveTo(sx, sy); });
     }
@@ -453,7 +363,7 @@ export default class Megaclass {
         var t = this;
         t.ctx.save();
         this.ctx.translate(t.xcor + t.cnvWidth / 2, t.cnvHeight / 2 - t.ycor);
-        t.ctx.rotate(this.rad(t.heading));
+        t.ctx.rotate(turtleMath.rad(t.heading));
         t.ctx.fillText(str, 0, 0);
         t.ctx.restore();
     }
@@ -485,7 +395,8 @@ export default class Megaclass {
         var dy = screenTop();
         var s = 1;
 
-        t.element.style.webkitTransform = 'translate(' + dx + 'px, ' + dy + 'px) rotate(' + t.heading + 'deg)' + ' scale(' + s + ',' + s + ')';
+        t.element.style.webkitTransform = `translate(${dx}px, ${dy}px) rotate(${t.heading}deg) scale(${s}, ${s})`;
+        // 'translate(' + dx + 'px, ' + dy + 'px) rotate(' + t.heading + 'deg)' + ' scale(' + s + ',' + s + ')';
         t.element.left = dx;
         t.element.top = dy;
 
@@ -534,7 +445,7 @@ export default class Megaclass {
     loadimg(dataurl, fcn) {
         var t = this;
         var ctx = this.ctx;
-        var img = new Image;
+        var img = new Image();
         img.onload = drawImageToFit;
         img.src = dataurl;
 
@@ -551,7 +462,7 @@ export default class Megaclass {
     loadpng(dataurl, fcn) {
         var t = this;
         var ctx = this.ctx;
-        var img = new Image;
+        var img = new Image();
         img.onload = drawImageToFit;
         img.src = dataurl;
 
@@ -650,7 +561,7 @@ export default class Megaclass {
             var thisproc = undefined;
             for (var i in prims) if ((prims[i].type) == 'normal') delete prims[i];
             var lines = str.split('\n');
-            for (var i = 0; i < lines.length; i++) procLines(lines[i]);
+            for (var j = 0; j < lines.length; j++) procLines(lines[j]);
             
 
             //TODO: This isn't passing values as arguments when words are defined. Meaning 'to something :n' doesn't see :n as having a value when you call 'something 5'.
@@ -732,16 +643,14 @@ export default class Megaclass {
     }
 
     handleFile(file) {
+        var fileReader = new FileReader();
         if (file == undefined) return;
-        var filename = file.name.split('.')[0];
         if (file.type == 'text/plain') {
-            var reader = new FileReader();
-            reader.onload = readprocs;
-            reader.readAsText(file);
+            fileReader.onload = readprocs;
+            fileReader.readAsText(file);
         } else if (file.type == 'image/png') {
-            var reader = new FileReader();
-            reader.onload = readimage;
-            reader.readAsDataURL(file);
+            fileReader.onload = readimage;
+            fileReader.readAsDataURL(file);
         }
 
         function readprocs() {
@@ -1030,7 +939,6 @@ export default class Megaclass {
     last(l) {
        if (l && (typeof l) == 'object') return l[l.length - 1];
        return String(l).substring(String(l).length - 1);
-    return
     }
 
     butlast(l) {
@@ -1205,28 +1113,8 @@ export default class Megaclass {
 
     //cc js
     insert(str) {
-        //NOTE: I commented out all of the original code that was here.
-        //It is very unclear what the intention was of any of this, but I imagine scrolling is a portion of this.
-        //Rather than try to reason through it, creating a new terminal, following UNIX terminal logic, may be best.
-        //It remains confusing to students when they can edit the terminal commands above the current new line. So, we should make the parts above the current entry uneditable,
-        //and maybe add a '>' or something so they can tell where they're supposed to be.
-        //Let's call that a TODO.
-
         var cc = document.getElementById("cc");
         cc.value = cc.value + str;
-        // var startpos = this.selectionStart;
-        // var endpos = this.selectionEnd;
-        // var t = cc.value;
-        // var before = t.substring(0, startpos);
-        // var after = t.substring(endpos);
-        // var oldtop = cc.scrollTop;
-        //  cc.value = before + str;
-        //  var halfscroll = this.scrollHeight - this.scrollTop - this.offsetHeight;
-        //  cc.value = before + str + after;
-        //  cc.selectionStart = startpos + str.length;
-        // this.selectionEnd = startpos + str.length;
-        // if (halfscroll > 0) cc.scrollTop += halfscroll;
-        // else cc.scrollTop = oldtop;
     }
 
     runLine(str) {
@@ -1358,11 +1246,12 @@ export default class Megaclass {
         while (true) {
             const { value, done } = await reader.read();
             if (value) {
+                var newValue;
                 this.handleReceiveData(value);
                 if (value[1] != 0) {
-                    var newValue = value[0] + 256 * value[1]
+                    newValue = value[0] + 256 * value[1]
                 } else {
-                    var newValue = value[0];
+                    newValue = value[0];
                 }
                 this.allReceivedData.push(newValue);
 
@@ -1426,8 +1315,8 @@ prims['remainder'] = { nargs: 2, fcn: function (a, b) { return this.getnum(a).mo
 prims['round'] = { nargs: 1, fcn: function (a) { return Math.round(this.getnum(a)); } }
 prims['int'] = { nargs: 1, fcn: function (a) { return Math.floor(this.getnum(a)); } }
 prims['minus'] = { nargs: 1, fcn: function (a) { return -a; } }
-prims['sin'] = { nargs: 1, fcn: function (a) { return turtleLogo.sindeg(this.getnum(a)); } }
-prims['cos'] = { nargs: 1, fcn: function (a) { return this.cosdeg(this.getnum(a)); } }
+prims['sin'] = { nargs: 1, fcn: function (a) { return turtleMath.sindeg(this.getnum(a)); } }
+prims['cos'] = { nargs: 1, fcn: function (a) { return turtleMath.cosdeg(this.getnum(a)); } }
 prims['sqrt'] = { nargs: 1, fcn: function (a) { return Math.sqrt(this.getnum(a)); } }
 prims['random2'] = { nargs: 2, fcn: function (a, b) { return this.random.pickRandom(a, b); } }
 prims['oneof'] = { nargs: 2, fcn: function (a, b) { return this.random.oneof(a, b); } }

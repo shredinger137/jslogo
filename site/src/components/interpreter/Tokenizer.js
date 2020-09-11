@@ -1,3 +1,5 @@
+/* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off" */
+
 export default class Tokenizer {
     constructor(stringToEvaluate) {
         this.stringToEvaluate = stringToEvaluate;
@@ -11,7 +13,7 @@ export default class Tokenizer {
         return readList();
 
         function readList() {
-            var arrayOfTokens = new Array();
+            var arrayOfTokens = [];
             skipSpace();
             while (true) {
                 if (eof()) break;
@@ -27,13 +29,13 @@ export default class Tokenizer {
             var n = Number(s);
             if (!isNaN(n)) return n;
             var first = s.charAt(0);
-            if (first == "]") return null;
-            if (first == "[") return readList();
+            if (first === "]") return null;
+            if (first === "[") return readList();
             return s;
         }
 
         function next() {
-            if (peekChar() == "'") return readString();
+            if (peekChar() === "'") return readString();
             var res = '';
             if (delim()) res = nextChar();
             else {
@@ -55,17 +57,6 @@ export default class Tokenizer {
                 var c = nextChar();
                 res += c;
                 if (c == "'") { skipSpace(); return res; }
-            }
-        }
-
-        //This never seems to be called - is that a mistake?
-        function nextLine() {
-            var res = '';
-            while (true) {
-                if (eof()) return res;
-                var c = nextChar();
-                if (c == '\n') return res;
-                res += c;
             }
         }
 
