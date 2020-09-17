@@ -1,4 +1,10 @@
+import React from 'react';
+
 export default class Projects {
+
+    componentDidMount(){
+
+    }
 
     saveAs(){
         var filename = "filename.txt";

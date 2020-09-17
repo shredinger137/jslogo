@@ -8,6 +8,11 @@ import includes from './components/interpreter/includes.js'
 import Projects from './components/Projects.js';
 var CodeMirror = require('react-codemirror');
 
+//More thoughts: If the only thing this actually does for us is numbered lines it might be better to just copy that methodology.
+//This is proving difficult to use. Loading files isn't working right, state management just got more complex. Not really worth it so far.
+//I'm going to disable codemirror for now.
+//Here was the include, for reference: <CodeMirror value={this.state.code} onChange={this.updateCode.bind(this)} options={{ lineNumbers: true }} />
+
 //We should look into CodeMirror-React2, which might provide better options for setting custom highlighting.
 //See https://stackoverflow.com/questions/63185680/how-to-use-custom-codemirror-modes-using-react-codemirror2.
 
@@ -18,6 +23,9 @@ var projects;
 //Now that Code Mirror has been added, we're not using procs.value directly. Instead, procs.value is being set to hold the code value 
 //for the interpreter to check. That means the browser has three copies of the entire code - the state, the procs.value and the code mirror divs.
 //That doesn't seem like a good idea, so finding a better way to pass the code to 'interpreter' would be better.
+
+//Also with Code Mirror: Tab now makes indentations instead of changing focus. We want that. But we might have to find another way to switch focus, like ctrl + tab or something,
+//so that we meet accessibility requirements.
 
 class App extends Component {
 
@@ -58,7 +66,7 @@ end`,
 
 
     interpreter = new Interpreter(document.getElementById("cnvframe").offsetHeight, document.getElementById("cnvframe").offsetWidth, this.addToChart.bind(this));
-    projects = new Projects();
+    projects = new Projects(this.updateCode);
     interpreter.setup();
 
     const connectButton = document.getElementById('connectButton');
@@ -97,25 +105,10 @@ end`,
   }
 
 
-  async clickConnect() {
-    await this.connectAndStartReading();
-  }
-
-  handleTerminalEntry(e) {
-    if (e && e.keyCode === 13) {
-      var terminalAllContent = document.getElementById("cc").value.split('\n').reverse();
-      var terminalLastLine = terminalAllContent[0];
-      this.interpretAndSend(terminalLastLine);
-
-    }
-  }
-
   chartToggle() {
     this.setState({ chartToggle: !this.state.chartToggle });
     document.getElementById("chartFrame").classList.toggle("hide");
     document.getElementById("cnvframe").classList.toggle("hide");
-
-
 
   }
 
@@ -130,9 +123,18 @@ end`,
   }
 
   updateCode(newCode) {
+    console.log("newcode");
+    console.log(newCode);
     this.setState({
       code: newCode,
     });
+  }
+
+  updateFromListener(){
+    console.log("updateFromListener");
+    var newCode = document.getElementById('listener').value;
+    this.updateCode(newCode);
+    document.getElementById('listener').value = "";
   }
 
 
@@ -161,9 +163,15 @@ end`,
         </div>
         <div className="interfaceGrid">
           <div className="codeEntry" id="codeEntryDiv" style={{ border: "1px solid black" }}>
-            <textarea id="procs" value={this.state.code} style={{ display: "none" }}>
+            <textarea id="procs" defaultValue={`to go
+   printSomething 5
+end
+
+to printSomething :n
+   print :n
+end`}
+>
             </textarea>
-            <CodeMirror value={this.state.code} onChange={this.updateCode.bind(this)} options={{ lineNumbers: true }} />
           </div>
           <div className="codeEntry" id="includesWrapper" style={{ display: "none" }}>
             <textarea id="includes" defaultValue={includes}
