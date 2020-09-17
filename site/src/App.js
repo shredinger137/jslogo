@@ -1,11 +1,27 @@
 import React, { Component } from 'react';
 import './css/styles.css';
 import './css/layout.css';
+import './css/codemirror.css';
 import Interpreter from './components/interpreter/Interpreter';
 import { Scatter } from 'react-chartjs-2';
 import includes from './components/interpreter/includes.js'
+import Projects from './components/Projects.js';
+var CodeMirror = require('react-codemirror');
+require('codemirror/mode/logo/logo');
+
+//The 'logo' dependency is part of the codemirror package, but edited to reflect our needs.
+//It hasn't been edited well and this is not a great way to include it. The edit is saved via the npx patch function. 
+//It's possible that the codemirror-react2 package has a better way to include custom functions, assuming we want to use this 
+//at all for syntax highlighting and such.
+
 
 var interpreter;
+var projects;
+
+//TODO:
+//Now that Code Mirror has been added, we're not using procs.value directly. Instead, procs.value is being set to hold the code value 
+//for the interpreter to check. That means the browser has three copies of the entire code - the state, the procs.value and the code mirror divs.
+//That doesn't seem like a good idea, so finding a better way to pass the code to 'interpreter' would be better.
 
 class App extends Component {
 
@@ -16,6 +32,10 @@ class App extends Component {
 
   chartRef = {}
   state = {
+    code: 
+`to go
+  print 5
+end`,
     canvasHeight: 400,
     canvasWidth: 900,
     showChartFrame: false,
@@ -42,7 +62,7 @@ class App extends Component {
 
 
     interpreter = new Interpreter(document.getElementById("cnvframe").offsetHeight, document.getElementById("cnvframe").offsetWidth, this.addToChart.bind(this));
-    interpreter.setuptl();
+    projects = new Projects();
     interpreter.setup();
 
     const connectButton = document.getElementById('connectButton');
@@ -61,6 +81,9 @@ class App extends Component {
 
 
   }
+
+ 
+
 
   addToChart(x, y) {
     var newData = this.state.chartData;
@@ -110,6 +133,11 @@ class App extends Component {
     document.getElementById('codeEntryDiv').style.display = "none";
   }
 
+  updateCode(newCode) {
+    this.setState({
+      code: newCode,
+    });
+  }
 
 
   render() {
@@ -118,6 +146,7 @@ class App extends Component {
         <header className="header">
           <h1>Learning by Making</h1>
         </header>
+
         <div className="main">
           <p>Click 'connect' to start, then select the Arduino device. Defining a 'go' word allows you to run
           things by clicking 'go', or you can use the terminal at the bottom. Use dp3on to turn on pin 3, read0 to read the sensor on A0. Requires Chrome. The chart can be updated with chartpush x y.
@@ -127,23 +156,18 @@ class App extends Component {
           <button id="disconnectButton" type="button" style={{ display: "none" }}>Disconnect</button>
           <button id="gobutton" onClick={() => { interpreter.runLine("go") }}>Go</button>
           <button id="chartToggle" onClick={() => this.chartToggle()}>Toggle Chart</button>
-          <span style={{paddingLeft: "100px"}}>Load File:</span>
-          <input id="load" type="file" onChange={() => interpreter.loadFile()} />
-          <button id="saveAs" onClick={() => interpreter.saveAs()}>Save File</button>
+          <span style={{ paddingLeft: "100px" }}>Load File:</span>
+          <input id="load" type="file" onChange={() => projects.loadFile()} />
+          <button id="saveAs" onClick={() => projects.saveAs()}>Save File</button>
           <br /><br />
           <span style={{ float: "left", marginRight: "20px" }} onClick={() => { this.showCode() }}>Code</span><span style={{ float: "left" }} onClick={() => { this.showIncludes() }}>Includes</span>
           <br />
         </div>
         <div className="interfaceGrid">
-          <div className="codeEntry" id="codeEntryDiv">
-            <textarea id="procs" defaultValue={`to go
-something 5
-end
-
-to something :n
-print :n
-end`}>
+          <div className="codeEntry" id="codeEntryDiv" style={{ border: "1px solid black" }}>
+            <textarea id="procs" value={this.state.code} style={{ display: "none" }}>
             </textarea>
+            <CodeMirror value={this.state.code} onChange={this.updateCode.bind(this)} options={{ lineNumbers: true, mode: 'logo' }} />
           </div>
           <div className="codeEntry" id="includesWrapper" style={{ display: "none" }}>
             <textarea id="includes" defaultValue={includes}
@@ -184,6 +208,7 @@ end`}>
                 redraw={true}
                 ref={this.chartReference}
               />
+
 
             </div>
           </div>

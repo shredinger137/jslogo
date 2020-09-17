@@ -1,7 +1,5 @@
 /* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off" */
 
-//TODO: Added errors to all throws. Next, make a test that runs every command and a sample code with multiple words to test LOGO.
-
 //TODO: Change to contenteditable div for code entry, to improve styling. Change 'value' to 'innerHTML' to accomodate this.
 
 
@@ -9,7 +7,6 @@ import Tokenizer from './Tokenizer';
 import turtleMath from './turtleMath';
 
 Number.prototype.mod = function (n) { return ((this % n) + n) % n; }
-
 
 var constants = {
     black: '-9999&0', white: '-9999&100', red: '0&50', green: '30&50', blue: '70&50',
@@ -113,42 +110,18 @@ export default class Interpreter {
 
     }
 
-    saveAs(){
-        var filename = "filename.txt";
-		var textToSave = document.getElementById('procs').value;
-        var newFile = new Blob([textToSave], {type: 'plain/text'});
-        var a = document.createElement("a"),
-                url = URL.createObjectURL(newFile);
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(function() {
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);  
-        }, 0); 
 
-    }
-
-    loadFile() {
-        const input = document.getElementById('load');
-        const file = input.files[0];
-        var fileReader = new FileReader()
-
-        fileReader.onload = function(fileLoadedEvent){
-            var textFromFileLoaded = fileLoadedEvent.target.result;
-            document.getElementById("procs").value = textFromFileLoaded;
-        };
-        fileReader.readAsText(file, "UTF-8");
+    openText() {
 
     }
 
 
-    //replacing 'setup' for now so it doesn't conflict
-    setuptl() {
-        //setup(){
-        this.loadStartup();
+    setup() {
+
         var t = this;
+       //commented out sept. 2020 - doesn't seem to be needed
+        // var procs = document.getElementById('procs');
+       // procs.focus();
         this.element = document.createElement('div');
         this.element.setAttribute('class', 'turtle');
         var cnvframe = document.getElementById('cnvframe');
@@ -163,6 +136,7 @@ export default class Interpreter {
         canvas.height = t.cnvHeight * t.dpi;
         t.ctx.scale(t.dpi, t.dpi);
         t.ctx.textBaseline = "middle";
+        window.requestAnimationFrame(this.ticker);
 
 
         function imgLoaded() {
@@ -175,8 +149,6 @@ export default class Interpreter {
 
     }
 
-    //CC moved
-
     handleCCKeyDown(e) {
         var k = e.keyCode;
         if (k == 13) {
@@ -184,7 +156,7 @@ export default class Interpreter {
             else this.handlecr(e);
         }
         if (e.ctrlKey) {
-            //if(e.keyCode==70) {e.preventDefault(); e.stopPropagation(); procs.focus();}
+            if(e.keyCode==70) {e.preventDefault(); e.stopPropagation();}
             if (e.keyCode == 71) { e.preventDefault(); e.stopPropagation(); this.runLine('go'); }
             if (e.keyCode == 190) { this.insert('stopped!\n'); this.reset([]); }
         }
@@ -211,6 +183,7 @@ export default class Interpreter {
         document.getElementById('cc').selectionStart = pos + 1;
         document.getElementById('cc').selectionEnd = pos + 1;
     }
+
     /////////////////////////
     //
     // Turtle
@@ -629,17 +602,8 @@ export default class Interpreter {
         }
     }
 
-    //i3-logo js from tlogo site
-    setup() {
-        this.openText();
-        window.requestAnimationFrame(this.ticker);
-    }
 
-    openText() {
-        var procs = document.getElementById('procs');
-        //procs.value = this.turtleStart;
-        procs.focus();
-    }
+
 
     //Ticker is the main loop - it continuously runs and updates movement, evaluating as it goes. Similar to frame updates in game frameworks.
     //'Hold' freezes evaluation and shows up in other functions; move is turtle specific.
@@ -1082,26 +1046,6 @@ export default class Interpreter {
     isDone() { return (this.stack.length == 0) && (this.evline.length == 0); }
 
 
-
-    //extensions js
-    //TODO: This doesn't actually load Startup. And you wouldn't expect it to.... so... there's that.
-    //We're now going to place this in 'Includes' in the main app, at least for now, and evaluate both that and 'procs' added together.
-    //Delete 'loadStartup' if this becomes how things stay.
-
-    loadStartup() {
-        var contextThis = this;
-        var req = new XMLHttpRequest();
-        req.onreadystatechange = next;
-        req.open('GET', 'startup.logo');
-        req.send();
-
-        function next() {
-            if (req.readyState != 4) return;
-            if (req.status != 200) return;
-            contextThis.procString(req.responseText, 'startup');
-            if (prims['startup']) contextThis.runLine('startup');
-        }
-    }
 
     //cc js
     insert(str) {
