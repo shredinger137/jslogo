@@ -127,6 +127,8 @@ class App extends Component {
           <button id="disconnectButton" type="button" style={{ display: "none" }}>Disconnect</button>
           <button id="gobutton" onClick={() => { interpreter.runLine("go") }}>Go</button>
           <button id="chartToggle" onClick={() => this.chartToggle()}>Toggle Chart</button>
+          <span style={{paddingLeft: "100px"}}>Load File:</span>
+          <input id="load" type="file" onChange={() => interpreter.loadFile()} />
           <br /><br />
           <span style={{ float: "left", marginRight: "20px" }} onClick={() => { this.showCode() }}>Code</span><span style={{ float: "left" }} onClick={() => { this.showIncludes() }}>Includes</span>
           <br />
@@ -147,11 +149,11 @@ end`}>
             />
           </div>
           <div className="chartArea">
-            <div id="cnvframe" style={{height: "100%", width: "100%" }}>
+            <div id="cnvframe" style={{ height: "100%", width: "100%" }}>
               <canvas className="cnv" id="canvas" ></canvas>
             </div>
-            <div id="chartFrame"  className="hide" style={{  height: "100%", width: "100%" }}>
-            <Scatter
+            <div id="chartFrame" className="hide" style={{ height: "100%", width: "100%" }}>
+              <Scatter
                 data={{
                   datasets:
                     [
@@ -162,7 +164,7 @@ end`}>
 
                     ]
                 }}
-     
+
 
                 options={{
                   responsive: true,

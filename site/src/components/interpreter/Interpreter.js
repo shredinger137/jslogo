@@ -1,5 +1,10 @@
 /* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off" */
 
+//TODO: Added errors to all throws. Next, make a test that runs every command and a sample code with multiple words to test LOGO.
+
+//TODO: Change to contenteditable div for code entry, to improve styling. Change 'value' to 'innerHTML' to accomodate this.
+
+
 import Tokenizer from './Tokenizer';
 import turtleMath from './turtleMath';
 
@@ -15,17 +20,13 @@ var reader;
 var flushtime = 200;
 var outputStream;
 
-
-
 export default class Interpreter {
-
 
     constructor(canvasHeight, canvasWidth, addToChart) {
         this.allReceivedData = [0];
         this.ticker = this.ticker.bind(this);
         this.isDone = this.isDone.bind(this);
 
-        this.procs = document.getElementById("procs");
         this.addToChart = addToChart;
 
         //turtle
@@ -67,11 +68,8 @@ export default class Interpreter {
 
         //procs js
         var t = this;
-        this.procs.autocapitalize = 'off';
-        this.procs.autocorrect = 'off';
-        this.procs.autocomplete = 'off';
-        this.procs.spellcheck = false;
-        this.procs.focused = false;
+
+        this.procs = document.getElementById("procs");
         this.procs.onfocus = function () { this.focused = true; };
         this.procs.onblur = function () { this.focused = false; t.readProcs() };
         this.procs.onkeydown = handleKeyDown;
@@ -115,7 +113,24 @@ export default class Interpreter {
 
     }
 
-    
+    loadFile() {
+        console.log("loadFile");
+        const input = document.getElementById('load');
+        const file = input.files[0];
+        var fileReader = new FileReader()
+
+        fileReader.onload = function(fileLoadedEvent){
+            console.log("filereader");
+            var textFromFileLoaded = fileLoadedEvent.target.result;
+            document.getElementById("procs").value = textFromFileLoaded;
+        };
+        fileReader.readAsText(file, "UTF-8");
+        // fr.onload = function (e) { document.getElementById("procs").value = e.target.result; procedures.readProcs(); };
+        //navigator.fileSystem.chooseEntry()
+
+    }
+
+
     //replacing 'setup' for now so it doesn't conflict
     setuptl() {
         //setup(){
@@ -562,7 +577,7 @@ export default class Interpreter {
             for (var i in prims) if ((prims[i].type) == 'normal') delete prims[i];
             var lines = str.split('\n');
             for (var j = 0; j < lines.length; j++) procLines(lines[j]);
-            
+
 
             //TODO: This isn't passing values as arguments when words are defined. Meaning 'to something :n' doesn't see :n as having a value when you call 'something 5'.
 
@@ -579,8 +594,8 @@ export default class Interpreter {
                 else if (sl[0] == 'end') { thisproc = undefined; return; }
                 if (thisproc == undefined) return;
                 prims[thisproc].fcn += (l + '\n');
-                if(thisproc == "something"){
-            }
+                if (thisproc == "something") {
+                }
             }
         }
 
@@ -590,7 +605,7 @@ export default class Interpreter {
                 var fcn = prim.fcn;
                 if ((typeof fcn) != 'string') continue;
 
-                if(prim.parsed) continue;
+                if (prim.parsed) continue;
                 prim.parsed = Tokenizer.parse(fcn);
 
 
@@ -673,8 +688,8 @@ export default class Interpreter {
         this.priority = 0;
         this.stack = [];
         this.frame = [];
-       
-        
+
+
         //This locals line had previously been commented out, as it broke make, but it seems to be working now. Delete this comment if it doesn't come up again.
         //Commented August 2020
         //NOTE: This locals line is still very suspicious. I still don't know why it exists or what, exactly, it's for.
@@ -696,7 +711,7 @@ export default class Interpreter {
             }
             if (t.evline.length == 0) {
                 if (t.cfun == undefined) t.evalEOL();
-                else throw 'not enough inputs to ' + t.cfun;
+                else throw 'error: not enough inputs to ' + t.cfun;
                 return;
             }
             var token = t.evline.shift();
@@ -716,7 +731,7 @@ export default class Interpreter {
             else if (constants[token]) t.pushResult(constants[token]);
             else {
                 if (token == '(') handleParend();
-                if (prims[token] == undefined) throw "I don't know how to " + token;
+                if (prims[token] == undefined) throw "error: I don't know how to " + token;
                 t.stack.push(t.cfun);
                 t.stack.push(t.arglist);
                 t.stack.push(t.priority);
@@ -745,7 +760,7 @@ export default class Interpreter {
             t.priority = t.stack.pop();
             t.arglist = t.stack.pop();
             t.cfun = t.stack.pop();
-            if ((res == undefined) && (t.cfun != undefined)) throw prim + " didn't output to " + t.cfun;
+            if ((res == undefined) && (t.cfun != undefined)) throw "error:" + prim + " didn't output to " + t.cfun;
             t.pushResult(res);
         }
 
@@ -761,7 +776,7 @@ export default class Interpreter {
                 var bindings = {};
                 var inputs = prims[cfun].inputs;
                 for (var i in inputs) bindings[inputs[i]] = arglist[i];
-                 t.locals.unshift(bindings);
+                t.locals.unshift(bindings);
             }
         }
     }
@@ -769,7 +784,7 @@ export default class Interpreter {
     pushResult(res) {
         var t = this;
         if (res == undefined) return;
-        if (t.cfun == undefined) throw "you don't say what to do with " + t.printstr(res);
+        if (t.cfun == undefined) throw "warning: you don't say what to do with " + t.printstr(res);
         if (isInfixNext()) infixCall(res);
         else t.arglist.push(res);
 
@@ -796,7 +811,7 @@ export default class Interpreter {
         for (var i in this.locals) {
             if (this.locals[i][name] != undefined) return this.locals[i][name];
         }
-        throw name + ' has no value';
+        throw 'warning: ' + name + ' has no value';
     }
 
     setValue(name, value) {
@@ -814,7 +829,7 @@ export default class Interpreter {
 
     procOutput(t, x) {
         if (t.frame.length == 0) {
-            if (x != undefined) throw "output can only be used in a procedure.";
+            if (x != undefined) throw "error: output can only be used in a procedure.";
             this.reset([]);
             return;
         }
@@ -855,7 +870,7 @@ export default class Interpreter {
         t.priority = t.stack.pop();
         t.arglist = t.stack.pop();
         t.cfun = t.stack.pop();
-        if (t.cfun != undefined) throw prim + " didn't output to " + t.cfun;
+        if (t.cfun != undefined) throw "error: " + prim + " didn't output to " + t.cfun;
     }
 
     repeat(n, l) {
@@ -937,8 +952,8 @@ export default class Interpreter {
     }
 
     last(l) {
-       if (l && (typeof l) == 'object') return l[l.length - 1];
-       return String(l).substring(String(l).length - 1);
+        if (l && (typeof l) == 'object') return l[l.length - 1];
+        return String(l).substring(String(l).length - 1);
     }
 
     butlast(l) {
@@ -1004,7 +1019,6 @@ export default class Interpreter {
     now() { return new Date().getTime(); }
 
     getDate() {
-        //return new Date(t0+(now()-t0)*this.clockspeed);
         return new Date();
     }
 
@@ -1031,7 +1045,7 @@ export default class Interpreter {
 
     textAlign(str) {
         if (['center', 'left', 'right'].indexOf(str) > -1) this.ctx.textAlign = str;
-        else throw this.cfun + " doesn't like " + this.printstr(str) + ' as input';
+        else throw "error: " + this.cfun + " doesn't like " + this.printstr(str) + ' as input';
     }
 
 
@@ -1054,24 +1068,24 @@ export default class Interpreter {
 
     getnum(x) {
         var n = Number(x);
-        if (isNaN(n) || (String(x) == 'false') || (String(x) == 'true')) throw this.cfun + " doesn't like " + this.printstr(x) + ' as input';
+        if (isNaN(n) || (String(x) == 'false') || (String(x) == 'true')) throw "error: " + this.cfun + " doesn't like " + this.printstr(x) + ' as input';
         return n;
     }
 
     getlist(x) {
         if ((typeof x) == 'object') return x;
-        throw this.cfun + " doesn't like " + this.printstr(x) + ' as input';
+        throw "error: " + this.cfun + " doesn't like " + this.printstr(x) + ' as input';
     }
 
     getbool(x) {
         if (String(x) == 'false') return false;
         if (String(x) == 'true') return true;
-        throw this.cfun + " doesn't like " + this.printstr(x) + ' as input';
+        throw "error: " + this.cfun + " doesn't like " + this.printstr(x) + ' as input';
     }
 
     getcolor(x) {
         var type = typeof x;
-        if (type == 'object') throw this.cfun + " doesn't like " + this.printstr(x) + ' as input';
+        if (type == 'object') throw "error: " + this.cfun + " doesn't like " + this.printstr(x) + ' as input';
         if (type == 'number') return x;
         var l = x.split('&');
         if (l.length == 1) return Number(x);
@@ -1194,7 +1208,7 @@ export default class Interpreter {
             writer.write(message);
             writer.releaseLock();
         } else {
-            throw "not connected";
+            throw "error: not connected";
         }
     }
 
@@ -1206,7 +1220,7 @@ export default class Interpreter {
             writer.write(message);
             writer.releaseLock();
         } else {
-            throw "not connected";
+            throw "error: not connected";
         }
     }
 
@@ -1463,4 +1477,4 @@ prims['connected9'] = { nargs: 0, fcn: function () { this.readPin(9); return thi
 prims['connected10'] = { nargs: 0, fcn: function () { this.readPin(10); return this.cfun; } }
 prims['connected11'] = { nargs: 0, fcn: function () { this.readPin(11); return this.cfun; } }
 prims['connected12'] = { nargs: 0, fcn: function () { this.readPin(12); return this.cfun; } }
-prims['chartpush'] = { nargs: 2, fcn: function (a, b) { this.addToChart(a, b);} }
+prims['chartpush'] = { nargs: 2, fcn: function (a, b) { this.addToChart(a, b); } }
