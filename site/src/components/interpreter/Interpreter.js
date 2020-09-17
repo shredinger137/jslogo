@@ -113,20 +113,33 @@ export default class Interpreter {
 
     }
 
+    saveAs(){
+        var filename = "filename.txt";
+		var textToSave = document.getElementById('procs').value;
+        var newFile = new Blob([textToSave], {type: 'plain/text'});
+        var a = document.createElement("a"),
+                url = URL.createObjectURL(newFile);
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function() {
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);  
+        }, 0); 
+
+    }
+
     loadFile() {
-        console.log("loadFile");
         const input = document.getElementById('load');
         const file = input.files[0];
         var fileReader = new FileReader()
 
         fileReader.onload = function(fileLoadedEvent){
-            console.log("filereader");
             var textFromFileLoaded = fileLoadedEvent.target.result;
             document.getElementById("procs").value = textFromFileLoaded;
         };
         fileReader.readAsText(file, "UTF-8");
-        // fr.onload = function (e) { document.getElementById("procs").value = e.target.result; procedures.readProcs(); };
-        //navigator.fileSystem.chooseEntry()
 
     }
 
@@ -642,41 +655,6 @@ export default class Interpreter {
             this.move();
         }
         window.requestAnimationFrame(this.ticker);
-    }
-
-    allowDrop(evt) {
-        evt.preventDefault();
-        evt.stopPropagation();
-    }
-
-    handleDropFile(evt) {
-        evt.preventDefault();
-        if (evt.stopPropagation) evt.stopPropagation();
-        else evt.cancelBubble = true;
-        var file = evt.dataTransfer.files[0];
-        this.handleFile(file);
-    }
-
-    handleFile(file) {
-        var fileReader = new FileReader();
-        if (file == undefined) return;
-        if (file.type == 'text/plain') {
-            fileReader.onload = readprocs;
-            fileReader.readAsText(file);
-        } else if (file.type == 'image/png') {
-            fileReader.onload = readimage;
-            fileReader.readAsDataURL(file);
-        }
-
-        function readprocs() {
-            var procs = document.getElementById("procs");
-            procs.value = reader.result;
-            this.readProcs();
-        }
-
-        function readimage() {
-            this.loadpng(reader.result, this.createDragImage);
-        }
     }
 
 

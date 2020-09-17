@@ -129,6 +129,7 @@ class App extends Component {
           <button id="chartToggle" onClick={() => this.chartToggle()}>Toggle Chart</button>
           <span style={{paddingLeft: "100px"}}>Load File:</span>
           <input id="load" type="file" onChange={() => interpreter.loadFile()} />
+          <button id="saveAs" onClick={() => interpreter.saveAs()}>Save File</button>
           <br /><br />
           <span style={{ float: "left", marginRight: "20px" }} onClick={() => { this.showCode() }}>Code</span><span style={{ float: "left" }} onClick={() => { this.showIncludes() }}>Includes</span>
           <br />
