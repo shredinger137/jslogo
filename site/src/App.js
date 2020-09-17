@@ -7,13 +7,9 @@ import { Scatter } from 'react-chartjs-2';
 import includes from './components/interpreter/includes.js'
 import Projects from './components/Projects.js';
 var CodeMirror = require('react-codemirror');
-require('codemirror/mode/logo/logo');
 
-//The 'logo' dependency is part of the codemirror package, but edited to reflect our needs.
-//It hasn't been edited well and this is not a great way to include it. The edit is saved via the npx patch function. 
-//It's possible that the codemirror-react2 package has a better way to include custom functions, assuming we want to use this 
-//at all for syntax highlighting and such.
-
+//We should look into CodeMirror-React2, which might provide better options for setting custom highlighting.
+//See https://stackoverflow.com/questions/63185680/how-to-use-custom-codemirror-modes-using-react-codemirror2.
 
 var interpreter;
 var projects;
@@ -167,7 +163,7 @@ end`,
           <div className="codeEntry" id="codeEntryDiv" style={{ border: "1px solid black" }}>
             <textarea id="procs" value={this.state.code} style={{ display: "none" }}>
             </textarea>
-            <CodeMirror value={this.state.code} onChange={this.updateCode.bind(this)} options={{ lineNumbers: true, mode: 'logo' }} />
+            <CodeMirror value={this.state.code} onChange={this.updateCode.bind(this)} options={{ lineNumbers: true }} />
           </div>
           <div className="codeEntry" id="includesWrapper" style={{ display: "none" }}>
             <textarea id="includes" defaultValue={includes}
