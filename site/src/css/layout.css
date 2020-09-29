@@ -41,3 +41,17 @@
 .hide {
     display: none;
 }
+
+.codeEntry div, .codeEntry textarea{
+    border: none;
+}
+
+.codeEntry {
+    display: grid;
+    grid-template-columns: 1.6em 1fr;
+    font-size: 1rem;
+}
+
+#gutter {
+    background-color: lightgray;
+}

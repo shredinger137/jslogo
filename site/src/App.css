@@ -183,6 +183,13 @@ button.go {
   width: 20vw;
 }
 
+
+#gutter {
+  width: 2em;
+  display: none;
+}
+
+
 .mainMenu {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;

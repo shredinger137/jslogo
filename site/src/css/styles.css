@@ -106,3 +106,8 @@
   textarea {
     resize: none;
   }
+
+  .codeEntry, .codeEntry textarea {
+    font-family: 'Calibri';
+    font-size: 1em;
+  }

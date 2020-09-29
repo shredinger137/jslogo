@@ -36,10 +36,11 @@ class App extends Component {
 
   chartRef = {}
   state = {
+    linesOfCode: [1],
     code: 
-`to go
-  print 5
-end`,
+      `to go
+        print 5
+      end`,
     canvasHeight: 400,
     canvasWidth: 900,
     showChartFrame: false,
@@ -75,6 +76,8 @@ end`,
     const disconnectButton = document.getElementById('disconnectButton');
     disconnectButton.addEventListener('click', interpreter.disconnectSerialPort.bind(interpreter));
 
+    this.countLineAndSetState();
+
   }
 
 
@@ -83,9 +86,9 @@ end`,
 
     interpreter.readProcs();
 
+    
 
   }
-
  
 
 
@@ -137,6 +140,17 @@ end`,
     document.getElementById('listener').value = "";
   }
 
+  countLineAndSetState(){
+    var count = document.getElementById('procs').value.split(/\r\n|\r|\n/).length;
+  //  var countArray = [];
+    var countArray = Array.from(Array(count + 1).keys());
+    countArray.shift();
+    console.log(countArray);
+    this.setState({
+      linesOfCode: countArray
+    });
+  }
+
 
   render() {
     return (
@@ -163,7 +177,11 @@ end`,
         </div>
         <div className="interfaceGrid">
           <div className="codeEntry" id="codeEntryDiv" style={{ border: "1px solid black" }}>
-            <textarea id="procs" defaultValue={`to go
+            <div id="gutter">
+              {this.state.linesOfCode.map((number) => 
+                <span>{number}<br/></span> )}
+            </div>
+            <textarea id="procs"  onChange={this.countLineAndSetState.bind(this)} defaultValue={`to go
    printSomething 5
 end
 
