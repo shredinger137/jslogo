@@ -33,9 +33,10 @@ class App extends Component {
     super(props);
     this.chartReference = React.createRef();
   }
-
+  
   chartRef = {}
   state = {
+    linesOfCode: [1],
     code: 
 `to go
   print 5
@@ -75,6 +76,7 @@ end`,
     const disconnectButton = document.getElementById('disconnectButton');
     disconnectButton.addEventListener('click', interpreter.disconnectSerialPort.bind(interpreter));
 
+    this.countLineAndSetState();
   }
 
 
@@ -113,13 +115,15 @@ end`,
   }
 
   showCode() {
-    document.getElementById('includesWrapper').style.display = "none";
-    document.getElementById('codeEntryDiv').style.display = "block";
+    document.getElementById('includes').style.display = "none";
+    document.getElementById('procs').style.display = "block";
+    this.countLineAndSetState();
   }
 
   showIncludes() {
-    document.getElementById('includesWrapper').style.display = "block";
-    document.getElementById('codeEntryDiv').style.display = "none";
+    document.getElementById('includes').style.display = "block";
+    document.getElementById('procs').style.display = "none";
+    this.countLineAndSetStateForIncludes();
   }
 
   updateCode(newCode) {
@@ -135,6 +139,24 @@ end`,
     var newCode = document.getElementById('listener').value;
     this.updateCode(newCode);
     document.getElementById('listener').value = "";
+  }
+
+  countLineAndSetStateForIncludes(){
+    var count = document.getElementById('includes').value.split(/\r\n|\r|\n/).length;
+    var countArray = Array.from(Array(count + 1).keys());
+    countArray.shift();
+    this.setState({
+      linesOfCode: countArray
+    });
+  }
+
+  countLineAndSetState(){
+    var count = document.getElementById('procs').value.split(/\r\n|\r|\n/).length;
+    var countArray = Array.from(Array(count + 1).keys());
+    countArray.shift();
+    this.setState({
+      linesOfCode: countArray
+    });
   }
 
 
@@ -163,20 +185,28 @@ end`,
         </div>
         <div className="interfaceGrid">
           <div className="codeEntry" id="codeEntryDiv" style={{ border: "1px solid black" }}>
-            <textarea id="procs" defaultValue={`to go
-   printSomething 5
+          <div id="gutter">
+              {this.state.linesOfCode.map((number) => 
+                <span>{number}<br/></span> )}
+            </div>
+            <textarea id="procs" spellCheck="false" onChange={this.countLineAndSetState.bind(this)} defaultValue=
+{`to go
+  printSomething 5
 end
 
 to printSomething :n
-   print :n
+  print :n
 end`}
->
+            >
             </textarea>
+            <textarea id="includes" spellCheck="false" defaultValue={includes} style={{ display: "none" }} />
           </div>
+
           <div className="codeEntry" id="includesWrapper" style={{ display: "none" }}>
-            <textarea id="includes" defaultValue={includes}
-            />
+            <textarea id="includes" spellCheck="false" defaultValue={includes}/>
           </div>
+
+
           <div className="chartArea">
             <div id="cnvframe" style={{ height: "100%", width: "100%" }}>
               <canvas className="cnv" id="canvas" ></canvas>
