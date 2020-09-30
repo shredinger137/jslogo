@@ -217,7 +217,7 @@ end`}
                   datasets:
                     [
                       {
-                        label: "Test",
+                        label: "Temp. vs Time",
                         data: this.state.chartData
                       }
 
