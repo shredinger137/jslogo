@@ -6,6 +6,7 @@ import Interpreter from './components/interpreter/Interpreter';
 import { Scatter } from 'react-chartjs-2';
 import includes from './components/interpreter/includes.js'
 import Projects from './components/Projects.js';
+import Header from './components/Header.js';
 var CodeMirror = require('react-codemirror');
 
 //More thoughts: If the only thing this actually does for us is numbered lines it might be better to just copy that methodology.
@@ -163,10 +164,7 @@ end`,
   render() {
     return (
       <div>
-        <header className="header">
-          <h1>Learning by Making</h1>
-        </header>
-
+        <Header />
         <div className="main">
           <p>Click 'connect' to start, then select the Arduino device. Defining a 'go' word allows you to run
           things by clicking 'go', or you can use the terminal at the bottom. Use dp3on to turn on pin 3, read0 to read the sensor on A0. Requires Chrome. The chart can be updated with chartpush x y.
@@ -176,9 +174,7 @@ end`,
           <button id="disconnectButton" type="button" style={{ display: "none" }}>Disconnect</button>
           <button id="gobutton" onClick={() => { interpreter.runLine("go") }}>Go</button>
           <button id="chartToggle" onClick={() => this.chartToggle()}>Toggle Chart</button>
-          <span style={{ paddingLeft: "100px" }}>Load File:</span>
-          <input id="load" type="file" onChange={() => projects.loadFile()} />
-          <button id="saveAs" onClick={() => projects.saveAs()}>Save File</button>
+          <input id="load" type="file" onChange={() => projects.loadFile()} style={{display: "none"}}/>
           <br /><br />
           <span style={{ float: "left", marginRight: "20px" }} onClick={() => { this.showCode() }}>Code</span><span style={{ float: "left" }} onClick={() => { this.showIncludes() }}>Includes</span>
           <br />
