@@ -7,36 +7,20 @@ import { Scatter } from 'react-chartjs-2';
 import includes from './components/interpreter/includes.js'
 import Projects from './components/Projects.js';
 import Header from './components/Header.js';
-var CodeMirror = require('react-codemirror');
-
-//More thoughts: If the only thing this actually does for us is numbered lines it might be better to just copy that methodology.
-//This is proving difficult to use. Loading files isn't working right, state management just got more complex. Not really worth it so far.
-//I'm going to disable codemirror for now.
-//Here was the include, for reference: <CodeMirror value={this.state.code} onChange={this.updateCode.bind(this)} options={{ lineNumbers: true }} />
-
-//We should look into CodeMirror-React2, which might provide better options for setting custom highlighting.
-//See https://stackoverflow.com/questions/63185680/how-to-use-custom-codemirror-modes-using-react-codemirror2.
+import NewProjectModal from './components/NewProjectModal'
 
 var interpreter;
 var projects;
 
-//TODO:
-//Now that Code Mirror has been added, we're not using procs.value directly. Instead, procs.value is being set to hold the code value 
-//for the interpreter to check. That means the browser has three copies of the entire code - the state, the procs.value and the code mirror divs.
-//That doesn't seem like a good idea, so finding a better way to pass the code to 'interpreter' would be better.
+var chartReference = React.createRef();
 
-//Also with Code Mirror: Tab now makes indentations instead of changing focus. We want that. But we might have to find another way to switch focus, like ctrl + tab or something,
-//so that we meet accessibility requirements.
 
 class App extends Component {
 
-  constructor(props) {
-    super(props);
-    this.chartReference = React.createRef();
-  }
   
   chartRef = {}
   state = {
+    showNewProjectModal: false,
     linesOfCode: [1],
     code: 
 `to go
@@ -83,9 +67,7 @@ end`,
 
 
   componentDidUpdate() {
-
     interpreter.readProcs();
-
 
   }
 
@@ -96,7 +78,6 @@ end`,
     var newData = this.state.chartData;
     newData.push({ x: x, y: y });
     this.setState({ chartData: newData });
-
   }
 
   checkIfSerialCapable = () => {
@@ -128,19 +109,11 @@ end`,
   }
 
   updateCode(newCode) {
-    console.log("newcode");
-    console.log(newCode);
     this.setState({
       code: newCode,
     });
   }
 
-  updateFromListener(){
-    console.log("updateFromListener");
-    var newCode = document.getElementById('listener').value;
-    this.updateCode(newCode);
-    document.getElementById('listener').value = "";
-  }
 
   countLineAndSetStateForIncludes(){
     var count = document.getElementById('includes').value.split(/\r\n|\r|\n/).length;
@@ -160,15 +133,23 @@ end`,
     });
   }
 
+  toggleShowNewProjectModal(){
+    this.setState({showNewProjectModal: !this.state.showNewProjectModal});
+    console.log("click");
+    console.log(this);
+  }
+
 
   render() {
     return (
       <div>
-        <Header />
+        <Header toggleNewProjectModal={this.toggleShowNewProjectModal.bind(this)}/>
         <div className="main">
+         
           <p>Click 'connect' to start, then select the Arduino device. Defining a 'go' word allows you to run
           things by clicking 'go', or you can use the terminal at the bottom. Use dp3on to turn on pin 3, read0 to read the sensor on A0. Requires Chrome. The chart can be updated with chartpush x y.
       <br />
+      {this.state.showNewProjectModal ? <NewProjectModal toggleModal={this.toggleShowNewProjectModal.bind(this)}/> : null }
           </p>
           <button id="connectButton" type="button" >Connect</button>
           <button id="disconnectButton" type="button" style={{ display: "none" }}>Disconnect</button>
