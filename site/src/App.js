@@ -14,16 +14,18 @@ var projects;
 
 //var chartReference = React.createRef();
 
+//TODO: Make 'unsavedChanges' global, since it's going to affect multiple things later
 
 class App extends Component {
 
-  
+
   chartRef = {}
   state = {
+    unsavedChanges: false,
     showNewProjectModal: false,
     linesOfCode: [1],
-    code: 
-`to go
+    code:
+      `to go
   print 5
 end`,
     canvasHeight: 400,
@@ -71,7 +73,7 @@ end`,
 
   }
 
- 
+
 
 
   addToChart(x, y) {
@@ -115,7 +117,7 @@ end`,
   }
 
 
-  countLineAndSetStateForIncludes(){
+  countLineAndSetStateForIncludes() {
     var count = document.getElementById('includes').value.split(/\r\n|\r|\n/).length;
     var countArray = Array.from(Array(count + 1).keys());
     countArray.shift();
@@ -124,49 +126,56 @@ end`,
     });
   }
 
-  countLineAndSetState(){
+  countLineAndSetState() {
     var count = document.getElementById('procs').value.split(/\r\n|\r|\n/).length;
     var countArray = Array.from(Array(count + 1).keys());
     countArray.shift();
     this.setState({
-      linesOfCode: countArray
+      linesOfCode: countArray,
+      unsavedChanges: true
     });
   }
 
-  toggleShowNewProjectModal(){
-    this.setState({showNewProjectModal: !this.state.showNewProjectModal});
+  toggleShowNewProjectModal() {
+    this.setState({ showNewProjectModal: !this.state.showNewProjectModal });
   }
 
 
   render() {
     return (
       <div>
-        <Header toggleNewProjectModal={this.toggleShowNewProjectModal.bind(this)}/>
+        <Header toggleNewProjectModal={this.toggleShowNewProjectModal.bind(this)} />
         <div className="main">
-         
+
           <p>Click 'connect' to start, then select the Arduino device. Defining a 'go' word allows you to run
           things by clicking 'go', or you can use the terminal at the bottom. Use dp3on to turn on pin 3, read0 to read the sensor on A0. Requires Chrome. The chart can be updated with chartpush x y.
       <br />
-      </p>
-      {this.state.showNewProjectModal ? <NewProjectModal toggleModal={this.toggleShowNewProjectModal.bind(this)} countLines={this.countLineAndSetState.bind(this)}/> : null }
-       
+          </p>
+          {this.state.showNewProjectModal ?
+            <NewProjectModal
+              toggleModal={this.toggleShowNewProjectModal.bind(this)}
+              countLines={this.countLineAndSetState.bind(this)}
+              unsavedChanges={this.state.unsavedChanges} />
+            :
+            null}
+
           <button id="connectButton" type="button" >Connect</button>
           <button id="disconnectButton" type="button" style={{ display: "none" }}>Disconnect</button>
           <button id="gobutton" onClick={() => { interpreter.runLine("go") }}>Go</button>
           <button id="chartToggle" onClick={() => this.chartToggle()}>Toggle Chart</button>
-          <input id="load" type="file" onChange={() => projects.loadFile()} style={{display: "none"}}/>
+          <input id="load" type="file" onChange={() => projects.loadFile()} style={{ display: "none" }} />
           <br /><br />
           <span style={{ float: "left", marginRight: "20px" }} onClick={() => { this.showCode() }}>Code</span><span style={{ float: "left" }} onClick={() => { this.showIncludes() }}>Includes</span>
           <br />
         </div>
         <div className="interfaceGrid">
           <div className="codeEntry" id="codeEntryDiv" style={{ border: "1px solid black" }}>
-          <div id="gutter">
-              {this.state.linesOfCode.map((number) => 
-                <span key={number}>{number}<br/></span> )}
+            <div id="gutter">
+              {this.state.linesOfCode.map((number) =>
+                <span key={number}>{number}<br /></span>)}
             </div>
             <textarea id="procs" spellCheck="false" onChange={this.countLineAndSetState.bind(this)} defaultValue=
-{`to go
+              {`to go
   printSomething 5
 end
 
@@ -179,7 +188,7 @@ end`}
           </div>
 
           <div className="codeEntry" id="includesWrapper" style={{ display: "none" }}>
-            <textarea id="includes" spellCheck="false" defaultValue={includes}/>
+            <textarea id="includes" spellCheck="false" defaultValue={includes} />
           </div>
 
 

@@ -12,6 +12,7 @@ export default class NewProjectModal extends Component {
 
     componentDidMount() {
         this.getAvailableProjects();
+        console.log(this.props.unsavedChanges);
     }
 
     componentDidUpdate() {
@@ -29,12 +30,22 @@ export default class NewProjectModal extends Component {
     }
 
     loadCodeFromProject(projectName){
-        for(var project of this.state.projectsAvailable){
-            if(project.name === projectName){
-                document.getElementById("procs").value = project.code;
+        //TODO: We're not using the 'unsaved changes' value correctly. We should not prompt if it's not unsaved.
+
+        if(this.props.unsavedChanges){
+            if(window.confirm("Any unsaved changes will be lost. Continue?")){
+                for(var project of this.state.projectsAvailable){
+                    if(project.name === projectName){
+                        document.getElementById("procs").value = project.code;
+                        this.props.toggleModal();
+                    }
+                }
+            } else {
                 this.props.toggleModal();
             }
         }
+
+
     }
 
     render() {
