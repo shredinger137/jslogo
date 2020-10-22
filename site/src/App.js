@@ -12,7 +12,7 @@ import NewProjectModal from './components/NewProjectModal'
 var interpreter;
 var projects;
 
-var chartReference = React.createRef();
+//var chartReference = React.createRef();
 
 
 class App extends Component {
@@ -135,8 +135,6 @@ end`,
 
   toggleShowNewProjectModal(){
     this.setState({showNewProjectModal: !this.state.showNewProjectModal});
-    console.log("click");
-    console.log(this);
   }
 
 
@@ -149,8 +147,9 @@ end`,
           <p>Click 'connect' to start, then select the Arduino device. Defining a 'go' word allows you to run
           things by clicking 'go', or you can use the terminal at the bottom. Use dp3on to turn on pin 3, read0 to read the sensor on A0. Requires Chrome. The chart can be updated with chartpush x y.
       <br />
-      {this.state.showNewProjectModal ? <NewProjectModal toggleModal={this.toggleShowNewProjectModal.bind(this)}/> : null }
-          </p>
+      </p>
+      {this.state.showNewProjectModal ? <NewProjectModal toggleModal={this.toggleShowNewProjectModal.bind(this)} countLines={this.countLineAndSetState.bind(this)}/> : null }
+       
           <button id="connectButton" type="button" >Connect</button>
           <button id="disconnectButton" type="button" style={{ display: "none" }}>Disconnect</button>
           <button id="gobutton" onClick={() => { interpreter.runLine("go") }}>Go</button>
@@ -164,7 +163,7 @@ end`,
           <div className="codeEntry" id="codeEntryDiv" style={{ border: "1px solid black" }}>
           <div id="gutter">
               {this.state.linesOfCode.map((number) => 
-                <span>{number}<br/></span> )}
+                <span key={number}>{number}<br/></span> )}
             </div>
             <textarea id="procs" spellCheck="false" onChange={this.countLineAndSetState.bind(this)} defaultValue=
 {`to go

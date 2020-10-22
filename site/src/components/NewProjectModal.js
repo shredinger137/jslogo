@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import '../css/styles.css';
 import '../css/layout.css';
-import { config } from '../config.js';
-import axios from 'axios';
-
+import {experimentsList} from '../data/experiments.js'
 
 
 export default class NewProjectModal extends Component {
@@ -21,17 +19,18 @@ export default class NewProjectModal extends Component {
     }
 
     getAvailableProjects() {
-        axios.get(`${config.apiUrl}/availableProjects`).then(res => {
-            if (res.data) {
-                this.setState({projectsAvailable: res.data});
-            }
-
-        })
+        if(experimentsList){
+            this.setState({
+                projectsAvailable: experimentsList
+            })
+            this.props.countLines();
+        }
+        
     }
 
     loadCodeFromProject(projectName){
         for(var project of this.state.projectsAvailable){
-            if(project.name == projectName){
+            if(project.name === projectName){
                 document.getElementById("procs").value = project.code;
                 this.props.toggleModal();
             }
@@ -40,16 +39,16 @@ export default class NewProjectModal extends Component {
 
     render() {
         return (
-            <div id="newProjectModal" class="modal">
-                <div class="modalContent">
-                    <span class="close" onClick={() => this.props.toggleModal()}>&times;</span>
+            <div id="newProjectModal" className="modal">
+                <div className="modalContent">
+                    <span className="close" onClick={() => this.props.toggleModal()}>&times;</span>
                     <h3>New Project</h3>
                     <br />
                     <div>
                         {this.state.projectsAvailable.map(project => (
-                            <>
-                                <span onClick={() => {this.loadCodeFromProject(project.name)}}>{project.name}</span><br />
-                            </>
+                            <div key={project.name + "div"}>
+                                <span onClick={() => {this.loadCodeFromProject(project.name)}} key={project.name}>{project.name}</span><br />
+                            </div>
                         )
                         )
                         }

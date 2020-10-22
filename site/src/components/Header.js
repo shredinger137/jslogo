@@ -7,7 +7,7 @@ var projects;
 export default class Header extends Component {
 
     componentDidMount() {
-        projects = new Projects;
+        projects = new Projects();
     }
 
     componentDidUpdate() {
@@ -42,7 +42,7 @@ export default class Header extends Component {
                 <div id="menu" className="menu">
                     <span><b>Projects</b></span>
                     <ul>
-                        <li style={{color: "gray"}}><span onClick={() => this.toggleNewProject()}>New Project</span></li>
+                        <li><span onClick={() => this.toggleNewProject()}>New Project</span></li>
                         <li><span onClick={() => this.loadFile()}>Load File</span></li>
                         <li onClick={() => this.saveAs()}>Save File</li>
                     </ul>

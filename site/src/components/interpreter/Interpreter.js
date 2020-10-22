@@ -1337,7 +1337,7 @@ prims['st'] = { nargs: 0, fcn: function (n) { this.showTurtle(); } }
 //prims['snapimage'] = {nargs: 1, fcn: function(n){ this.snaps[n] = canvas.toDataURL();}}
 prims['drawsnap'] = { nargs: 1, fcn: function (n) { this.hold = true; this.loadimg(this.snaps[n], function () { this.hold = false; }); } }
 
-prims['flushtime'] = { nargs: 1, fcn: function (n) { var flushtime = this.getnum(n); } }
+prims['flushtime'] = { nargs: 1, fcn: function (n) { flushtime = this.getnum(n); } }
 
 prims['( '] = { nargs: 1, fcn: function (x) { this.evline.shift(); return x; } }
 prims['se '] = { nargs: 'ipm', fcn: function () { return this.ipm_se(arguments); } }
