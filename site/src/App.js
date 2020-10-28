@@ -9,10 +9,9 @@ import Projects from './components/Projects.js';
 import Header from './components/Header.js';
 import NewProjectModal from './components/NewProjectModal'
 
+
 var interpreter;
 var projects;
-
-//var chartReference = React.createRef();
 
 //TODO: Make 'unsavedChanges' global, since it's going to affect multiple things later
 
@@ -21,6 +20,7 @@ class App extends Component {
 
   chartRef = {}
   state = {
+    workspace: "turtle",
     unsavedChanges: false,
     showNewProjectModal: false,
     linesOfCode: [1],
@@ -134,12 +134,17 @@ end`,
       linesOfCode: countArray,
       unsavedChanges: true
     });
+
   }
 
   toggleShowNewProjectModal() {
     this.setState({ showNewProjectModal: !this.state.showNewProjectModal });
   }
 
+  workspaceChange(){
+    this.state.workspace == "turtle" ? this.setState({workspace: "jslogo"}) : this.setState({workspace: "turtle"});
+
+  }
 
   render() {
     return (
@@ -163,37 +168,26 @@ end`,
           <button id="disconnectButton" type="button" style={{ display: "none" }}>Disconnect</button>
           <button id="gobutton" onClick={() => { interpreter.runLine("go") }}>Go</button>
           <button id="chartToggle" onClick={() => this.chartToggle()}>Toggle Chart</button>
+          <button id="workspace1" onClick={() => this.workspaceChange()}>Workspace Test</button>
           <input id="load" type="file" onChange={() => projects.loadFile()} style={{ display: "none" }} />
           <br /><br />
           <span style={{ float: "left", marginRight: "20px" }} onClick={() => { this.showCode() }}>Code</span><span style={{ float: "left" }} onClick={() => { this.showIncludes() }}>Includes</span>
           <br />
         </div>
-        <div className="interfaceGrid">
-          <div className="codeEntry" id="codeEntryDiv" style={{ border: "1px solid black" }}>
+        <div className={this.state.workspace == "turtle" ? "interfaceGrid" : "interfaceGridCode"}>
+          <div className="codeEntry" id="codeEntryDiv" style={{ border: "1px solid black", maxHeight: "75vh", minHeight: "50vh", overflow: "scroll" }}>
             <div id="gutter">
               {this.state.linesOfCode.map((number) =>
                 <span key={number}>{number}<br /></span>)}
             </div>
-            <textarea id="procs" spellCheck="false" onChange={this.countLineAndSetState.bind(this)} defaultValue=
-              {`to go
-  printSomething 5
-end
-
-to printSomething :n
-  print :n
-end`}
-            >
+            <textarea id="procs" spellCheck="false" onChange={this.countLineAndSetState.bind(this)} style={{ whiteSpace: "nowrap"}} defaultValue={this.state.code}>
             </textarea>
-            <textarea id="includes" spellCheck="false" defaultValue={includes} style={{ display: "none" }} />
+            <textarea id="includes" spellCheck="false" defaultValue={includes} style={{ display: "none", whiteSpace: "nowrap" }} />
           </div>
 
-          <div className="codeEntry" id="includesWrapper" style={{ display: "none" }}>
-            <textarea id="includes" spellCheck="false" defaultValue={includes} />
-          </div>
-
-
-          <div className="chartArea">
-            <div id="cnvframe" style={{ height: "100%", width: "100%" }}>
+          <div className={this.state.workspace == "turtle" ? "chartArea" : "chartArea hidden"}>
+            <div id="cnvframe" style={{ height: "100%", width: "100%" }} 
+              >
               <canvas className="cnv" id="canvas" ></canvas>
             </div>
             <div id="chartFrame" className="hide" style={{ height: "100%", width: "100%" }}>

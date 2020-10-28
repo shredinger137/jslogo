@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import '../css/styles.css';
 import '../css/layout.css';
-import {experimentsList} from '../data/experiments.js'
+import { experimentsList } from '../data/experiments.js'
 
 
 export default class NewProjectModal extends Component {
@@ -12,7 +12,6 @@ export default class NewProjectModal extends Component {
 
     componentDidMount() {
         this.getAvailableProjects();
-        console.log(this.props.unsavedChanges);
     }
 
     componentDidUpdate() {
@@ -20,25 +19,38 @@ export default class NewProjectModal extends Component {
     }
 
     getAvailableProjects() {
-        if(experimentsList){
+        if (experimentsList) {
             this.setState({
                 projectsAvailable: experimentsList
             })
             this.props.countLines();
         }
-        
     }
 
-    loadCodeFromProject(projectName){
+    loadCodeFromProject(projectName) {
         //TODO: We're not using the 'unsaved changes' value correctly. We should not prompt if it's not unsaved.
+        //TODO: Eventually all files will have a 'fileLocation' field, in which case this conditional can be removed.
 
-        if(this.props.unsavedChanges){
-            if(window.confirm("Any unsaved changes will be lost. Continue?")){
-                for(var project of this.state.projectsAvailable){
-                    if(project.name === projectName){
-                        document.getElementById("procs").value = project.code;
-                        this.props.toggleModal();
+        if (this.props.unsavedChanges) {
+            if (window.confirm("Any unsaved changes will be lost. Continue?")) {
+                for (var project of this.state.projectsAvailable) {
+                    if (project.name === projectName) {
+                        if (project.fileLocation) {
+                            var request = new XMLHttpRequest();
+                            request.open('GET', project.fileLocation, true);
+                            request.send(null);
+                            request.onreadystatechange = function () {
+                                if (request.readyState === 4 && request.status === 200) {
+                                    document.getElementById("procs").value = request.responseText;
+                                }
+                            }
+                        } else {
+
+                            document.getElementById("procs").value = project.code;
+
+                        }
                     }
+                    this.props.toggleModal();
                 }
             } else {
                 this.props.toggleModal();
@@ -54,11 +66,12 @@ export default class NewProjectModal extends Component {
                 <div className="modalContent">
                     <span className="close" onClick={() => this.props.toggleModal()}>&times;</span>
                     <h3>New Project</h3>
+                    <p>Use LEDs for initial testing</p>
                     <br />
                     <div>
                         {this.state.projectsAvailable.map(project => (
                             <div key={project.name + "div"}>
-                                <span onClick={() => {this.loadCodeFromProject(project.name)}} key={project.name}>{project.name}</span><br />
+                                <span onClick={() => { this.loadCodeFromProject(project.name) }} key={project.name}>{project.name}</span><br />
                             </div>
                         )
                         )

@@ -23,6 +23,21 @@
     height: 50vh;
 }
 
+.interfaceGridCode {
+    max-width: 98vw;
+    margin: 0 auto;
+    height: 75vh;
+    display: grid;
+    grid-gap: 0px;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+        "codeEntry"
+        "codeEntry"
+        "terminal";
+        background-color: #fff;
+        color: #444;
+}
+
 .interfaceGrid {
     max-width: 98vw;
     margin: 0 auto;

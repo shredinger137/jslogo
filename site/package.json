@@ -6,15 +6,21 @@
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
+    "ace-builds": "^1.4.12",
     "axios": "^0.20.0",
+    "babel-plugin-prismjs": "^2.0.1",
     "chart.js": "^2.9.3",
     "chartjs": "^0.3.24",
     "codemirror": "^5.57.0",
+    "prism-react-renderer": "^1.1.1",
+    "prismjs": "^1.22.0",
     "react": "^16.13.1",
+    "react-ace": "^9.1.4",
     "react-chartjs-2": "^2.10.0",
     "react-codemirror": "^1.0.0",
     "react-dom": "^16.13.1",
-    "react-scripts": "3.4.1"
+    "react-scripts": "3.4.1",
+    "react-simple-code-editor": "^0.11.0"
   },
   "scripts": {
     "postinstall": "npx patch-package",

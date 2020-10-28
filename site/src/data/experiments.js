@@ -19,10 +19,36 @@ end`
     },
     {
         name: "LEDs",
+        fileLocation: "/experiments/LEDs.logo",
         code: 
-`to go
-    print "LEDs
-end`
+`to a-on
+   dp2on ;enter a comment that describes the function of this word
+end
+
+to a-off
+   dp2off ;enter a comment that describes the function of this word
+end
+
+to b-on
+   dp3on ;enter a comment that describes the function of this word
+end
+
+to b-off
+   dp3off ;enter a comment that describes the function of this word
+end
+
+to c-on
+   ;dp4on
+end
+
+to c-off
+;	dp4off
+end
+
+to d-on
+   ;enter code to turn LED d on
+end
+`
     }
 ];
 
