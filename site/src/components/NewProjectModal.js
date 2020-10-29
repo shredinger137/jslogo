@@ -3,6 +3,8 @@ import '../css/styles.css';
 import '../css/layout.css';
 import { experimentsList } from '../data/experiments.js'
 
+var globalUpdateCode;
+
 
 export default class NewProjectModal extends Component {
 
@@ -31,6 +33,8 @@ export default class NewProjectModal extends Component {
         //TODO: We're not using the 'unsaved changes' value correctly. We should not prompt if it's not unsaved.
         //TODO: Eventually all files will have a 'fileLocation' field, in which case this conditional can be removed.
 
+        var scopedUpdateCode = this.props.updateCode;
+
         if (this.props.unsavedChanges) {
             if (window.confirm("Any unsaved changes will be lost. Continue?")) {
                 for (var project of this.state.projectsAvailable) {
@@ -41,7 +45,7 @@ export default class NewProjectModal extends Component {
                             request.send(null);
                             request.onreadystatechange = function () {
                                 if (request.readyState === 4 && request.status === 200) {
-                                    document.getElementById("procs").value = request.responseText;
+                                    scopedUpdateCode(request.responseText);
                                 }
                             }
                         } else {

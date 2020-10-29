@@ -9,7 +9,7 @@ import Projects from './components/Projects.js';
 import Header from './components/Header.js';
 import NewProjectModal from './components/NewProjectModal';
 import MonacoEditor from 'react-monaco-editor';
-import { options, languageDef, configuration } from './components/editorOptions' 
+import { options, languageDef, configuration } from './components/editorOptions'
 
 
 var interpreter;
@@ -49,14 +49,8 @@ end`,
       canvasWidth: canvasWidth
     });
 
-
-    this.setState({
-
-    });
-
-
     interpreter = new Interpreter(document.getElementById("cnvframe").offsetHeight, document.getElementById("cnvframe").offsetWidth, this.addToChart.bind(this));
-    projects = new Projects(this.updateCode);
+    projects = new Projects(this.updateCode.bind(this));
     interpreter.setup();
 
     const connectButton = document.getElementById('connectButton');
@@ -169,30 +163,32 @@ end`,
       ],
       colors: {
       },
-});
+    });
 
 
   }
 
   editorDidMount(editor, monaco) {
     console.log('editorDidMount', editor);
+
     editor.focus();
   }
-  onChange(newValue, e) {
-    this.setState({code: newValue});
-    console.log(this.state.code)
+  updateCode(newValue) {
+    this.setState({ code: newValue });
   }
 
   render() {
     const options = {
       selectOnLineNumbers: true,
+      automaticLayout: true,
       minimap: {
         enabled: false
       },
     };
     return (
       <div>
-        <Header toggleNewProjectModal={this.toggleShowNewProjectModal.bind(this)} />
+        <Header
+          toggleNewProjectModal={this.toggleShowNewProjectModal.bind(this)} />
         <div className="main">
 
           <p>Click 'connect' to start, then select the Arduino device. Defining a 'go' word allows you to run
@@ -203,7 +199,10 @@ end`,
             <NewProjectModal
               toggleModal={this.toggleShowNewProjectModal.bind(this)}
               countLines={this.countLineAndSetState.bind(this)}
-              unsavedChanges={this.state.unsavedChanges} />
+              unsavedChanges={this.state.unsavedChanges}
+              updateCode={this.updateCode.bind(this)}
+            />
+
             :
             null}
 
@@ -218,13 +217,13 @@ end`,
           <br />
         </div>
         <div className={this.state.workspace == "turtle" ? "interfaceGrid" : "interfaceGridCode"}>
-          <div className="codeEntry" id="codeEntryDiv" style={{ border: "1px solid black", maxHeight: "75vh", minHeight: "50vh"}}>
+          <div className="codeEntry" id="codeEntryDiv" style={{ border: "1px solid black", maxHeight: "75vh", minHeight: "50vh" }}>
             <MonacoEditor
               language="jslogo"
               theme="jslogo"
               value={this.state.code}
               options={options}
-              onChange={this.onChange.bind(this)}
+              onChange={this.updateCode.bind(this)}
               editorDidMount={this.editorDidMount}
               editorWillMount={this.editorWillMount}
             />

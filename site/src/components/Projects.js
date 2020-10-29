@@ -1,9 +1,13 @@
+var globalUpdateCode;
+
 export default class Projects {
 
-    componentDidMount(){
 
+    constructor(updateCode) {
+        globalUpdateCode = updateCode;
     }
 
+    
     saveAs(){
         var filename = "filename.txt";
 		var textToSave = document.getElementById('procs').value;
@@ -25,10 +29,13 @@ export default class Projects {
         const input = document.getElementById('load');
         const file = input.files[0];
         var fileReader = new FileReader()
+        var context = this;
+        console.log(global);
 
-        fileReader.onload = function(fileLoadedEvent){
+        fileReader.onload = function(fileLoadedEvent, context){
             var textFromFileLoaded = fileLoadedEvent.target.result;
-            document.getElementById("procs").value = textFromFileLoaded;
+            globalUpdateCode(textFromFileLoaded);
+            //document.getElementById("procs").value = textFromFileLoaded;
         };
         fileReader.readAsText(file, "UTF-8");
 
