@@ -20,6 +20,7 @@ export const languageDef = {
     "read5",
     "read6",
     "read7",
+    "dp2on",
     "dp3on",
     "dp4on",
     "dp5on",
@@ -30,13 +31,26 @@ export const languageDef = {
     "dp10on",
     "dp11on",
     "dp12on",
+    "dp2off",
+    "dp3off",
+    "dp4off",
+    "dp5off",
+    "dp6off",
+    "dp7off",
+    "dp8off",
+    "dp9off",
+    "dp10off",
+    "dp11off",
+    "dp12off",
     "make",
     "let",
-
-  ],
-  identifiers: [
-    "to",
-    "end",
+    "fd",
+    "rt",
+    "arc",
+    "penup",
+    "pendown",
+    "chartpush",
+    "wait",
   ],
   operators: [
     '=', '>', '<', '!', '~', '?', ':', '==', '<=', '>=', '!=',
@@ -47,7 +61,7 @@ export const languageDef = {
   symbols: /[=><!~?:&|+\-*\/\^%]+/,
   tokenizer: {
     root: [
-      [/to\s[a-zA-Z]*|end/, "custom-words"],
+      [/to\s[a-zA-Z\-re]+|end/, "custom-words"],
       { include: "@whitespace" },
       { include: "@numbers" },
       { include: "@strings" },
@@ -72,15 +86,12 @@ export const languageDef = {
     ],
     strings: [
       [/[=|][ @number]*$/, "string.escape"],
-    [/\"[a-zA-Z]*/, "string.escape"],
+      [/\"[a-zA-Z]*/, "string.escape"],
     ],
     tags: [
       [/^%[a-zA-Z]\w*/, "tag"],
       [/#[a-zA-Z]\w*/, "tag"],
     ],
-    identifiers: [
-      [/to/, "identifier"],
-    ]
   },
 }
 
@@ -90,6 +101,6 @@ export const configuration = {
     lineComment: ";",
   },
   brackets: [
-    ["{", "}"], ["[", "]"], ["(", ")"],
+    ["{", "}"], ["[", "]"], ["(", ")",],["to","end"]
   ],
 }
