@@ -160,6 +160,18 @@ end`,
       // Set the editing configuration for the language
       monaco.languages.setLanguageConfiguration('jslogo', configuration)
     }
+
+    monaco.editor.defineTheme('jslogo', {
+      base: 'vs-dark',
+      inherit: true,
+      rules: [
+        { token: 'custom-words', foreground: 'FFFD8A' },
+      ],
+      colors: {
+      },
+});
+
+
   }
 
   editorDidMount(editor, monaco) {
@@ -209,7 +221,7 @@ end`,
           <div className="codeEntry" id="codeEntryDiv" style={{ border: "1px solid black", maxHeight: "75vh", minHeight: "50vh"}}>
             <MonacoEditor
               language="jslogo"
-              theme="vs-dark"
+              theme="jslogo"
               value={this.state.code}
               options={options}
               onChange={this.onChange.bind(this)}
