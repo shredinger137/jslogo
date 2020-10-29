@@ -7,7 +7,9 @@ import { Scatter } from 'react-chartjs-2';
 import includes from './components/interpreter/includes.js'
 import Projects from './components/Projects.js';
 import Header from './components/Header.js';
-import NewProjectModal from './components/NewProjectModal'
+import NewProjectModal from './components/NewProjectModal';
+import MonacoEditor from 'react-monaco-editor';
+import { options, languageDef, configuration } from './components/editorOptions' 
 
 
 var interpreter;
@@ -62,7 +64,6 @@ end`,
 
     const disconnectButton = document.getElementById('disconnectButton');
     disconnectButton.addEventListener('click', interpreter.disconnectSerialPort.bind(interpreter));
-
     this.countLineAndSetState();
   }
 
@@ -127,6 +128,9 @@ end`,
   }
 
   countLineAndSetState() {
+    //this will have to turn into a parser to work right
+    //might be better to stop here and try Monaco first
+
     var count = document.getElementById('procs').value.split(/\r\n|\r|\n/).length;
     var countArray = Array.from(Array(count + 1).keys());
     countArray.shift();
@@ -141,12 +145,39 @@ end`,
     this.setState({ showNewProjectModal: !this.state.showNewProjectModal });
   }
 
-  workspaceChange(){
-    this.state.workspace == "turtle" ? this.setState({workspace: "jslogo"}) : this.setState({workspace: "turtle"});
+  workspaceChange() {
+    this.state.workspace == "turtle" ? this.setState({ workspace: "jslogo" }) : this.setState({ workspace: "turtle" });
 
   }
 
+  editorWillMount = monaco => {
+    this.editor = monaco
+    if (!monaco.languages.getLanguages().some(({ id }) => id === 'jslogo')) {
+      // Register a new language
+      monaco.languages.register({ id: 'jslogo' })
+      // Register a tokens provider for the language
+      monaco.languages.setMonarchTokensProvider('jslogo', languageDef)
+      // Set the editing configuration for the language
+      monaco.languages.setLanguageConfiguration('jslogo', configuration)
+    }
+  }
+
+  editorDidMount(editor, monaco) {
+    console.log('editorDidMount', editor);
+    editor.focus();
+  }
+  onChange(newValue, e) {
+    this.setState({code: newValue});
+    console.log(this.state.code)
+  }
+
   render() {
+    const options = {
+      selectOnLineNumbers: true,
+      minimap: {
+        enabled: false
+      },
+    };
     return (
       <div>
         <Header toggleNewProjectModal={this.toggleShowNewProjectModal.bind(this)} />
@@ -175,19 +206,24 @@ end`,
           <br />
         </div>
         <div className={this.state.workspace == "turtle" ? "interfaceGrid" : "interfaceGridCode"}>
-          <div className="codeEntry" id="codeEntryDiv" style={{ border: "1px solid black", maxHeight: "75vh", minHeight: "50vh", overflow: "scroll" }}>
-            <div id="gutter">
-              {this.state.linesOfCode.map((number) =>
-                <span key={number}>{number}<br /></span>)}
-            </div>
-            <textarea id="procs" spellCheck="false" onChange={this.countLineAndSetState.bind(this)} style={{ whiteSpace: "nowrap"}} defaultValue={this.state.code}>
+          <div className="codeEntry" id="codeEntryDiv" style={{ border: "1px solid black", maxHeight: "75vh", minHeight: "50vh"}}>
+            <MonacoEditor
+              language="jslogo"
+              theme="vs-dark"
+              value={this.state.code}
+              options={options}
+              onChange={this.onChange.bind(this)}
+              editorDidMount={this.editorDidMount}
+              editorWillMount={this.editorWillMount}
+            />
+            <textarea id="procs" spellCheck="false" onChange={this.countLineAndSetState.bind(this)} style={{ whiteSpace: "nowrap", display: "none" }} value={this.state.code} >
             </textarea>
-            <textarea id="includes" spellCheck="false" defaultValue={includes} style={{ display: "none", whiteSpace: "nowrap" }} />
+            <textarea id="includes" spellCheck="false" defaultValue={includes} style={{ display: "none", whiteSpace: "nowrap", overflow: "visible" }} />
           </div>
 
           <div className={this.state.workspace == "turtle" ? "chartArea" : "chartArea hidden"}>
-            <div id="cnvframe" style={{ height: "100%", width: "100%" }} 
-              >
+            <div id="cnvframe" style={{ height: "100%", width: "100%" }}
+            >
               <canvas className="cnv" id="canvas" ></canvas>
             </div>
             <div id="chartFrame" className="hide" style={{ height: "100%", width: "100%" }}>
