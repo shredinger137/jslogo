@@ -119,9 +119,9 @@ export default class Interpreter {
     setup() {
 
         var t = this;
-       //commented out sept. 2020 - doesn't seem to be needed
+        //commented out sept. 2020 - doesn't seem to be needed
         // var procs = document.getElementById('procs');
-       // procs.focus();
+        // procs.focus();
         this.element = document.createElement('div');
         this.element.setAttribute('class', 'turtle');
         var cnvframe = document.getElementById('cnvframe');
@@ -156,7 +156,7 @@ export default class Interpreter {
             else this.handlecr(e);
         }
         if (e.ctrlKey) {
-            if(e.keyCode==70) {e.preventDefault(); e.stopPropagation();}
+            if (e.keyCode == 70) { e.preventDefault(); e.stopPropagation(); }
             if (e.keyCode == 71) { e.preventDefault(); e.stopPropagation(); this.runLine('go'); }
             if (e.keyCode == 190) { this.insert('stopped!\n'); this.reset([]); }
         }
@@ -642,7 +642,11 @@ export default class Interpreter {
         this.timeout = undefined;
     }
 
-    lprint(x) { this.insert(x + '\n'); }
+    printToConsole(x) {
+        var cc = document.getElementById("cc");
+        cc.value = cc.value + x + "\n";
+        cc.scrollTop = cc.scrollHeight;
+    }
 
     evalNext() {
         var t = this;
@@ -661,7 +665,7 @@ export default class Interpreter {
             else t.pushResult(token);
         }
         catch (e) {
-            this.lprint(e);
+            this.printToConsole(e);
             t.stack = [];
             t.evline = [];
         }
@@ -1283,7 +1287,7 @@ prims['member?'] = { nargs: 2, fcn: function (x, l) { return this.member(x, l); 
 prims['empty?'] = { nargs: 1, fcn: function (l) { return l.length == 0; } }
 prims['pick'] = { nargs: 1, fcn: function (l) { return l[this.random.pickRandom(0, this.getlist(l).length - 1)]; } }
 
-prims['print'] = { nargs: 1, fcn: function (x) { this.lprint(this.printstr(x)); } }
+prims['print'] = { nargs: 1, fcn: function (x) { this.printToConsole(this.printstr(x)); } }
 
 prims['clean'] = { nargs: 0, fcn: function (n) { this.clean(); } }
 prims['forward'] = { nargs: 1, fcn: function (n) { this.forward(this.getnum(n)); } }
