@@ -1151,7 +1151,7 @@ export default class Interpreter {
 
     async openSerialPort() {
         port = await navigator.serial.requestPort();
-        await port.open({ baudrate: 115200 });
+        await port.open({ baudRate: 115200 });
         reader = port.readable.getReader();
         outputStream = port.writable;
         document.getElementById("connectButton").style.display = "none";
