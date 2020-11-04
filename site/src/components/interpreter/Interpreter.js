@@ -1,4 +1,4 @@
-/* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off" */
+/* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off", no-use-before-define: "off" */
 
 //TODO: Change to contenteditable div for code entry, to improve styling. Change 'value' to 'innerHTML' to accomodate this.
 

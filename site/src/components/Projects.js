@@ -29,7 +29,6 @@ export default class Projects {
         const input = document.getElementById('load');
         const file = input.files[0];
         var fileReader = new FileReader()
-        var context = this;
         console.log(global);
 
         fileReader.onload = function(fileLoadedEvent, context){

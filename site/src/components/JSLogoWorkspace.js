@@ -27,7 +27,7 @@ export default class JSLogo extends Component {
                 editorDidMount={this.props.editorDidMount}
                 editorWillMount={this.props.editorWillMount}
               />
-              <textarea id="procs" spellCheck="false" onChange={this.props.countLineAndSetState} style={{ whiteSpace: "nowrap", display: "none" }} value={this.props.code} >
+              <textarea id="procs" spellCheck="false" onChange={this.props.countLineAndSetState} style={{ whiteSpace: "nowrap", display: "none" }} value={this.props.code} readOnly={true}>
               </textarea>
               <textarea id="includes" spellCheck="false" style={{ display: "none", whiteSpace: "nowrap", overflow: "visible" }} />
             </div>
@@ -38,7 +38,7 @@ export default class JSLogo extends Component {
           
           </div>
             
-            <div className="chartArea">
+            <div className="chartArea" style={{display: "none"}}>
               <div id="cnvframe" style={{ height: "100%", width: "100%" }}>
                 <canvas className="cnv" id="canvas" ></canvas>
               </div>

@@ -29,11 +29,11 @@
     height: 75vh;
     display: grid;
     grid-gap: 0px;
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
     grid-template-areas:
-        "codeEntry"
-        "codeEntry"
-        "terminal";
+        "codeEntry codentry"
+        "codeEntry  codentry"
+        "terminal  terminal";
         background-color: #fff;
         color: #444;
 }

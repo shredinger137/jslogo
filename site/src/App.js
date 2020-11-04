@@ -1,18 +1,17 @@
+/* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off", no-use-before-define: "off" */
+
 import React, { Component } from 'react';
 import './css/styles.css';
 import './css/layout.css';
 import './css/codemirror.css';
 import Interpreter from './components/interpreter/Interpreter';
-import { Scatter } from 'react-chartjs-2';
-import includes from './components/interpreter/includes.js'
 import Projects from './components/Projects.js';
 import Header from './components/Header.js';
 import TurtleLogo from './components/TurtleLogoWorkspace';
 import JSLogo from './components/JSLogoWorkspace';
 import NewProjectModal from './components/NewProjectModal';
-import MonacoEditor from 'react-monaco-editor';
 import { options, languageDef, configuration } from './components/editorOptions'
-import { Route, Switch, BrowserRouter } from "react-router-dom";
+import { Route, BrowserRouter } from "react-router-dom";
 
 var interpreter;
 var projects;
@@ -64,13 +63,10 @@ end`,
   }
 
 
-
   componentDidUpdate() {
     interpreter.readProcs();
 
   }
-
-
 
 
   addToChart(x, y) {
@@ -95,17 +91,7 @@ end`,
 
   }
 
-  showCode() {
-    document.getElementById('includes').style.display = "none";
-    document.getElementById('procs').style.display = "block";
-    this.countLineAndSetState();
-  }
 
-  showIncludes() {
-    document.getElementById('includes').style.display = "block";
-    document.getElementById('procs').style.display = "none";
-    this.countLineAndSetStateForIncludes();
-  }
 
   updateCode(newCode) {
     this.setState({
@@ -169,15 +155,12 @@ end`,
   }
 
   editorDidMount(editor, monaco) {
-    console.log('editorDidMount', editor);
+      editor.focus();
+  }
 
-    editor.focus();
-  }
-  updateCode(newValue) {
-    this.setState({ code: newValue });
-  }
 
   render() {
+    
     const options = {
       selectOnLineNumbers: true,
       automaticLayout: true,
@@ -185,6 +168,7 @@ end`,
         enabled: false
       },
     };
+
     return (
       <div>
         <Header
@@ -223,6 +207,7 @@ end`,
                   editorDidMount={this.editorDidMount}
                   editorWillMount={this.editorWillMount}
                   interpreter={interpreter}
+                  options={options}
                 />
               </Route>
               <Route path="/tlogo">

@@ -3,9 +3,6 @@ import '../css/styles.css';
 import '../css/layout.css';
 import { experimentsList } from '../data/experiments.js'
 
-var globalUpdateCode;
-
-
 export default class NewProjectModal extends Component {
 
     state = {

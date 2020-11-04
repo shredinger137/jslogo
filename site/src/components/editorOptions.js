@@ -1,3 +1,5 @@
+/* eslint eqeqeq: "off", no-useless-escape: "off", no-throw-literal: "off", no-use-before-define: "off" */
+
 export const options = {
   lineNumbers: false,
   scrollBeyondLastLine: false,
@@ -61,7 +63,7 @@ export const languageDef = {
     '<<', '>>', '>>>', '+=', '-=', '*=', '/=', '&=', '|=', '^=',
     '%=', '<<=', '>>=', '>>>='
   ],
-  symbols: /[=><!~?:&|+\-*\/\^%]+/,
+  symbols: /[=><!~?:&|+\-*\/^%]+/,
   tokenizer: {
     root: [
       [/to\s[a-zA-Z\-re]+|end/, "custom-words"],
