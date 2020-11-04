@@ -51,6 +51,9 @@ export const languageDef = {
     "pendown",
     "chartpush",
     "wait",
+    "ob1on",
+    "ob1off",
+    "loop",
   ],
   operators: [
     '=', '>', '<', '!', '~', '?', ':', '==', '<=', '>=', '!=',

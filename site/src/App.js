@@ -7,10 +7,12 @@ import { Scatter } from 'react-chartjs-2';
 import includes from './components/interpreter/includes.js'
 import Projects from './components/Projects.js';
 import Header from './components/Header.js';
+import TurtleLogo from './components/TurtleLogoWorkspace';
+import JSLogo from './components/JSLogoWorkspace';
 import NewProjectModal from './components/NewProjectModal';
 import MonacoEditor from 'react-monaco-editor';
 import { options, languageDef, configuration } from './components/editorOptions'
-
+import { Route, Switch, BrowserRouter } from "react-router-dom";
 
 var interpreter;
 var projects;
@@ -122,8 +124,6 @@ end`,
   }
 
   countLineAndSetState() {
-    //this will have to turn into a parser to work right
-    //might be better to stop here and try Monaco first
 
     var count = document.getElementById('procs').value.split(/\r\n|\r|\n/).length;
     var countArray = Array.from(Array(count + 1).keys());
@@ -210,35 +210,58 @@ end`,
           <button id="disconnectButton" type="button" style={{ display: "none" }}>Disconnect</button>
           <button id="gobutton" onClick={() => { interpreter.runLine("go") }}>Go</button>
           <button id="chartToggle" onClick={() => this.chartToggle()}>Toggle Chart</button>
-          <button id="workspace1" onClick={() => this.workspaceChange()}>Workspace Test</button>
           <input id="load" type="file" onChange={() => projects.loadFile()} style={{ display: "none" }} />
-          <br /><br />
-          <span style={{ float: "left", marginRight: "20px" }} onClick={() => { this.showCode() }}>Code</span><span style={{ float: "left" }} onClick={() => { this.showIncludes() }}>Includes</span>
-          <br />
         </div>
-        <div className={this.state.workspace == "turtle" ? "interfaceGrid" : "interfaceGridCode"}>
-          <div className="codeEntry" id="codeEntryDiv" style={{ border: "1px solid black", maxHeight: "75vh", minHeight: "50vh" }}>
-            <MonacoEditor
-              language="jslogo"
-              theme="jslogo"
-              value={this.state.code}
-              options={options}
-              onChange={this.updateCode.bind(this)}
-              editorDidMount={this.editorDidMount}
-              editorWillMount={this.editorWillMount}
-            />
-            <textarea id="procs" spellCheck="false" onChange={this.countLineAndSetState.bind(this)} style={{ whiteSpace: "nowrap", display: "none" }} value={this.state.code} >
-            </textarea>
-            <textarea id="includes" spellCheck="false" defaultValue={includes} style={{ display: "none", whiteSpace: "nowrap", overflow: "visible" }} />
-          </div>
 
-          <div className={this.state.workspace == "turtle" ? "chartArea" : "chartArea hidden"}>
-            <div id="cnvframe" style={{ height: "100%", width: "100%" }}
-            >
-              <canvas className="cnv" id="canvas" ></canvas>
-            </div>
-            <div id="chartFrame" className="hide" style={{ height: "100%", width: "100%" }}>
-              <Scatter
+        <BrowserRouter>
+          <div>
+            <>
+              <Route path="/jslogo">
+                <JSLogo
+                  code={this.state.code}
+                  updateCode={this.updateCode.bind(this)}
+                  editorDidMount={this.editorDidMount}
+                  editorWillMount={this.editorWillMount}
+                  interpreter={interpreter}
+                />
+              </Route>
+              <Route path="/tlogo">
+                <TurtleLogo
+                  code={this.state.code}
+                  updateCode={this.updateCode.bind(this)}
+                  editorDidMount={this.editorDidMount}
+                  editorWillMount={this.editorWillMount}
+                  interpreter={interpreter}
+                />
+              </Route>
+              <Route exact path="/">
+                <TurtleLogo
+                  code={this.state.code}
+                  updateCode={this.updateCode.bind(this)}
+                  editorDidMount={this.editorDidMount}
+                  editorWillMount={this.editorWillMount}
+                  interpreter={interpreter}
+                />
+              </Route>
+            </>
+          </div>
+        </BrowserRouter>
+
+      </div >
+    );
+  }
+}
+
+
+
+
+
+export default App;
+
+
+/*
+
+ <Scatter
                 data={{
                   datasets:
                     [
@@ -269,21 +292,4 @@ end`,
                 ref={this.chartReference}
               />
 
-
-            </div>
-          </div>
-
-          <div className="terminal" id="terminal">
-            <textarea id="cc" onKeyDown={(e) => interpreter.handleCCKeyDown(e)} ></textarea>
-          </div>
-        </div>
-      </div>
-    );
-  }
-}
-
-
-
-
-
-export default App;
+*/

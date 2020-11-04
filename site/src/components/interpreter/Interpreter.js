@@ -31,7 +31,7 @@ export default class Interpreter {
         this.cnvWidth = canvasWidth;
         this.cnvHeight = canvasHeight;
         // this.img;
-        //this.ctx = document.getElementById('canvas');
+        this.ctx = document.getElementById('canvas');
         this.xcor = 0;
         this.ycor = 0;
         //this.element;
@@ -318,6 +318,7 @@ export default class Interpreter {
 
         if ((typeof c) == 'object') { this.color = c[0]; this.shade = c[1]; }
         else this.color = c;
+        console.log("setcolor: " + c);
         this.setCtxColorShade(this.color, this.shade);
     }
 
@@ -500,6 +501,7 @@ export default class Interpreter {
 
 
     setCtxColorShade(color, shade) {
+        console.log("setCtxColorShade: " + color + ", " + shade);
         var t = this;
         setCtxColor(mergeColorShade(color, shade));
 
@@ -508,6 +510,7 @@ export default class Interpreter {
             if (sh > 100) sh = 200 - sh;
             if (color == -9999) return blend(0x000000, 0xffffff, sh / 100);
             var c = colorFromNumber(color);
+            console.log("c: " + c);
             if (sh == 50) return c;
             else if (sh < 50) return blend(c, 0x000000, (50 - sh) / 60);
             else return blend(c, 0xffffff, (sh - 50) / 53);
@@ -530,7 +533,10 @@ export default class Interpreter {
         }
 
         function setCtxColor(c) {
+            console.log("setCtxColor: " + c);
             var cc = '#' + (c + 0x1000000).toString(16).substring(1);
+            console.log(cc);
+            console.log(t.ctx);
             t.ctx.strokeStyle = cc;
             t.ctx.fillStyle = cc;
         }
@@ -1095,6 +1101,21 @@ export default class Interpreter {
         this.sendReceive(cmd, 1, fcn);
     }
 
+    calibrate(calibrateValues, valueToCalibrate) {
+        console.log(calibrateValues);
+        console.log(Array.isArray(calibrateValues));
+        if(Array.isArray(calibrateValues)){
+            if(calibrateValues.length == 4){
+                //we assume the format is adcvalue1, realvalue1, adcvalue2, realvalue2
+                var slope = (calibrateValues[1] - calibrateValues[3]) / (calibrateValues[0] - calibrateValues[2]);
+                var value = calibrateValues[1] + (valueToCalibrate - calibrateValues[0]) * slope;
+                return(Math.floor(value * 100)/100);
+            } 
+            //no error handling; seems like a TODO
+        }
+
+    }
+
     rb(addr, fcn) {
         var cmd = [].concat(0xfe, this.twobytes(addr));
         this.sendReceive(cmd, 1, fcn);
@@ -1232,6 +1253,7 @@ export default class Interpreter {
 
 export var prims = {};
 
+prims['calibrate'] = { nargs: 2, fcn: function(a, b) { return this.calibrate(a, b) }}
 prims['repeat'] = { nargs: 2, flow: true, fcn: function (a, b) { this.repeat(a, b); } }
 prims['forever'] = { nargs: 1, flow: true, fcn: function (a) { this.loop(a); } }
 prims['loop'] = { nargs: 1, flow: true, fcn: function (a) { this.loop(a); } }

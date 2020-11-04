@@ -49,9 +49,7 @@ export default class NewProjectModal extends Component {
                                 }
                             }
                         } else {
-
-                            document.getElementById("procs").value = project.code;
-
+                            console.log("error: no filename specified");
                         }
                     }
                     this.props.toggleModal();
@@ -70,7 +68,6 @@ export default class NewProjectModal extends Component {
                 <div className="modalContent">
                     <span className="close" onClick={() => this.props.toggleModal()}>&times;</span>
                     <h3>New Project</h3>
-                    <p>Use LEDs for initial testing</p>
                     <br />
                     <div>
                         {this.state.projectsAvailable.map(project => (
