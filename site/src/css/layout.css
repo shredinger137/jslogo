@@ -27,15 +27,15 @@
     max-width: 98vw;
     margin: 0 auto;
     height: 75vh;
-    display: grid;
-    grid-gap: 0px;
-    grid-template-columns: 1fr 1fr;
-    grid-template-areas:
-        "codeEntry codentry"
-        "codeEntry  codentry"
-        "terminal  terminal";
-        background-color: #fff;
-        color: #444;
+
+}
+
+.interfaceGridCode .codeEntry, .codeEntry textarea {
+    height: 75%;
+}
+
+.interfaceGridCode .terminal {
+    height: 25%;
 }
 
 .interfaceGrid {

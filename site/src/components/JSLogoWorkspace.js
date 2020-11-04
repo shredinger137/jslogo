@@ -2,9 +2,40 @@ import React, { Component } from 'react';
 import '../css/styles.css';
 import '../css/layout.css';
 import MonacoEditor from 'react-monaco-editor';
+import { options, languageDef, configuration } from './editorOptions'
 
 
 export default class JSLogo extends Component {
+
+  componentDidUpdate(){
+    console.log(this.props.code);
+    console.log(this.props);
+  }
+
+  
+  editorWillMount = monaco => {
+    this.editor = monaco
+    if (!monaco.languages.getLanguages().some(({ id }) => id === 'jslogo')) {
+      // Register a new language
+      monaco.languages.register({ id: 'jslogo' })
+      // Register a tokens provider for the language
+      monaco.languages.setMonarchTokensProvider('jslogo', languageDef)
+      // Set the editing configuration for the language
+      monaco.languages.setLanguageConfiguration('jslogo', configuration)
+    }
+
+    monaco.editor.defineTheme('jslogo', {
+      base: 'vs-dark',
+      inherit: true,
+      rules: [
+        { token: 'custom-words', foreground: 'FFFD8A' },
+      ],
+      colors: {
+      },
+    });
+
+
+  }
 
     render(){
         const options = {
@@ -25,9 +56,9 @@ export default class JSLogo extends Component {
                 options={options}
                 onChange={this.props.updateCode}
                 editorDidMount={this.props.editorDidMount}
-                editorWillMount={this.props.editorWillMount}
+                editorWillMount={this.editorWillMount}
               />
-              <textarea id="procs" spellCheck="false" onChange={this.props.countLineAndSetState} style={{ whiteSpace: "nowrap", display: "none" }} value={this.props.code} readOnly={true}>
+              <textarea id="procs" spellCheck="false" onChange={this.props.countLineAndSetState} style={{ whiteSpace: "nowrap", display: "none" }} value={this.props.code}>
               </textarea>
               <textarea id="includes" spellCheck="false" style={{ display: "none", whiteSpace: "nowrap", overflow: "visible" }} />
             </div>
