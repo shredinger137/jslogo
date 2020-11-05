@@ -23,6 +23,7 @@ class App extends Component {
 
   chartRef = {}
   state = {
+    turtle: true,
     workspace: "turtle",
     unsavedChanges: false,
     showNewProjectModal: false,
@@ -129,10 +130,6 @@ end`,
     this.setState({ showNewProjectModal: !this.state.showNewProjectModal });
   }
 
-  workspaceChange() {
-    this.state.workspace == "turtle" ? this.setState({ workspace: "jslogo" }) : this.setState({ workspace: "turtle" });
-
-  }
 
   editorWillMount = monaco => {
     this.editor = monaco
@@ -160,6 +157,16 @@ end`,
 
   editorDidMount(editor, monaco) {
     editor.focus();
+  }
+
+  toggleTurtle(){
+    if(this.state.turtle == true){
+
+    }
+    this.setState({turtle: !this.state.turtle})
+    if(this.state.turtle == true){
+      interpreter.setup()
+    }
   }
 
 
@@ -200,42 +207,32 @@ end`,
           <span style={{ width: "10px" }}></span>
           <button id="chartToggle" onClick={() => this.chartToggle()}>Toggle Chart</button>
           <input id="load" type="file" onChange={() => projects.loadFile()} style={{ display: "none" }} />
+          <button onClick={() => this.toggleTurtle()}>Turtle On/Off</button>
         </div>
 
-        <BrowserRouter>
           <div>
-            <>
-              <Route path="/jslogo">
-                <JSLogo
-                  code={this.state.code}
-                  updateCode={this.updateCode.bind(this)}
-                  editorDidMount={this.editorDidMount}
-                  editorWillMount={this.editorWillMount}
-                  interpreter={interpreter}
-                  options={options}
-                />
-              </Route>
-              <Route path="/tlogo">
-                <TurtleLogo
-                  code={this.state.code}
-                  updateCode={this.updateCode.bind(this)}
-                  editorDidMount={this.editorDidMount}
-                  editorWillMount={this.editorWillMount}
-                  interpreter={interpreter}
-                />
-              </Route>
-              <Route exact path="/">
-                <TurtleLogo
-                  code={this.state.code}
-                  updateCode={this.updateCode.bind(this)}
-                  editorDidMount={this.editorDidMount}
-                  editorWillMount={this.editorWillMount}
-                  interpreter={interpreter}
-                />
-              </Route>
-            </>
+            {this.state.turtle ? 
+                            <TurtleLogo
+                            code={this.state.code}
+                            updateCode={this.updateCode.bind(this)}
+                            editorDidMount={this.editorDidMount}
+                            editorWillMount={this.editorWillMount}
+                            interpreter={interpreter}
+                          />
+                          :
+                          <JSLogo
+                          code={this.state.code}
+                          updateCode={this.updateCode.bind(this)}
+                          editorDidMount={this.editorDidMount}
+                          editorWillMount={this.editorWillMount}
+                          interpreter={interpreter}
+                          options={options}
+                        />
+          
+          }
+
           </div>
-        </BrowserRouter>
+       
 
       </div >
     );
