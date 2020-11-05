@@ -24,7 +24,7 @@ class App extends Component {
   chartRef = {}
   state = {
     workspace: "turtle",
-    unsavedChanges: false,
+    unsavedChanges: true,
     showNewProjectModal: false,
     linesOfCode: [1],
     code:

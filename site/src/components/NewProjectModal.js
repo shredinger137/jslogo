@@ -27,6 +27,7 @@ export default class NewProjectModal extends Component {
     }
 
     loadCodeFromProject(projectName) {
+        console.log("clickity");
         //TODO: We're not using the 'unsaved changes' value correctly. We should not prompt if it's not unsaved.
         //TODO: Eventually all files will have a 'fileLocation' field, in which case this conditional can be removed.
 
@@ -37,16 +38,19 @@ export default class NewProjectModal extends Component {
                 for (var project of this.state.projectsAvailable) {
                     if (project.name === projectName) {
                         if (project.fileLocation) {
+                            console.log(project.fileLocation);
                             var request = new XMLHttpRequest();
                             request.open('GET', project.fileLocation, true);
                             request.send(null);
                             request.onreadystatechange = function () {
                                 if (request.readyState === 4 && request.status === 200) {
+                                    console.log("found text");
                                     scopedUpdateCode(request.responseText);
                                 }
                             }
                         } else {
                             console.log("error: no filename specified");
+                            this.props.toggleModal();
                         }
                     }
                     this.props.toggleModal();
