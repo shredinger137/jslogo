@@ -1,4 +1,4 @@
-/* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off" */
+/* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off", no-use-before-define: "off" */
 
 //TODO: Change to contenteditable div for code entry, to improve styling. Change 'value' to 'innerHTML' to accomodate this.
 
@@ -31,7 +31,7 @@ export default class Interpreter {
         this.cnvWidth = canvasWidth;
         this.cnvHeight = canvasHeight;
         // this.img;
-        //this.ctx = document.getElementById('canvas');
+        this.ctx = document.getElementById('canvas');
         this.xcor = 0;
         this.ycor = 0;
         //this.element;
@@ -119,9 +119,9 @@ export default class Interpreter {
     setup() {
 
         var t = this;
-       //commented out sept. 2020 - doesn't seem to be needed
+        //commented out sept. 2020 - doesn't seem to be needed
         // var procs = document.getElementById('procs');
-       // procs.focus();
+        // procs.focus();
         this.element = document.createElement('div');
         this.element.setAttribute('class', 'turtle');
         var cnvframe = document.getElementById('cnvframe');
@@ -156,7 +156,7 @@ export default class Interpreter {
             else this.handlecr(e);
         }
         if (e.ctrlKey) {
-            if(e.keyCode==70) {e.preventDefault(); e.stopPropagation();}
+            if (e.keyCode == 70) { e.preventDefault(); e.stopPropagation(); }
             if (e.keyCode == 71) { e.preventDefault(); e.stopPropagation(); this.runLine('go'); }
             if (e.keyCode == 190) { this.insert('stopped!\n'); this.reset([]); }
         }
@@ -318,6 +318,7 @@ export default class Interpreter {
 
         if ((typeof c) == 'object') { this.color = c[0]; this.shade = c[1]; }
         else this.color = c;
+        console.log("setcolor: " + c);
         this.setCtxColorShade(this.color, this.shade);
     }
 
@@ -500,6 +501,7 @@ export default class Interpreter {
 
 
     setCtxColorShade(color, shade) {
+        console.log("setCtxColorShade: " + color + ", " + shade);
         var t = this;
         setCtxColor(mergeColorShade(color, shade));
 
@@ -508,6 +510,7 @@ export default class Interpreter {
             if (sh > 100) sh = 200 - sh;
             if (color == -9999) return blend(0x000000, 0xffffff, sh / 100);
             var c = colorFromNumber(color);
+            console.log("c: " + c);
             if (sh == 50) return c;
             else if (sh < 50) return blend(c, 0x000000, (50 - sh) / 60);
             else return blend(c, 0xffffff, (sh - 50) / 53);
@@ -530,7 +533,10 @@ export default class Interpreter {
         }
 
         function setCtxColor(c) {
+            console.log("setCtxColor: " + c);
             var cc = '#' + (c + 0x1000000).toString(16).substring(1);
+            console.log(cc);
+            console.log(t.ctx);
             t.ctx.strokeStyle = cc;
             t.ctx.fillStyle = cc;
         }
@@ -642,7 +648,11 @@ export default class Interpreter {
         this.timeout = undefined;
     }
 
-    lprint(x) { this.insert(x + '\n'); }
+    printToConsole(x) {
+        var cc = document.getElementById("cc");
+        cc.value = cc.value + x + "\n";
+        cc.scrollTop = cc.scrollHeight;
+    }
 
     evalNext() {
         var t = this;
@@ -661,7 +671,7 @@ export default class Interpreter {
             else t.pushResult(token);
         }
         catch (e) {
-            this.lprint(e);
+            this.printToConsole(e);
             t.stack = [];
             t.evline = [];
         }
@@ -1091,6 +1101,21 @@ export default class Interpreter {
         this.sendReceive(cmd, 1, fcn);
     }
 
+    calibrate(calibrateValues, valueToCalibrate) {
+        console.log(calibrateValues);
+        console.log(Array.isArray(calibrateValues));
+        if(Array.isArray(calibrateValues)){
+            if(calibrateValues.length == 4){
+                //we assume the format is adcvalue1, realvalue1, adcvalue2, realvalue2
+                var slope = (calibrateValues[1] - calibrateValues[3]) / (calibrateValues[0] - calibrateValues[2]);
+                var value = calibrateValues[1] + (valueToCalibrate - calibrateValues[0]) * slope;
+                return(Math.floor(value * 100)/100);
+            } 
+            //no error handling; seems like a TODO
+        }
+
+    }
+
     rb(addr, fcn) {
         var cmd = [].concat(0xfe, this.twobytes(addr));
         this.sendReceive(cmd, 1, fcn);
@@ -1151,7 +1176,7 @@ export default class Interpreter {
 
     async openSerialPort() {
         port = await navigator.serial.requestPort();
-        await port.open({ baudrate: 115200 });
+        await port.open({ baudRate: 115200 });
         reader = port.readable.getReader();
         outputStream = port.writable;
         document.getElementById("connectButton").style.display = "none";
@@ -1228,6 +1253,7 @@ export default class Interpreter {
 
 export var prims = {};
 
+prims['calibrate'] = { nargs: 2, fcn: function(a, b) { return this.calibrate(a, b) }}
 prims['repeat'] = { nargs: 2, flow: true, fcn: function (a, b) { this.repeat(a, b); } }
 prims['forever'] = { nargs: 1, flow: true, fcn: function (a) { this.loop(a); } }
 prims['loop'] = { nargs: 1, flow: true, fcn: function (a) { this.loop(a); } }
@@ -1283,7 +1309,7 @@ prims['member?'] = { nargs: 2, fcn: function (x, l) { return this.member(x, l); 
 prims['empty?'] = { nargs: 1, fcn: function (l) { return l.length == 0; } }
 prims['pick'] = { nargs: 1, fcn: function (l) { return l[this.random.pickRandom(0, this.getlist(l).length - 1)]; } }
 
-prims['print'] = { nargs: 1, fcn: function (x) { this.lprint(this.printstr(x)); } }
+prims['print'] = { nargs: 1, fcn: function (x) { this.printToConsole(this.printstr(x)); } }
 
 prims['clean'] = { nargs: 0, fcn: function (n) { this.clean(); } }
 prims['forward'] = { nargs: 1, fcn: function (n) { this.forward(this.getnum(n)); } }
@@ -1337,7 +1363,7 @@ prims['st'] = { nargs: 0, fcn: function (n) { this.showTurtle(); } }
 //prims['snapimage'] = {nargs: 1, fcn: function(n){ this.snaps[n] = canvas.toDataURL();}}
 prims['drawsnap'] = { nargs: 1, fcn: function (n) { this.hold = true; this.loadimg(this.snaps[n], function () { this.hold = false; }); } }
 
-prims['flushtime'] = { nargs: 1, fcn: function (n) { var flushtime = this.getnum(n); } }
+prims['flushtime'] = { nargs: 1, fcn: function (n) { flushtime = this.getnum(n); } }
 
 prims['( '] = { nargs: 1, fcn: function (x) { this.evline.shift(); return x; } }
 prims['se '] = { nargs: 'ipm', fcn: function () { return this.ipm_se(arguments); } }

@@ -1,46 +1,36 @@
+/* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off", no-use-before-define: "off" */
+
 import React, { Component } from 'react';
 import './css/styles.css';
 import './css/layout.css';
 import './css/codemirror.css';
 import Interpreter from './components/interpreter/Interpreter';
-import { Scatter } from 'react-chartjs-2';
-import includes from './components/interpreter/includes.js'
 import Projects from './components/Projects.js';
-var CodeMirror = require('react-codemirror');
-
-//More thoughts: If the only thing this actually does for us is numbered lines it might be better to just copy that methodology.
-//This is proving difficult to use. Loading files isn't working right, state management just got more complex. Not really worth it so far.
-//I'm going to disable codemirror for now.
-//Here was the include, for reference: <CodeMirror value={this.state.code} onChange={this.updateCode.bind(this)} options={{ lineNumbers: true }} />
-
-//We should look into CodeMirror-React2, which might provide better options for setting custom highlighting.
-//See https://stackoverflow.com/questions/63185680/how-to-use-custom-codemirror-modes-using-react-codemirror2.
+import Header from './components/Header.js';
+import TurtleLogo from './components/TurtleLogoWorkspace';
+import JSLogo from './components/JSLogoWorkspace';
+import NewProjectModal from './components/NewProjectModal';
+import { options, languageDef, configuration } from './components/editorOptions'
+import { Route, BrowserRouter } from "react-router-dom";
 
 var interpreter;
 var projects;
 
-//TODO:
-//Now that Code Mirror has been added, we're not using procs.value directly. Instead, procs.value is being set to hold the code value 
-//for the interpreter to check. That means the browser has three copies of the entire code - the state, the procs.value and the code mirror divs.
-//That doesn't seem like a good idea, so finding a better way to pass the code to 'interpreter' would be better.
-
-//Also with Code Mirror: Tab now makes indentations instead of changing focus. We want that. But we might have to find another way to switch focus, like ctrl + tab or something,
-//so that we meet accessibility requirements.
+//TODO: Make 'unsavedChanges' global, since it's going to affect multiple things later
 
 class App extends Component {
 
-  constructor(props) {
-    super(props);
-    this.chartReference = React.createRef();
-  }
 
   chartRef = {}
   state = {
+    workspace: "turtle",
+    unsavedChanges: false,
+    showNewProjectModal: false,
     linesOfCode: [1],
-    code: 
+    code:
       `to go
-        print 5
-      end`,
+  print 5
+end`,
     canvasHeight: 400,
     canvasWidth: 900,
     showChartFrame: false,
@@ -60,14 +50,8 @@ class App extends Component {
       canvasWidth: canvasWidth
     });
 
-
-    this.setState({
-
-    });
-
-
     interpreter = new Interpreter(document.getElementById("cnvframe").offsetHeight, document.getElementById("cnvframe").offsetWidth, this.addToChart.bind(this));
-    projects = new Projects(this.updateCode);
+    projects = new Projects(this.updateCode.bind(this));
     interpreter.setup();
 
     const connectButton = document.getElementById('connectButton');
@@ -75,28 +59,21 @@ class App extends Component {
 
     const disconnectButton = document.getElementById('disconnectButton');
     disconnectButton.addEventListener('click', interpreter.disconnectSerialPort.bind(interpreter));
-
     this.countLineAndSetState();
-
   }
-
 
 
   componentDidUpdate() {
-
     interpreter.readProcs();
 
-    
-
   }
- 
 
 
   addToChart(x, y) {
+    console.log("Chartpush: " + x + ", " + y)
     var newData = this.state.chartData;
     newData.push({ x: x, y: y });
     this.setState({ chartData: newData });
-
   }
 
   checkIfSerialCapable = () => {
@@ -115,29 +92,71 @@ class App extends Component {
 
   }
 
-  showCode() {
-    document.getElementById('includesWrapper').style.display = "none";
-    document.getElementById('codeEntryDiv').style.display = "block";
-  }
 
-  showIncludes() {
-    document.getElementById('includesWrapper').style.display = "block";
-    document.getElementById('codeEntryDiv').style.display = "none";
-  }
 
   updateCode(newCode) {
-    console.log("newcode");
-    console.log(newCode);
     this.setState({
       code: newCode,
     });
   }
 
-  updateFromListener(){
-    console.log("updateFromListener");
-    var newCode = document.getElementById('listener').value;
-    this.updateCode(newCode);
-    document.getElementById('listener').value = "";
+
+  countLineAndSetStateForIncludes() {
+    var count = document.getElementById('includes').value.split(/\r\n|\r|\n/).length;
+    var countArray = Array.from(Array(count + 1).keys());
+    countArray.shift();
+    this.setState({
+      linesOfCode: countArray
+    });
+  }
+
+  countLineAndSetState() {
+
+    var count = document.getElementById('procs').value.split(/\r\n|\r|\n/).length;
+    var countArray = Array.from(Array(count + 1).keys());
+    countArray.shift();
+    this.setState({
+      linesOfCode: countArray,
+      unsavedChanges: true
+    });
+
+  }
+
+  toggleShowNewProjectModal() {
+    this.setState({ showNewProjectModal: !this.state.showNewProjectModal });
+  }
+
+  workspaceChange() {
+    this.state.workspace == "turtle" ? this.setState({ workspace: "jslogo" }) : this.setState({ workspace: "turtle" });
+
+  }
+
+  editorWillMount = monaco => {
+    this.editor = monaco
+    if (!monaco.languages.getLanguages().some(({ id }) => id === 'jslogo')) {
+      // Register a new language
+      monaco.languages.register({ id: 'jslogo' })
+      // Register a tokens provider for the language
+      monaco.languages.setMonarchTokensProvider('jslogo', languageDef)
+      // Set the editing configuration for the language
+      monaco.languages.setLanguageConfiguration('jslogo', configuration)
+    }
+
+    monaco.editor.defineTheme('jslogo', {
+      base: 'vs-dark',
+      inherit: true,
+      rules: [
+        { token: 'custom-words', foreground: 'FFFD8A' },
+      ],
+      colors: {
+      },
+    });
+
+
+  }
+
+  editorDidMount(editor, monaco) {
+    editor.focus();
   }
 
   countLineAndSetState(){
@@ -153,59 +172,102 @@ class App extends Component {
 
 
   render() {
+
+    const options = {
+      selectOnLineNumbers: true,
+      automaticLayout: true,
+      minimap: {
+        enabled: false
+      },
+    };
+
     return (
       <div>
-        <header className="header">
-          <h1>Learning by Making</h1>
-        </header>
-
+        <Header
+          toggleNewProjectModal={this.toggleShowNewProjectModal.bind(this)} />
         <div className="main">
+
           <p>Click 'connect' to start, then select the Arduino device. Defining a 'go' word allows you to run
           things by clicking 'go', or you can use the terminal at the bottom. Use dp3on to turn on pin 3, read0 to read the sensor on A0. Requires Chrome. The chart can be updated with chartpush x y.
       <br />
           </p>
+          {this.state.showNewProjectModal ?
+            <NewProjectModal
+              toggleModal={this.toggleShowNewProjectModal.bind(this)}
+              countLines={this.countLineAndSetState.bind(this)}
+              unsavedChanges={this.state.unsavedChanges}
+              updateCode={this.updateCode.bind(this)}
+            />
+
+            :
+            null}
+
           <button id="connectButton" type="button" >Connect</button>
           <button id="disconnectButton" type="button" style={{ display: "none" }}>Disconnect</button>
           <button id="gobutton" onClick={() => { interpreter.runLine("go") }}>Go</button>
           <button id="chartToggle" onClick={() => this.chartToggle()}>Toggle Chart</button>
-          <span style={{ paddingLeft: "100px" }}>Load File:</span>
-          <input id="load" type="file" onChange={() => projects.loadFile()} />
-          <button id="saveAs" onClick={() => projects.saveAs()}>Save File</button>
-          <br /><br />
-          <span style={{ float: "left", marginRight: "20px" }} onClick={() => { this.showCode() }}>Code</span><span style={{ float: "left" }} onClick={() => { this.showIncludes() }}>Includes</span>
-          <br />
+          <input id="load" type="file" onChange={() => projects.loadFile()} style={{ display: "none" }} />
         </div>
-        <div className="interfaceGrid">
-          <div className="codeEntry" id="codeEntryDiv" style={{ border: "1px solid black" }}>
-            <div id="gutter">
-              {this.state.linesOfCode.map((number) => 
-                <span>{number}<br/></span> )}
-            </div>
-            <textarea id="procs"  onChange={this.countLineAndSetState.bind(this)} defaultValue={`to go
-   printSomething 5
-end
 
-to printSomething :n
-   print :n
-end`}
->
-            </textarea>
+        <BrowserRouter>
+          <div>
+            <>
+              <Route path="/jslogo">
+                <JSLogo
+                  code={this.state.code}
+                  updateCode={this.updateCode.bind(this)}
+                  editorDidMount={this.editorDidMount}
+                  editorWillMount={this.editorWillMount}
+                  interpreter={interpreter}
+                  options={options}
+                />
+              </Route>
+              <Route path="/tlogo">
+                <TurtleLogo
+                  code={this.state.code}
+                  updateCode={this.updateCode.bind(this)}
+                  editorDidMount={this.editorDidMount}
+                  editorWillMount={this.editorWillMount}
+                  interpreter={interpreter}
+                  chartData={this.state.chartData}
+                  addToChart={this.addToChart}
+                />
+              </Route>
+              <Route exact path="/">
+                <TurtleLogo
+                  code={this.state.code}
+                  updateCode={this.updateCode.bind(this)}
+                  editorDidMount={this.editorDidMount}
+                  editorWillMount={this.editorWillMount}
+                  interpreter={interpreter}
+                  chartData={this.state.chartData}
+                  addToChart={this.addToChart}
+                />
+              </Route>
+            </>
           </div>
-          <div className="codeEntry" id="includesWrapper" style={{ display: "none" }}>
-            <textarea id="includes" defaultValue={includes}
-            />
-          </div>
-          <div className="chartArea">
-            <div id="cnvframe" style={{ height: "100%", width: "100%" }}>
-              <canvas className="cnv" id="canvas" ></canvas>
-            </div>
-            <div id="chartFrame" className="hide" style={{ height: "100%", width: "100%" }}>
-              <Scatter
+        </BrowserRouter>
+
+      </div >
+    );
+  }
+}
+
+
+
+
+
+export default App;
+
+
+/*
+
+ <Scatter
                 data={{
                   datasets:
                     [
                       {
-                        label: "Test",
+                        label: "Temp. vs Time",
                         data: this.state.chartData
                       }
 
@@ -231,21 +293,4 @@ end`}
                 ref={this.chartReference}
               />
 
-
-            </div>
-          </div>
-
-          <div className="terminal" id="terminal">
-            <textarea id="cc" onKeyDown={(e) => interpreter.handleCCKeyDown(e)} ></textarea>
-          </div>
-        </div>
-      </div>
-    );
-  }
-}
-
-
-
-
-
-export default App;
+*/

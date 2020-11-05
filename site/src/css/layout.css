@@ -23,6 +23,21 @@
     height: 50vh;
 }
 
+.interfaceGridCode {
+    max-width: 98vw;
+    margin: 0 auto;
+    height: 75vh;
+
+}
+
+.interfaceGridCode .codeEntry, .codeEntry textarea {
+    height: 75%;
+}
+
+.interfaceGridCode .terminal {
+    height: 25%;
+}
+
 .interfaceGrid {
     max-width: 98vw;
     margin: 0 auto;
@@ -42,16 +57,7 @@
     display: none;
 }
 
+
 .codeEntry div, .codeEntry textarea{
     border: none;
-}
-
-.codeEntry {
-    display: grid;
-    grid-template-columns: 1.6em 1fr;
-    font-size: 1rem;
-}
-
-#gutter {
-    background-color: lightgray;
 }

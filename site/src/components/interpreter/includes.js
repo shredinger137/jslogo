@@ -1,6 +1,5 @@
 const includes = 
-`
-to box 
+`to box 
     fd 50
     rt 90
     fd 50
@@ -8,8 +7,6 @@ to box
     fd 50   
     rt 90
     fd 50
-end
-
-`;
+end`;
 
 export default includes;
