@@ -48,7 +48,6 @@
     font-size: 20px;
     height: 56px;
     justify-content: flex-start;
-    padding: 16px 16px 0 16px;
     position: fixed;
     transition: transform 0.233s cubic-bezier(0, 0, 0.21, 1) 0.1s;
     width: 100%;
@@ -129,7 +128,24 @@
 
 	.menuExpanded {
 		transform: translate3d(0vw, 0, 0);
-	}
+  }
+
+  .buttonDiv {
+    height: 50px;
+    vertical-align: middle;
+    margin-right: 10px;
+    cursor: pointer;
+  }
+  
+  .buttonDiv img {
+    width: 20px;
+    vertical-align: middle;
+  }
+  
+  .buttonDiv span {
+    line-height: 50px;
+    vertical-align: middle;
+  }
 
 
   /* The Modal (background) */

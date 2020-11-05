@@ -12,6 +12,7 @@ export const languageDef = {
   defaultToken: "",
   number: /\d+(\.\d+)?/,
   keywords: [
+    "setcolor",
     "print",
     "read0",
     "repeat",

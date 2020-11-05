@@ -11,7 +11,7 @@ import TurtleLogo from './components/TurtleLogoWorkspace';
 import JSLogo from './components/JSLogoWorkspace';
 import NewProjectModal from './components/NewProjectModal';
 import { options, languageDef, configuration } from './components/editorOptions'
-import { Route, BrowserRouter } from "react-router-dom";
+import { Link, Route, BrowserRouter, useHistory } from "react-router-dom";
 
 var interpreter;
 var projects;
@@ -34,10 +34,8 @@ end`,
     canvasHeight: 400,
     canvasWidth: 900,
     showChartFrame: false,
-    chartType: 1,
-    chartData:
-      [
-      ],
+    chartType: "Single Scatter",
+    chartData: [],
     chartDataSecond: []
   };
 
@@ -161,12 +159,12 @@ end`,
   }
 
   editorDidMount(editor, monaco) {
-      editor.focus();
+    editor.focus();
   }
 
 
   render() {
-    
+
     const options = {
       selectOnLineNumbers: true,
       automaticLayout: true,
@@ -178,7 +176,10 @@ end`,
     return (
       <div>
         <Header
-          toggleNewProjectModal={this.toggleShowNewProjectModal.bind(this)} />
+          toggleNewProjectModal={this.toggleShowNewProjectModal.bind(this)}
+          interpreter={this.interpreter}
+          chartToggle={this.chartToggle}
+        />
         <div className="main">
 
           <p>Click 'connect' to start, then select the Arduino device. Defining a 'go' word allows you to run
@@ -195,10 +196,8 @@ end`,
 
             :
             null}
-
-          <button id="connectButton" type="button" >Connect</button>
-          <button id="disconnectButton" type="button" style={{ display: "none" }}>Disconnect</button>
           <button id="gobutton" onClick={() => { interpreter.runLine("go") }}>Go</button>
+          <span style={{ width: "10px" }}></span>
           <button id="chartToggle" onClick={() => this.chartToggle()}>Toggle Chart</button>
           <input id="load" type="file" onChange={() => projects.loadFile()} style={{ display: "none" }} />
         </div>

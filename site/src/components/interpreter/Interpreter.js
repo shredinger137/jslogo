@@ -320,7 +320,6 @@ export default class Interpreter {
 
         if ((typeof c) == 'object') { this.color = c[0]; this.shade = c[1]; }
         else this.color = c;
-        console.log("setcolor: " + c);
         this.setCtxColorShade(this.color, this.shade);
     }
 
@@ -403,7 +402,6 @@ export default class Interpreter {
         // 'translate(' + dx + 'px, ' + dy + 'px) rotate(' + t.heading + 'deg)' + ' scale(' + s + ',' + s + ')';
         t.element.left = dx;
         t.element.top = dy;
-        console.log(t.xcor + ", " + t.ycor);
 
         function screenLeft() {
             return -img.width / 2 + (t.xcor + t.cnvWidth / 2);
@@ -416,8 +414,6 @@ export default class Interpreter {
 
     clean() {
         var t = this;
-        console.log(t.ctx);
-        console.log("clean 1");
         var t = this;
         this.xcor = 0;
         t.ycor = 0;
@@ -505,7 +501,6 @@ export default class Interpreter {
 
 
     setCtxColorShade(color, shade) {
-        console.log("setCtxColorShade: " + color + ", " + shade);
         var t = this;
         setCtxColor(mergeColorShade(color, shade));
 
@@ -514,7 +509,6 @@ export default class Interpreter {
             if (sh > 100) sh = 200 - sh;
             if (color == -9999) return blend(0x000000, 0xffffff, sh / 100);
             var c = colorFromNumber(color);
-            console.log("c: " + c);
             if (sh == 50) return c;
             else if (sh < 50) return blend(c, 0x000000, (50 - sh) / 60);
             else return blend(c, 0xffffff, (sh - 50) / 53);
@@ -537,10 +531,7 @@ export default class Interpreter {
         }
 
         function setCtxColor(c) {
-            console.log("setCtxColor: " + c);
             var cc = '#' + (c + 0x1000000).toString(16).substring(1);
-            console.log(cc);
-            console.log(t.ctx);
             t.ctx.strokeStyle = cc;
             t.ctx.fillStyle = cc;
         }
