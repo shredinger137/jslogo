@@ -70,6 +70,7 @@ end`,
 
 
   addToChart(x, y) {
+    console.log("Chartpush: " + x + ", " + y)
     var newData = this.state.chartData;
     newData.push({ x: x, y: y });
     this.setState({ chartData: newData });
@@ -155,12 +156,12 @@ end`,
   }
 
   editorDidMount(editor, monaco) {
-      editor.focus();
+    editor.focus();
   }
 
 
   render() {
-    
+
     const options = {
       selectOnLineNumbers: true,
       automaticLayout: true,
@@ -217,6 +218,8 @@ end`,
                   editorDidMount={this.editorDidMount}
                   editorWillMount={this.editorWillMount}
                   interpreter={interpreter}
+                  chartData={this.state.chartData}
+                  addToChart={this.addToChart}
                 />
               </Route>
               <Route exact path="/">
@@ -226,6 +229,8 @@ end`,
                   editorDidMount={this.editorDidMount}
                   editorWillMount={this.editorWillMount}
                   interpreter={interpreter}
+                  chartData={this.state.chartData}
+                  addToChart={this.addToChart}
                 />
               </Route>
             </>

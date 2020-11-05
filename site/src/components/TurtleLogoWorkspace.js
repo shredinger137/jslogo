@@ -2,10 +2,18 @@ import React, { Component } from 'react';
 import '../css/styles.css';
 import '../css/layout.css';
 import MonacoEditor from 'react-monaco-editor';
+import {Scatter} from 'react-chartjs-2';
 
 export default class TurtleLogo extends Component {
+  chartRef = {}
 
+  componentDidUpdate(){
+    console.log(this.props.chartData);
+    console.log(this.props);
+  }
+  
   render() {
+
     const options = {
       selectOnLineNumbers: true,
       automaticLayout: true,
@@ -35,8 +43,36 @@ export default class TurtleLogo extends Component {
             <canvas className="cnv" id="canvas" ></canvas>
           </div>
           <div id="chartFrame" className="hide" style={{ height: "100%", width: "100%" }}>
-            <p>Chart goes here... or does it for this workspace?</p>
+          <Scatter
+                data={{
+                  datasets:
+                    [
+                      {
+                        label: "Temp. vs Time",
+                        data: this.props.chartData
+                      }
 
+                    ]
+                }}
+
+
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  animation: {
+                    duration: 0
+                  },
+                  elements: {
+                    point: {
+                      radius: 4,
+                      backgroundColor: "black"
+                    }
+                  }
+                }
+                }
+                redraw={true}
+                ref={this.chartReference}
+              />
           </div>
         </div>
 
