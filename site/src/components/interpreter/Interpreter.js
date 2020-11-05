@@ -403,7 +403,7 @@ export default class Interpreter {
         // 'translate(' + dx + 'px, ' + dy + 'px) rotate(' + t.heading + 'deg)' + ' scale(' + s + ',' + s + ')';
         t.element.left = dx;
         t.element.top = dy;
-
+        console.log(t.xcor + ", " + t.ycor);
 
         function screenLeft() {
             return -img.width / 2 + (t.xcor + t.cnvWidth / 2);
@@ -427,7 +427,7 @@ export default class Interpreter {
         t.color = 0;
         t.shade = 50;
         t.setCtxColorShade(t.color, t.shade);
-        t.pensize = 1;
+        t.pensize = 4;
         t.ctx.lineWidth = t.pensize;
         t.opacity = 1;
         t.pendown = true;
