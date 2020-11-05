@@ -34,10 +34,16 @@ end`,
     canvasHeight: 400,
     canvasWidth: 900,
     showChartFrame: false,
+    chartType: 1,
     chartData:
       [
       ],
+    chartDataSecond: []
   };
+
+  //Chartype Key:
+  //1 - Single Scatter
+  //2 - Double Scatter
 
 
   componentDidMount() {

@@ -38,7 +38,7 @@ export default class Interpreter {
         this.heading = 0;
         this.color = 0;
         //shade started off at 50 in the previous version. Unclear on why. Zero works a lot better, 50 kept giving us red.
-        this.shade = 0;
+        this.shade = 50;
         this.opacity = 1;
         this.pendown = true;
         this.pensize = 1;
@@ -136,7 +136,9 @@ export default class Interpreter {
         canvas.height = t.cnvHeight * t.dpi;
         t.ctx.scale(t.dpi, t.dpi);
         t.ctx.textBaseline = "middle";
+        t.clean();
         window.requestAnimationFrame(this.ticker);
+
 
 
         function imgLoaded() {
@@ -413,7 +415,9 @@ export default class Interpreter {
     }
 
     clean() {
-
+        var t = this;
+        console.log(t.ctx);
+        console.log("clean 1");
         var t = this;
         this.xcor = 0;
         t.ycor = 0;
@@ -421,7 +425,7 @@ export default class Interpreter {
         t.setCtxColorShade(-9999, 98); // #FAFAFA
         t.ctx.fillRect(0, 0, t.cnvWidth, t.cnvHeight);
         t.color = 0;
-        t.shade = 0;
+        t.shade = 50;
         t.setCtxColorShade(t.color, t.shade);
         t.pensize = 1;
         t.ctx.lineWidth = t.pensize;
