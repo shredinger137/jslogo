@@ -57,7 +57,7 @@ end`,
 
     interpreter = new Interpreter(document.getElementById("cnvframe").offsetHeight, document.getElementById("cnvframe").offsetWidth, this.addToChart.bind(this));
     projects = new Projects(this.updateCode.bind(this));
-    interpreter.setup();
+    //interpreter.setup();
 
     const connectButton = document.getElementById('connectButton');
     connectButton.addEventListener('click', interpreter.openSerialPort.bind(interpreter));
@@ -160,11 +160,9 @@ end`,
   }
 
   toggleTurtle(){
-    if(this.state.turtle == true){
-
-    }
     this.setState({turtle: !this.state.turtle})
     if(this.state.turtle == true){
+      interpreter = new Interpreter(document.getElementById("cnvframe").offsetHeight, document.getElementById("cnvframe").offsetWidth, this.addToChart.bind(this));
       interpreter.setup()
     }
   }
@@ -208,6 +206,8 @@ end`,
           <button id="chartToggle" onClick={() => this.chartToggle()}>Toggle Chart</button>
           <input id="load" type="file" onChange={() => projects.loadFile()} style={{ display: "none" }} />
           <button onClick={() => this.toggleTurtle()}>Turtle On/Off</button>
+          <button onClick={() => this.setState({chartType: "Single Scatter"})}>Single Chart</button>
+          <button onClick={() => this.setState({chartType: "Double Scatter"})}>Double Chart</button>
         </div>
 
           <div>
@@ -218,6 +218,7 @@ end`,
                             editorDidMount={this.editorDidMount}
                             editorWillMount={this.editorWillMount}
                             interpreter={interpreter}
+                            chartType={this.state.chartType}
                           />
                           :
                           <JSLogo
@@ -227,6 +228,7 @@ end`,
                           editorWillMount={this.editorWillMount}
                           interpreter={interpreter}
                           options={options}
+                          chartType={this.state.chartType}
                         />
           
           }

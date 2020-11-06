@@ -3,14 +3,21 @@ import '../css/styles.css';
 import '../css/layout.css';
 import MonacoEditor from 'react-monaco-editor';
 import { options, languageDef, configuration } from './editorOptions'
+import Interpreter from './interpreter/Interpreter';
 
 //Create a conditional for chart state. Running 'initchart (argument)' sets state, so you display whatever data. 
 //For multiple charts, try using an argument for 'which chart'. So, 'chartpush 1 5 4' adds point 5,4 to the first chart; 'chartpush 2 5 4' to chart 2. So forth.
 //This doesn't cover overlay. Might be good to get a write up on which charts are needed, because those all have to be coded separately.
-//These functions also all have to be passed to Interpreter to make them able to manage state, unless you figure out how to do global properly.
+//These functions also all have to be passed to Interpreter to make them able to manage state, unless you want to switch to global
 
+var interpreter;
 
 export default class JSLogo extends Component {
+
+  componentDidMount(){
+    interpreter = new Interpreter(document.getElementById("cnvframe").offsetHeight, document.getElementById("cnvframe").offsetWidth, this.addToChart);
+    interpreter.setup();
+  }
 
   componentDidUpdate(){
     console.log(this.props.code);
