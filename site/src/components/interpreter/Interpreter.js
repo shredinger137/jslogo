@@ -5,6 +5,7 @@
 
 import Tokenizer from './Tokenizer';
 import turtleMath from './turtleMath';
+import {includes} from './includes';
 
 Number.prototype.mod = function (n) { return ((this % n) + n) % n; }
 
@@ -542,13 +543,9 @@ export default class Interpreter {
 
     //procs js
     readProcs() {
-        var includes = document.getElementById("includes").value;
+        console.log(includes)
         var procs = document.getElementById("procs").value;
         var toBeEvaluated = procs + "\n" + includes;
-
-        //TODO: Add includes here. It can be a different div maybe, if we want to go that route, and it can be added to procs.value.
-        //Then the thing submitted to procString would be the entire procs area + the includes.
-
         this.procString(toBeEvaluated, 'normal');
 
     }
@@ -1071,6 +1068,7 @@ export default class Interpreter {
         this.hold = true;
         this.sendReceive([0xc0 + n], 2, this.gotsensor);
         //   this.readADC(n, this.gotsensor);  readADC didn't seem necessary here
+        console.log("readSesnor " + n);
     }
 
     gotsensor(x) {
@@ -1141,7 +1139,10 @@ export default class Interpreter {
 
     sendReceive(sendMessage, n, fcn) {
 
+        console.log("sendRecieve");
+
         if (port && port.readable) {
+            console.log("sending");
             this.respfcn = fcn;
             this.resp = [];
             this.respCount = n;
@@ -1370,6 +1371,7 @@ prims['storeinbox2'] = { nargs: 1, fcn: function (n) { this.boxes[1] = n; } }
 prims['box2'] = { nargs: 0, fcn: function () { return this.boxes[1]; } }
 prims['storeinbox3'] = { nargs: 1, fcn: function (n) { this.boxes[2] = n; } }
 prims['box3'] = { nargs: 0, fcn: function () { return this.boxes[2]; } }
+prims ['now'] = {nargs: 0, fcn: function () {return Math.floor(Date.now()/1000)}}
 
 prims['resett'] = { nargs: 0, fcn: function (n) { this.resett(); } }
 prims['timer'] = { nargs: 0, fcn: function () { return this.timer(); } }

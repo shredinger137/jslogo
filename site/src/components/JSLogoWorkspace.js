@@ -3,7 +3,7 @@ import '../css/styles.css';
 import '../css/layout.css';
 import MonacoEditor from 'react-monaco-editor';
 import { options, languageDef, configuration } from './editorOptions'
-import Interpreter from './interpreter/Interpreter';
+import Chart from './Chart';
 
 //Create a conditional for chart state. Running 'initchart (argument)' sets state, so you display whatever data. 
 //For multiple charts, try using an argument for 'which chart'. So, 'chartpush 1 5 4' adds point 5,4 to the first chart; 'chartpush 2 5 4' to chart 2. So forth.
@@ -14,17 +14,16 @@ var interpreter;
 
 export default class JSLogo extends Component {
 
-  componentDidMount(){
-    interpreter = new Interpreter(document.getElementById("cnvframe").offsetHeight, document.getElementById("cnvframe").offsetWidth, this.addToChart);
-    interpreter.setup();
+  componentDidMount() {
+
   }
 
-  componentDidUpdate(){
+  componentDidUpdate() {
     console.log(this.props.code);
     console.log(this.props);
   }
 
-  
+
   editorWillMount = monaco => {
     this.editor = monaco
     if (!monaco.languages.getLanguages().some(({ id }) => id === 'jslogo')) {
@@ -49,18 +48,19 @@ export default class JSLogo extends Component {
 
   }
 
-    render(){
-        const options = {
-            selectOnLineNumbers: true,
-            automaticLayout: true,
-            minimap: {
-              enabled: false
-            },
-          };
-        return(
-          <>
-            <div className="interfaceGridCode">
-            <div className="codeEntry" id="codeEntryDiv" style={{ border: "1px solid black", maxHeight: "75vh", minHeight: "50vh" }}>
+  render() {
+    const options = {
+      selectOnLineNumbers: true,
+      automaticLayout: true,
+      minimap: {
+        enabled: false
+      },
+    };
+    return (
+      <>
+        <div className="interfaceGridCode">
+          <div className="codeEntry" id="codeEntryDiv" style={{ border: "1px solid black", maxHeight: "75vh", minHeight: "50vh" }}>
+            <div id="editor" style={{height: "100%", width: "100%"}}>
               <MonacoEditor
                 language="jslogo"
                 theme="jslogo"
@@ -70,30 +70,38 @@ export default class JSLogo extends Component {
                 editorDidMount={this.props.editorDidMount}
                 editorWillMount={this.editorWillMount}
               />
-              <textarea id="procs" spellCheck="false" onChange={this.props.countLineAndSetState} style={{ whiteSpace: "nowrap", display: "none" }} value={this.props.code}>
-              </textarea>
-              <textarea id="includes" spellCheck="false" style={{ display: "none", whiteSpace: "nowrap", overflow: "visible" }} />
             </div>
- 
-            <div className="terminal" id="terminal">
-              <textarea id="cc" onKeyDown={(e) => this.props.interpreter.handleCCKeyDown(e)} ></textarea>
+            <div id="chartFrame" className="hide" style={{ height: "100%", width: "100%" }}>
+              <Chart
+                chartType={this.props.chartType}
+              />
+
             </div>
-          
+            <textarea id="procs" spellCheck="false" onChange={this.props.countLineAndSetState} style={{ whiteSpace: "nowrap", display: "none" }} value={this.props.code}>
+            </textarea>
+            <textarea id="includes" spellCheck="false" style={{ display: "none", whiteSpace: "nowrap", overflow: "visible" }} />
           </div>
-            
-            <div className="chartArea" style={{display: "none"}}>
-              <div id="cnvframe" style={{ height: "100%", width: "100%" }}>
-                <canvas className="cnv" id="canvas" ></canvas>
-              </div>
-              <div id="chartFrame" className="hide" style={{ height: "100%", width: "100%" }}>
-                <p>Chart goes here</p>
-  
-              </div>
-            </div>
-            </>
 
 
-        )
-    }
+          <div className="terminal" id="terminal">
+            <textarea id="cc" onKeyDown={(e) => this.props.interpreter.handleCCKeyDown(e)} ></textarea>
+          </div>
+
+        </div>
+
+        <div className="chartArea" style={{ display: "none" }}>
+          <div id="cnvframe" style={{ height: "100%", width: "100%" }}>
+            <canvas className="cnv" id="canvas" ></canvas>
+          </div>
+          <div id="chartFrame" className="hide" style={{ height: "100%", width: "100%" }}>
+            <p>Chart goes here</p>
+
+          </div>
+        </div>
+      </>
+
+
+    )
+  }
 
 }

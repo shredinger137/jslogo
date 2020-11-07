@@ -2,17 +2,14 @@ import React, { Component } from 'react';
 import '../css/styles.css';
 import '../css/layout.css';
 import MonacoEditor from 'react-monaco-editor';
-import {Scatter} from 'react-chartjs-2'
-import Interpreter from './interpreter/Interpreter';
 import Chart from './Chart';
 
-var interpreter;
+
 
 export default class TurtleLogo extends Component {
 
   componentDidMount(){
-    interpreter = new Interpreter(document.getElementById("cnvframe").offsetHeight, document.getElementById("cnvframe").offsetWidth, this.props.addToChart);
-    interpreter.setup();
+
   }
 
   render() {
@@ -53,7 +50,7 @@ export default class TurtleLogo extends Component {
         </div>
 
         <div className="terminal" id="terminal">
-          <textarea id="cc" onKeyDown={(e) => interpreter.handleCCKeyDown(e)} ></textarea>
+          <textarea id="cc" onKeyDown={(e) => this.props.interpreter.handleCCKeyDown(e)} ></textarea>
         </div>
       </div>
     )

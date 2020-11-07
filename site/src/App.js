@@ -12,6 +12,7 @@ import JSLogo from './components/JSLogoWorkspace';
 import NewProjectModal from './components/NewProjectModal';
 import { options, languageDef, configuration } from './components/editorOptions'
 import { Link, Route, BrowserRouter, useHistory } from "react-router-dom";
+import {includes} from './components/interpreter/includes.js';
 
 var interpreter;
 var projects;
@@ -48,22 +49,29 @@ end`,
   componentDidMount() {
     console.log("Serial API Check:");
     console.log(this.checkIfSerialCapable());
+
     var canvasHeight = document.getElementById("cnvframe").clientHeight;
     var canvasWidth = document.getElementById("cnvframe").clientWidth;
+
     this.setState({
       canvasHeight: canvasHeight,
-      canvasWidth: canvasWidth
+      canvasWidth: canvasWidth,
     });
 
+    console.log(this.state);
     interpreter = new Interpreter(document.getElementById("cnvframe").offsetHeight, document.getElementById("cnvframe").offsetWidth, this.addToChart.bind(this));
     projects = new Projects(this.updateCode.bind(this));
-    //interpreter.setup();
+    interpreter.setup();
 
     const connectButton = document.getElementById('connectButton');
     connectButton.addEventListener('click', interpreter.openSerialPort.bind(interpreter));
 
     const disconnectButton = document.getElementById('disconnectButton');
     disconnectButton.addEventListener('click', interpreter.disconnectSerialPort.bind(interpreter));
+
+    this.setState({
+      includes: includes
+    });
     this.countLineAndSetState();
   }
 
@@ -91,8 +99,13 @@ end`,
 
   chartToggle() {
     this.setState({ chartToggle: !this.state.chartToggle });
-    document.getElementById("chartFrame").classList.toggle("hide");
-    document.getElementById("cnvframe").classList.toggle("hide");
+    if (this.state.turtle) {
+      document.getElementById("chartFrame").classList.toggle("hide");
+      document.getElementById("cnvframe").classList.toggle("hide");
+    } else {
+      document.getElementById("chartFrame").classList.toggle("hide");
+      document.getElementById("editor").classList.toggle("hide");
+    }
 
   }
 
@@ -104,15 +117,6 @@ end`,
     });
   }
 
-
-  countLineAndSetStateForIncludes() {
-    var count = document.getElementById('includes').value.split(/\r\n|\r|\n/).length;
-    var countArray = Array.from(Array(count + 1).keys());
-    countArray.shift();
-    this.setState({
-      linesOfCode: countArray
-    });
-  }
 
   countLineAndSetState() {
 
@@ -159,9 +163,9 @@ end`,
     editor.focus();
   }
 
-  toggleTurtle(){
-    this.setState({turtle: !this.state.turtle})
-    if(this.state.turtle == true){
+  toggleTurtle() {
+    this.setState({ turtle: !this.state.turtle })
+    if (this.state.turtle == true) {
       interpreter = new Interpreter(document.getElementById("cnvframe").offsetHeight, document.getElementById("cnvframe").offsetWidth, this.addToChart.bind(this));
       interpreter.setup()
     }
@@ -206,35 +210,39 @@ end`,
           <button id="chartToggle" onClick={() => this.chartToggle()}>Toggle Chart</button>
           <input id="load" type="file" onChange={() => projects.loadFile()} style={{ display: "none" }} />
           <button onClick={() => this.toggleTurtle()}>Turtle On/Off</button>
-          <button onClick={() => this.setState({chartType: "Single Scatter"})}>Single Chart</button>
-          <button onClick={() => this.setState({chartType: "Double Scatter"})}>Double Chart</button>
+          <button onClick={() => this.setState({ chartType: "Single Scatter" })}>Single Chart</button>
+          <button onClick={() => this.setState({ chartType: "Double Scatter" })}>Double Chart</button>
+          <button onClick={() => interpreter.setup()}>Setup</button>
         </div>
 
-          <div>
-            {this.state.turtle ? 
-                            <TurtleLogo
-                            code={this.state.code}
-                            updateCode={this.updateCode.bind(this)}
-                            editorDidMount={this.editorDidMount}
-                            editorWillMount={this.editorWillMount}
-                            interpreter={interpreter}
-                            chartType={this.state.chartType}
-                          />
-                          :
-                          <JSLogo
-                          code={this.state.code}
-                          updateCode={this.updateCode.bind(this)}
-                          editorDidMount={this.editorDidMount}
-                          editorWillMount={this.editorWillMount}
-                          interpreter={interpreter}
-                          options={options}
-                          chartType={this.state.chartType}
-                        />
-          
+        <div>
+          {this.state.turtle ?
+            <TurtleLogo
+              code={this.state.code}
+              updateCode={this.updateCode.bind(this)}
+              editorDidMount={this.editorDidMount}
+              editorWillMount={this.editorWillMount}
+              interpreter={interpreter}
+              chartType={this.state.chartType}
+              addToChart={this.addToChart.bind(this)}
+            />
+            :
+            <JSLogo
+              code={this.state.code}
+              updateCode={this.updateCode.bind(this)}
+              editorDidMount={this.editorDidMount}
+              editorWillMount={this.editorWillMount}
+              interpreter={interpreter}
+              options={options}
+              chartType={this.state.chartType}
+              addToChart={this.addToChart.bind(this)}
+            />
+
           }
 
-          </div>
-       
+        </div>
+        <textarea id="includes" style={{display: "none"}} value={this.state.includes}/>
+
 
       </div >
     );
