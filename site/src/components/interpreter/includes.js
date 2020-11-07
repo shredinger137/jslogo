@@ -18,7 +18,7 @@ to readData
   make "data (se :data read3)
   make "data (se :data read4)
   make "data (se :data read5)
-  print :data
+  output :data
 end
 
 `;
