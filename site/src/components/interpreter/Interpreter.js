@@ -20,13 +20,13 @@ var outputStream;
 
 export default class Interpreter {
 
-    constructor(canvasHeight, canvasWidth, addToChart) {
+    constructor(canvasHeight, canvasWidth, addToChart, pushToTable) {
         this.allReceivedData = [0];
         this.ticker = this.ticker.bind(this);
         this.isDone = this.isDone.bind(this);
 
         this.addToChart = addToChart;
-
+        this.pushToTable = pushToTable;
         //turtle
 
         this.cnvWidth = canvasWidth;
@@ -1250,6 +1250,7 @@ export default class Interpreter {
 export var prims = {};
 
 prims['calibrate'] = { nargs: 2, fcn: function(a, b) { return this.calibrate(a, b) }}
+prims['logData'] = { nargs: 1, fcn: function(a) { this.pushToTable(a) }}
 prims['repeat'] = { nargs: 2, flow: true, fcn: function (a, b) { this.repeat(a, b); } }
 prims['forever'] = { nargs: 1, flow: true, fcn: function (a) { this.loop(a); } }
 prims['loop'] = { nargs: 1, flow: true, fcn: function (a) { this.loop(a); } }

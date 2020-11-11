@@ -3,6 +3,7 @@ import '../css/styles.css';
 import '../css/layout.css';
 import MonacoEditor from 'react-monaco-editor';
 import Chart from './Chart';
+import DataTable from './DataTable';
 
 
 
@@ -38,15 +39,20 @@ export default class TurtleLogo extends Component {
         </div>
 
         <div className="chartArea">
-          <div id="cnvframe" style={{ height: "100%", width: "100%" }}>
+          <div id="cnvframe" className={this.props.view == "main" ? null: "hide"} style={{ height: "100%", width: "100%" }}>
             <canvas className="cnv" id="canvas" ></canvas>
           </div>
-          <div id="chartFrame" className="hide" style={{ height: "100%", width: "100%" }}>
+          <div id="chartFrame" className={this.props.view == "graph" ? null : "hide"} style={{ height: "100%", width: "100%" }}>
             <Chart 
               chartType={this.props.chartType}
              />
 
           </div>
+          <div id="dataFrame" className={this.props.view == "data" ? null: "hide"} style={{height: "100%", width: "100%"}}>
+              <DataTable
+                tableData = {this.props.tableData} 
+              />
+            </div>
         </div>
 
         <div className="terminal" id="terminal">

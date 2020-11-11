@@ -1,5 +1,7 @@
 /* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off", no-use-before-define: "off" */
 
+//TODO: CountLinesAndSetState no longer valid; remove
+
 import React, { Component } from 'react';
 import './css/styles.css';
 import './css/layout.css';
@@ -11,19 +13,23 @@ import TurtleLogo from './components/TurtleLogoWorkspace';
 import JSLogo from './components/JSLogoWorkspace';
 import NewProjectModal from './components/NewProjectModal';
 import { options, languageDef, configuration } from './components/editorOptions'
-import { Link, Route, BrowserRouter, useHistory } from "react-router-dom";
 import {includes} from './components/interpreter/includes.js';
+
 
 var interpreter;
 var projects;
 
 //TODO: Make 'unsavedChanges' global, since it's going to affect multiple things later
 
+
+
 class App extends Component {
 
 
   chartRef = {}
   state = {
+    tableData: [[]],
+    view: "main",
     turtle: true,
     workspace: "turtle",
     unsavedChanges: false,
@@ -59,7 +65,7 @@ end`,
     });
 
     console.log(this.state);
-    interpreter = new Interpreter(document.getElementById("cnvframe").offsetHeight, document.getElementById("cnvframe").offsetWidth, this.addToChart.bind(this));
+    interpreter = new Interpreter(document.getElementById("cnvframe").offsetHeight, document.getElementById("cnvframe").offsetWidth, this.addToChart.bind(this), this.pushToDataTable.bind(this));
     projects = new Projects(this.updateCode.bind(this));
     interpreter.setup();
 
@@ -96,17 +102,12 @@ end`,
     }
   }
 
-
-  chartToggle() {
-    this.setState({ chartToggle: !this.state.chartToggle });
-    if (this.state.turtle) {
-      document.getElementById("chartFrame").classList.toggle("hide");
-      document.getElementById("cnvframe").classList.toggle("hide");
-    } else {
-      document.getElementById("chartFrame").classList.toggle("hide");
-      document.getElementById("editor").classList.toggle("hide");
-    }
-
+  pushToDataTable(newDataLine){
+    var newData = this.state.tableData;
+    newData.push(newDataLine);
+    this.setState({
+      tableData: newData
+    })
   }
 
 
@@ -163,14 +164,6 @@ end`,
     editor.focus();
   }
 
-  toggleTurtle() {
-    this.setState({ turtle: !this.state.turtle })
-    if (this.state.turtle == true) {
-      interpreter = new Interpreter(document.getElementById("cnvframe").offsetHeight, document.getElementById("cnvframe").offsetWidth, this.addToChart.bind(this));
-      interpreter.setup()
-    }
-  }
-
 
   render() {
 
@@ -206,10 +199,11 @@ end`,
             :
             null}
           <button id="gobutton" onClick={() => { interpreter.runLine("go") }}>Go</button>
-          <span style={{ width: "10px" }}></span>
-          <button id="chartToggle" onClick={() => this.chartToggle()}>Toggle Chart</button>
+          <button id="chartToggle" onClick={() => this.setState({view: "main"})}>Main View</button>
+          <button id="chartToggle" onClick={() => this.setState({view: "graph"})}>Graph</button>
+          <button id="chartToggle" onClick={() => this.setState({view: "data"})}>Data</button>
           <input id="load" type="file" onChange={() => projects.loadFile()} style={{ display: "none" }} />
-          <button onClick={() => this.toggleTurtle()}>Turtle On/Off</button>
+          <button onClick={() => this.setState({ turtle: !this.state.turtle})}>Turtle On/Off</button>
           <button onClick={() => this.setState({ chartType: "Single Scatter" })}>Single Chart</button>
           <button onClick={() => this.setState({ chartType: "Double Scatter" })}>Double Chart</button>
           <button onClick={() => interpreter.setup()}>Setup</button>
@@ -225,6 +219,8 @@ end`,
               interpreter={interpreter}
               chartType={this.state.chartType}
               addToChart={this.addToChart.bind(this)}
+              view={this.state.view}
+              tableData={this.state.tableData}
             />
             :
             <JSLogo
@@ -236,6 +232,8 @@ end`,
               options={options}
               chartType={this.state.chartType}
               addToChart={this.addToChart.bind(this)}
+              view={this.state.view}
+              tableData={this.state.tableData}
             />
 
           }

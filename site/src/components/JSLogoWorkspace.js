@@ -4,6 +4,7 @@ import '../css/layout.css';
 import MonacoEditor from 'react-monaco-editor';
 import { options, languageDef, configuration } from './editorOptions'
 import Chart from './Chart';
+import DataTable from './DataTable';
 
 //Create a conditional for chart state. Running 'initchart (argument)' sets state, so you display whatever data. 
 //For multiple charts, try using an argument for 'which chart'. So, 'chartpush 1 5 4' adds point 5,4 to the first chart; 'chartpush 2 5 4' to chart 2. So forth.
@@ -60,7 +61,7 @@ export default class JSLogo extends Component {
       <>
         <div className="interfaceGridCode">
           <div className="codeEntry" id="codeEntryDiv" style={{ border: "1px solid black", maxHeight: "75vh", minHeight: "50vh" }}>
-            <div id="editor" style={{height: "100%", width: "100%"}}>
+            <div id="editor" class={this.props.view == "main" ? null : "hide"} style={{ height: "100%", width: "100%" }}>
               <MonacoEditor
                 language="jslogo"
                 theme="jslogo"
@@ -71,11 +72,16 @@ export default class JSLogo extends Component {
                 editorWillMount={this.editorWillMount}
               />
             </div>
-            <div id="chartFrame" className="hide" style={{ height: "100%", width: "100%" }}>
+            <div id="chartFrame" className={this.props.view == "graph" ? null : "hide"} style={{ height: "100%", width: "100%" }}>
               <Chart
                 chartType={this.props.chartType}
               />
 
+            </div>
+            <div id="dataFrame" className={this.props.view == "data" ? null : "hide"} style={{ height: "100%", width: "100%" }}>
+              <DataTable
+                tableData={this.props.tableData}
+              />
             </div>
             <textarea id="procs" spellCheck="false" onChange={this.props.countLineAndSetState} style={{ whiteSpace: "nowrap", display: "none" }} value={this.props.code}>
             </textarea>
