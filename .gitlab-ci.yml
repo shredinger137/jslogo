@@ -6,6 +6,7 @@ build:
     before_script:
       - cd site
     environment: 
+      name: "dev"
       CI: ""
     script:
         - echo "Building deploy package"
