@@ -5,7 +5,7 @@ build:
     stage: build
     before_script:
       - cd site
-    env: 
+    environment: 
       CI: ""
     script:
         - echo "Building deploy package"
