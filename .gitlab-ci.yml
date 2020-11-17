@@ -5,13 +5,12 @@ build:
     stage: build
     before_script:
       - cd site
-    environment: 
+    environment:
       name: "dev"
-      CI: ""
     script:
         - echo "Building deploy package"
         - npm install
-        - npm run build
+        - CI=false npm run build
         - echo "Build successful"
     artifacts:
       expire_in: 1 hour
