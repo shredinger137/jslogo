@@ -1,6 +1,7 @@
 stages:
     - build
     - deploy
+    
 build:
     stage: build
     before_script:
@@ -16,6 +17,7 @@ build:
       expire_in: 1 hour
       paths:
         - site/build
+
 deploy_dev:
     stage: deploy
     before_script:
@@ -29,3 +31,31 @@ deploy_dev:
         url: dev.lbym.org
     only:
         - dev
+
+deploy_production:
+    stage: deploy
+    before_script:
+      - cd site
+    script:
+        - echo "Deploying production to server"
+        - cp -rv build/* /var/www/lbym-app/beta
+        - echo "Deployed"
+    environment:
+        name: production
+        url: app.lbym.org
+    only:
+        - release
+
+deploy_release:
+    stage: deploy
+    before_script:
+      - cd site
+    script:
+        - echo "Deploying production to server"
+        - cp -rv build/* /var/www/lbym-app/public
+        - echo "Deployed"
+    environment:
+        name: production
+        url: app.lbym.org
+    only:
+        - master
