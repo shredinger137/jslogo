@@ -78,6 +78,7 @@ export default class Chart extends Component {
                                 ref={this.chartReference}
                             />
                         </div>
+                        
                          <div style={{ height: "50%" }}>
                          <Scatter
                              data={{
