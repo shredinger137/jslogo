@@ -5,6 +5,8 @@ build:
     stage: build
     before_script:
       - cd site
+    env: 
+      CI: ""
     script:
         - echo "Building deploy package"
         - npm install
