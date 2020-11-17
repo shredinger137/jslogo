@@ -9,3 +9,18 @@ build:
         - npm install
         - npm build
         - echo "Build successful"
+    artifacts:
+      expire_in: 1 hour
+      paths:
+        - build
+deploy_dev:
+    stage: deploy
+    script:
+        - echo "Deploying dev to server"
+        - cp -rv build/* /var/www/lbym-app/dev
+        - echo "Deployed"
+    environment:
+        name: dev
+        url: dev.lbym.org
+    only:
+        - dev
