@@ -16,6 +16,8 @@ build:
         - build
 deploy_dev:
     stage: deploy
+    before_script:
+      - cd site
     script:
         - echo "Deploying dev to server"
         - cp -rv build/* /var/www/lbym-app/dev
