@@ -1,0 +1,11 @@
+stages:
+    - build
+build:
+    stage: build
+    before_script:
+      - cd site
+    script:
+        - echo "Building deploy package"
+        - npm install
+        - npm build
+        - echo "Build successful"
