@@ -543,7 +543,6 @@ export default class Interpreter {
 
     //procs js
     readProcs() {
-        console.log(includes)
         var procs = document.getElementById("procs").value;
         var toBeEvaluated = procs + "\n" + includes;
         this.procString(toBeEvaluated, 'normal');
@@ -1068,7 +1067,6 @@ export default class Interpreter {
         this.hold = true;
         this.sendReceive([0xc0 + n], 2, this.gotsensor);
         //   this.readADC(n, this.gotsensor);  readADC didn't seem necessary here
-        console.log("readSesnor " + n);
     }
 
     gotsensor(x) {
@@ -1095,8 +1093,6 @@ export default class Interpreter {
     }
 
     calibrate(calibrateValues, valueToCalibrate) {
-        console.log(calibrateValues);
-        console.log(Array.isArray(calibrateValues));
         if(Array.isArray(calibrateValues)){
             if(calibrateValues.length == 4){
                 //we assume the format is adcvalue1, realvalue1, adcvalue2, realvalue2
@@ -1139,10 +1135,8 @@ export default class Interpreter {
 
     sendReceive(sendMessage, n, fcn) {
 
-        console.log("sendRecieve");
 
         if (port && port.readable) {
-            console.log("sending");
             this.respfcn = fcn;
             this.resp = [];
             this.respCount = n;

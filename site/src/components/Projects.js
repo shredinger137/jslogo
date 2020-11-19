@@ -1,4 +1,7 @@
+import Dexie, { DBCoreRangeType } from 'dexie';
+
 var globalUpdateCode;
+var localDatabase = new Dexie;
 
 export default class Projects {
 
@@ -6,6 +9,61 @@ export default class Projects {
     constructor(updateCode) {
         globalUpdateCode = updateCode;
     }
+
+    async initializeDatabase(){
+        localDatabase.version(1).stores({
+            projects: '++id, name, code'
+          })
+    }
+
+      //obviously it doesn't do what it says it does
+  async writeLastCodeToLocalStorage(code) {
+    
+    //read the database and see if 'recover' exists; if so, get the id key
+
+    this.getRecoverEntry().then(async function(entries) {
+      if(entries && entries.length > 0){
+
+        //if a recovery entry exists, update it with the new code
+
+        var recoveryId = entries[0]["id"];
+        await localDatabase.projects.update(recoveryId, {
+          name: "recover",
+          code: code
+        })
+      } else {
+        await localDatabase.projects.add({
+          name: 'recover',
+          code: code
+        })
+        //if a recover entry doesn't exist, create it
+
+        //TODO
+
+      }
+
+    })
+
+    //add recovery data
+    //await localDatabase.projects.put({
+    //  name: 'recover',
+     // code: this.state.code
+    //},
+    
+   // );
+
+  }
+
+  async getRecoverEntry(){
+    var returnValue = false;
+    if(localDatabase && localDatabase.projects){
+        returnValue = await localDatabase.projects.where('name').equals('recover').toArray();
+    } 
+    console.log(returnValue);
+    return returnValue;
+    
+  }
+
 
     
     saveAs(){

@@ -2,7 +2,7 @@
 
 //TODO: CountLinesAndSetState no longer valid; remove
 
-import React, { Component } from 'react';
+import React, { Component, useEffect } from 'react';
 import './css/styles.css';
 import './css/layout.css';
 import './css/codemirror.css';
@@ -13,13 +13,15 @@ import TurtleLogo from './components/TurtleLogoWorkspace';
 import JSLogo from './components/JSLogoWorkspace';
 import NewProjectModal from './components/NewProjectModal';
 import { options, languageDef, configuration } from './components/editorOptions'
-import {includes} from './components/interpreter/includes.js';
+import { includes } from './components/interpreter/includes.js';
+import Dexie, { DBCoreRangeType } from 'dexie'
 
 
 var interpreter;
 var projects;
+var localDatabase;
 
-//TODO: Make 'unsavedChanges' global, since it's going to affect multiple things later
+//TODO: Make 'unsavedChanges' global, since it's going to affect multiple things later. Or otherwise use it properly.
 
 
 
@@ -47,12 +49,14 @@ end`,
     chartDataSecond: []
   };
 
-  //Chartype Key:
-  //1 - Single Scatter
-  //2 - Double Scatter
+
+  
 
 
   componentDidMount() {
+
+    localDatabase = new Dexie('lbym');
+
     console.log("Serial API Check:");
     console.log(this.checkIfSerialCapable());
 
@@ -64,7 +68,6 @@ end`,
       canvasWidth: canvasWidth,
     });
 
-    console.log(this.state);
     interpreter = new Interpreter(document.getElementById("cnvframe").offsetHeight, document.getElementById("cnvframe").offsetWidth, this.addToChart.bind(this), this.pushToDataTable.bind(this));
     projects = new Projects(this.updateCode.bind(this));
     interpreter.setup();
@@ -79,6 +82,19 @@ end`,
       includes: includes
     });
     this.countLineAndSetState();
+    projects.initializeDatabase();
+
+    projects.getRecoverEntry().then(recoveryProject => {
+      if(recoveryProject && recoveryProject[0] && recoveryProject[0]['code']){
+        this.updateCode(recoveryProject[0]['code'])
+      }
+    });
+
+    setInterval(() => {
+      projects.writeLastCodeToLocalStorage(this.state.code);
+      console.log("interval");
+    }, 10000);
+
   }
 
 
@@ -102,7 +118,7 @@ end`,
     }
   }
 
-  pushToDataTable(newDataLine){
+  pushToDataTable(newDataLine) {
     var newData = this.state.tableData;
     newData.push(newDataLine);
     this.setState({
@@ -199,13 +215,14 @@ end`,
             :
             null}
           <button id="gobutton" onClick={() => { interpreter.runLine("go") }}>Go</button>
-          <button id="chartToggle" onClick={() => this.setState({view: "main"})}>Main View</button>
-          <button id="chartToggle" onClick={() => this.setState({view: "graph"})}>Graph</button>
-          <button id="chartToggle" onClick={() => this.setState({view: "data"})}>Data</button>
+          <button id="chartToggle" onClick={() => this.setState({ view: "main" })}>Main View</button>
+          <button id="chartToggle" onClick={() => this.setState({ view: "graph" })}>Graph</button>
+          <button id="chartToggle" onClick={() => this.setState({ view: "data" })}>Data</button>
           <input id="load" type="file" onChange={() => projects.loadFile()} style={{ display: "none" }} />
-          <button onClick={() => this.setState({ turtle: !this.state.turtle})}>Turtle On/Off</button>
+          <button onClick={() => this.setState({ turtle: !this.state.turtle })}>Turtle On/Off</button>
           <button onClick={() => this.setState({ chartType: "Single Scatter" })}>Single Chart</button>
           <button onClick={() => this.setState({ chartType: "Double Scatter" })}>Double Chart</button>
+          <button onClick={() => projects.writeLastCodeToLocalStorage(this.state.code)}>Write to Recovery</button>
           <button onClick={() => interpreter.setup()}>Setup</button>
         </div>
 
@@ -239,7 +256,7 @@ end`,
           }
 
         </div>
-        <textarea id="includes" style={{display: "none"}} value={this.state.includes}/>
+        <textarea id="includes" style={{ display: "none" }} value={this.state.includes} />
 
 
       </div >
