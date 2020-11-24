@@ -44,6 +44,9 @@ export default class TurtleLogo extends Component {
           <div id="cnvframe" className={this.props.view == "main" ? null: "hide"} style={{ height: "100%", width: "100%" }}>
             <canvas className="cnv" id="canvas" ></canvas>
           </div>
+          <div id="cnvframe" className={this.props.view == "test" ? null: "hide"} style={{ height: "100%", width: "100%" }}>
+            <canvas id="testcanvas" style={{width: "100%", height: "100%"}}></canvas>
+          </div>
           <div id="chartFrame" className={this.props.view == "graph" ? null : "hide"} style={{ height: "100%", width: "100%" }}>
             <Chart 
               chartType={this.props.chartType}

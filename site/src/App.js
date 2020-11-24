@@ -92,7 +92,6 @@ end`,
 
     setInterval(() => {
       projects.writeLastCodeToLocalStorage(this.state.code);
-      console.log("interval");
     }, 10000);
 
   }
@@ -214,16 +213,16 @@ end`,
 
             :
             null}
-          <button id="gobutton" onClick={() => { interpreter.runLine("go") }}>Go</button>
-          <button id="chartToggle" onClick={() => this.setState({ view: "main" })}>Main View</button>
-          <button id="chartToggle" onClick={() => this.setState({ view: "graph" })}>Graph</button>
-          <button id="chartToggle" onClick={() => this.setState({ view: "data" })}>Data</button>
+          <button onClick={() => { interpreter.runLine("go") }}>Go</button>
+          <button onClick={() => this.setState({ view: "main" })}>Main View</button>
+          <button onClick={() => this.setState({ view: "graph" })}>Graph</button>
+          <button onClick={() => this.setState({ view: "data" })}>Data</button>
           <input id="load" type="file" onChange={() => projects.loadFile()} style={{ display: "none" }} />
           <button onClick={() => this.setState({ turtle: !this.state.turtle })}>Turtle On/Off</button>
           <button onClick={() => this.setState({ chartType: "Single Scatter" })}>Single Chart</button>
           <button onClick={() => this.setState({ chartType: "Double Scatter" })}>Double Chart</button>
-          <button onClick={() => projects.writeLastCodeToLocalStorage(this.state.code)}>Write to Recovery</button>
           <button onClick={() => interpreter.setup()}>Setup</button>
+          <button onClick={() => this.setState({ view: "test" })}>Test Area</button>
         </div>
 
         <div>

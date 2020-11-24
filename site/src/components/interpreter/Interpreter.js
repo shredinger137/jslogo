@@ -372,6 +372,15 @@ export default class Interpreter {
         t.ctx.restore();
     }
 
+    drawLine(x, y){
+        var canvasElement = document.getElementById("testcanvas");
+        var canvas = canvasElement.getContext("2d");
+        canvas.beginPath();
+        canvas.moveTo(0,0);
+        canvas.lineTo(x, y);
+        canvas.stroke();
+    }
+
     setfont(f) {
         this.font = f;
         this.ctx.font = this.fontsize + 'px ' + f;
@@ -1404,6 +1413,7 @@ prims['dp6on'] = { nargs: 0, fcn: function () { this.pinOn(6); this.mwait(1); } 
 prims['dp6off'] = { nargs: 0, fcn: function () { this.pinOff(6); this.mwait(1); } }
 prims['dp7on'] = { nargs: 0, fcn: function () { this.pinOn(7); this.mwait(1); } }
 prims['dp7off'] = { nargs: 0, fcn: function () { this.pinOff(7); this.mwait(1); } }
+prims['lineto'] = { nargs: 2, fcn: function (a, b) { this.drawLine(a, b); } }
 
 prims['read0'] = { nargs: 0, fcn: function () { this.readSensor(0); return this.cfun; } }
 prims['read1'] = { nargs: 0, fcn: function () { this.readSensor(1); return this.cfun; } }

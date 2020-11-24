@@ -59,7 +59,6 @@ export default class Projects {
     if(localDatabase && localDatabase.projects){
         returnValue = await localDatabase.projects.where('name').equals('recover').toArray();
     } 
-    console.log(returnValue);
     return returnValue;
     
   }
@@ -87,7 +86,6 @@ export default class Projects {
         const input = document.getElementById('load');
         const file = input.files[0];
         var fileReader = new FileReader()
-        console.log(global);
 
         fileReader.onload = function(fileLoadedEvent, context){
             var textFromFileLoaded = fileLoadedEvent.target.result;
