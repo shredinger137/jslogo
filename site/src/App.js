@@ -50,7 +50,7 @@ end`,
   };
 
 
-  
+
 
 
   componentDidMount() {
@@ -85,7 +85,7 @@ end`,
     projects.initializeDatabase();
 
     projects.getRecoverEntry().then(recoveryProject => {
-      if(recoveryProject && recoveryProject[0] && recoveryProject[0]['code']){
+      if (recoveryProject && recoveryProject[0] && recoveryProject[0]['code']) {
         this.updateCode(recoveryProject[0]['code'])
       }
     });
@@ -197,12 +197,8 @@ end`,
           interpreter={this.interpreter}
           chartToggle={this.chartToggle}
         />
+        <br />
         <div className="main">
-
-          <p>1117. Click 'connect' to start, then select the Arduino device. Defining a 'go' word allows you to run
-          things by clicking 'go', or you can use the terminal at the bottom. Use dp3on to turn on pin 3, read0 to read the sensor on A0. Requires Chrome. The chart can be updated with chartpush x y.
-      <br />
-          </p>
           {this.state.showNewProjectModal ?
             <NewProjectModal
               toggleModal={this.toggleShowNewProjectModal.bind(this)}
@@ -213,6 +209,7 @@ end`,
 
             :
             null}
+          <p>Canvas: {this.state.canvasWidth} x {this.state.canvasHeight}</p>
           <button onClick={() => { interpreter.runLine("go") }}>Go</button>
           <button onClick={() => this.setState({ view: "main" })}>Main View</button>
           <button onClick={() => this.setState({ view: "graph" })}>Graph</button>
@@ -223,6 +220,7 @@ end`,
           <button onClick={() => this.setState({ chartType: "Double Scatter" })}>Double Chart</button>
           <button onClick={() => interpreter.setup()}>Setup</button>
           <button onClick={() => this.setState({ view: "test" })}>Test Area</button>
+
         </div>
 
         <div>
