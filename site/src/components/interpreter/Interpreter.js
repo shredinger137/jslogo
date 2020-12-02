@@ -5,7 +5,7 @@
 
 import Tokenizer from './Tokenizer';
 import turtleMath from './turtleMath';
-import {includes} from './includes';
+import { includes } from './includes';
 
 Number.prototype.mod = function (n) { return ((this % n) + n) % n; }
 
@@ -372,11 +372,11 @@ export default class Interpreter {
         t.ctx.restore();
     }
 
-    drawLine(x, y){
+    drawLine(x, y) {
         var canvasElement = document.getElementById("testcanvas");
         var canvas = canvasElement.getContext("2d");
         canvas.beginPath();
-        canvas.moveTo(0,0);
+        canvas.moveTo(0, 0);
         canvas.lineTo(x, y);
         canvas.stroke();
     }
@@ -1019,7 +1019,21 @@ export default class Interpreter {
     }
 
     getnum(x) {
-        var n = Number(x);
+        var n;
+        if (typeof x == "string") {
+            if (x.includes("vh")) {
+                var cleaned = x.replace("vh", "");
+                n = Number(cleaned) / 100 * this.cnvHeight;
+            }
+            if (x.includes("vw")) {
+                var cleaned = x.replace("vw", "");
+                n = Number(cleaned) / 100 * this.cnvWidth;
+            }
+        }
+        else {
+            n = Number(x);
+        }
+
         if (isNaN(n) || (String(x) == 'false') || (String(x) == 'true')) throw "error: " + this.cfun + " doesn't like " + this.printstr(x) + ' as input';
         return n;
     }
@@ -1102,13 +1116,13 @@ export default class Interpreter {
     }
 
     calibrate(calibrateValues, valueToCalibrate) {
-        if(Array.isArray(calibrateValues)){
-            if(calibrateValues.length == 4){
+        if (Array.isArray(calibrateValues)) {
+            if (calibrateValues.length == 4) {
                 //we assume the format is adcvalue1, realvalue1, adcvalue2, realvalue2
                 var slope = (calibrateValues[1] - calibrateValues[3]) / (calibrateValues[0] - calibrateValues[2]);
                 var value = calibrateValues[1] + (valueToCalibrate - calibrateValues[0]) * slope;
-                return(Math.floor(value * 100)/100);
-            } 
+                return (Math.floor(value * 100) / 100);
+            }
             //no error handling; seems like a TODO
         }
 
@@ -1252,8 +1266,8 @@ export default class Interpreter {
 
 export var prims = {};
 
-prims['calibrate'] = { nargs: 2, fcn: function(a, b) { return this.calibrate(a, b) }}
-prims['logData'] = { nargs: 1, fcn: function(a) { this.pushToTable(a) }}
+prims['calibrate'] = { nargs: 2, fcn: function (a, b) { return this.calibrate(a, b) } }
+prims['logData'] = { nargs: 1, fcn: function (a) { this.pushToTable(a) } }
 prims['repeat'] = { nargs: 2, flow: true, fcn: function (a, b) { this.repeat(a, b); } }
 prims['forever'] = { nargs: 1, flow: true, fcn: function (a) { this.loop(a); } }
 prims['loop'] = { nargs: 1, flow: true, fcn: function (a) { this.loop(a); } }
@@ -1375,7 +1389,7 @@ prims['storeinbox2'] = { nargs: 1, fcn: function (n) { this.boxes[1] = n; } }
 prims['box2'] = { nargs: 0, fcn: function () { return this.boxes[1]; } }
 prims['storeinbox3'] = { nargs: 1, fcn: function (n) { this.boxes[2] = n; } }
 prims['box3'] = { nargs: 0, fcn: function () { return this.boxes[2]; } }
-prims ['now'] = {nargs: 0, fcn: function () {return Math.floor(Date.now()/1000)}}
+prims['now'] = { nargs: 0, fcn: function () { return Math.floor(Date.now() / 1000) } }
 
 prims['resett'] = { nargs: 0, fcn: function (n) { this.resett(); } }
 prims['timer'] = { nargs: 0, fcn: function () { return this.timer(); } }
