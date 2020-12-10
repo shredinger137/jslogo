@@ -45,8 +45,13 @@ end`,
     canvasWidth: 900,
     showChartFrame: false,
     chartType: "Single Scatter",
-    chartData: [],
-    chartDataSecond: []
+    chartOptionsSingle: {},
+    chartDataSingle: [],
+    chartOptionsTop: {},
+    chartDataTop: [],
+    chartOptionsBottom: {},
+    chartDataBottom: [],
+    logoVariables: []
   };
 
 
@@ -68,7 +73,13 @@ end`,
       canvasWidth: canvasWidth,
     });
 
-    interpreter = new Interpreter(document.getElementById("cnvframe").offsetHeight, document.getElementById("cnvframe").offsetWidth, this.addToChart.bind(this), this.pushToDataTable.bind(this));
+    interpreter = new Interpreter(document.getElementById("cnvframe").offsetHeight,
+                                  document.getElementById("cnvframe").offsetWidth, 
+                                  this.addToChart.bind(this), 
+                                  this.pushToDataTable.bind(this), 
+                                  this.updateLogoVariables.bind(this),
+                                  this.pushChartData.bind(this)
+                                  );
     projects = new Projects(this.updateCode.bind(this));
     interpreter.setup();
 
@@ -102,11 +113,21 @@ end`,
 
   }
 
+  updateLogoVariables(newVariables) {
+    this.setState({ logoVariables: newVariables });
+  }
 
   addToChart(x, y) {
     var newData = this.state.chartData;
     newData.push({ x: x, y: y });
     this.setState({ chartData: newData });
+  }
+
+  pushChartData(newData) {
+    console.log("pushing");
+    console.log(newData);
+    this.setState({ chartDataSingle: newData });
+    console.log(this.state.chartDataSingle);
   }
 
   checkIfSerialCapable = () => {
@@ -235,6 +256,12 @@ end`,
               addToChart={this.addToChart.bind(this)}
               view={this.state.view}
               tableData={this.state.tableData}
+              chartOptionsSingle={this.state.chartOptionsSingle}
+              chartDataSingle={this.state.chartDataSingle}
+              chartOptionsTop={this.state.chartOptionsTop}
+              chartDataTop={this.state.chartDataTop}
+              chartOptionsBottom={this.state.chartOptionsBottom}
+              chartDataBottom={this.state.chartDataBottom}
             />
             :
             <JSLogo
@@ -248,6 +275,12 @@ end`,
               addToChart={this.addToChart.bind(this)}
               view={this.state.view}
               tableData={this.state.tableData}
+              chartOptionsSingle={this.state.chartOptionsSingle}
+              chartDataSingle={this.state.chartDataSingle}
+              chartOptionsTop={this.state.chartOptionsTop}
+              chartDataTop={this.state.chartDataTop}
+              chartOptionsBottom={this.state.chartOptionsBottom}
+              chartDataBottom={this.state.chartDataBottom}
             />
 
           }
@@ -266,39 +299,3 @@ end`,
 
 
 export default App;
-
-
-/*
-
- <Scatter
-                data={{
-                  datasets:
-                    [
-                      {
-                        label: "Temp. vs Time",
-                        data: this.state.chartData
-                      }
-
-                    ]
-                }}
-
-
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  animation: {
-                    duration: 0
-                  },
-                  elements: {
-                    point: {
-                      radius: 4,
-                      backgroundColor: "black"
-                    }
-                  }
-                }
-                }
-                redraw={true}
-                ref={this.chartReference}
-              />
-
-*/

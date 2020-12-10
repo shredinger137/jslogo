@@ -11,6 +11,42 @@ export default class Chart extends Component {
     render() {
         return (
             <div style={{ height: "100%", width: "100%" }}>
+                <Scatter
+                    data={{
+                        datasets:
+                            [
+                                {
+                                    label: "Temp. vs Time",
+                                    data: this.props.chartData
+                                }
+
+                            ]
+                    }}
+
+
+                    options={{
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: {
+                            duration: 0
+                        },
+                        elements: {
+                            point: {
+                                radius: 4,
+                                backgroundColor: "black"
+                            }
+                        }
+                    }
+                    }
+                    redraw={true}
+                    ref={this.chartReference}
+                />
+            </div>
+        )
+
+        /*
+        return (
+            <div style={{ height: "100%", width: "100%" }}>
                 {this.props.chartType == "Single Scatter" ?
                     <Scatter
                         data={{
@@ -118,7 +154,7 @@ export default class Chart extends Component {
                 }
 
             </div>
-        )
-    }
+*/
 
-}   
+    }   
+}

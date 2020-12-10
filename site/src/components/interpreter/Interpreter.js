@@ -20,7 +20,27 @@ var outputStream;
 
 export default class Interpreter {
 
-    constructor(canvasHeight, canvasWidth, addToChart, pushToTable) {
+    constructor(canvasHeight, canvasWidth, addToChart, pushToTable, updateLogoVariables, pushNewChartData) {
+        
+        this.updateLogoVariables = updateLogoVariables;
+
+        //charts are given assigned variables for data; these are effectively listened for in 'make', so that 
+        //if the variable in question is one of the chart data ones we know to update the chart data in our app.
+
+        //Note that we enable charts in steps. Currently, for example, more than one data field can't be pushed up.
+        //We'll need to allow for an arbitrary number of data lists later on, which may require refactoring some stuff.
+        //Sorry.
+
+        this.singleChartXVariable = "_testVariable";
+        this.topChartXVariable = "";
+        this.bottomChartXVariable = "";
+
+        this.singleChartYVariable = "";
+        this.topChartYVariable = "";
+        this.bottomChartYVariable = "";
+
+        this.pushNewChartData = pushNewChartData;
+
         this.allReceivedData = [0];
         this.ticker = this.ticker.bind(this);
         this.isDone = this.isDone.bind(this);
@@ -149,6 +169,31 @@ export default class Interpreter {
             t.element.style.height = t.size + 'px';
             t.move();
         }
+
+    }
+
+    setChartListener(axis, variable){
+
+        var t = this;
+        //maybe make these objects, instead of a bunch of string? Might help when we expand this to be general.
+
+        if(t.getValue("_chartType")){
+            if(axis == "x"){
+                if(t.getValue("_chartType") == "singleChart"){
+                    t.singleChartXVariable = variable;
+                }
+            } else {
+                if(t.getValue("_chartType") == "singleChart"){
+                    t.singleChartYVariable = variable;
+                }
+            }
+
+        } else {
+            console.log(this.locals[0]);
+           throw "Chart not defined";
+        }
+
+        console.log(this.singleChartXVariable);
 
     }
 
@@ -767,17 +812,67 @@ export default class Interpreter {
     }
 
     setValue(name, value) {
+
         var t = this;
+
         for (var i in t.locals) {
             if (t.locals[i][name] != undefined) {
                 t.locals[i][name] = value;
+
+
+                //TODO
+                //Note: This doesn't run if the variable wasn't previously defined, which may prevent
+                //the first point from being plotted
+
+                if(name == this.topChartXVariable || 
+                    name == this.topChartYVariable || 
+                    name == this.bottomChartXVariable || 
+                    name == this.bottomChartYVariable || 
+                    name == this.singleChartXVariable || 
+                    name == this.singleChartYVariable){
+                    console.log("match chart");
+                    console.log(t.singleChartXVariable);
+                    this.updateChartData();
+                    console.log(t.locals);
+                }
+
                 return;
             }
         }
         t.locals[t.locals.length - 1][name] = value;
+        console.log(t.locals);
+        //this.updateLogoVariables(t.locals[0]);
+        //TODO: Uncomment to enable local variables in user facing app.
     }
 
+    //Are these actually different - setVariable and makeLocal?
+
     makeLocal(name) { this.locals[0][name] = 0; }
+
+//This will push data to x; doesn't include y, doesn't handle other plot types
+
+
+
+    updateChartData(){
+        var t = this;
+        console.log(this.singleChartXVariable);
+        var chartData = [];
+        var counter = 0;
+        if(this.getValue(this.singleChartXVariable)){
+            if(this.getValue(this.singleChartYVariable)){
+                for(var xValue of this.getValue(this.singleChartXVariable)){
+                    if(this.getValue(this.singleChartYVariable)[counter]){
+                        chartData.push({x: xValue, y: counter});
+                        counter++;
+                    }
+                }
+            }
+   
+        t.pushNewChartData(chartData);
+        }
+
+
+    }
 
     procOutput(t, x) {
         if (t.frame.length == 0) {
@@ -1266,6 +1361,8 @@ export default class Interpreter {
 
 export var prims = {};
 
+prims['setChartX'] = { nargs: 1, fcn: function(a) {this.setChartListener("x", a)}}
+prims['setChartY'] = { nargs: 1, fcn: function(a) {this.setChartListener("y", a)}}
 prims['calibrate'] = { nargs: 2, fcn: function (a, b) { return this.calibrate(a, b) } }
 prims['logData'] = { nargs: 1, fcn: function (a) { this.pushToTable(a) } }
 prims['repeat'] = { nargs: 2, flow: true, fcn: function (a, b) { this.repeat(a, b); } }
