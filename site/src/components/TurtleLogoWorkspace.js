@@ -16,7 +16,7 @@ export default class TurtleLogo extends Component {
   }
 
   componentDidUpdate(){
-    console.log(this.props);
+
   }
 
   render() {
@@ -54,7 +54,13 @@ export default class TurtleLogo extends Component {
           <div id="chartFrame" className={this.props.view == "graph" ? null : "hide"} style={{ height: "100%", width: "100%" }}>
             <Chart 
               chartType={this.props.chartType}
-              chartData={this.props.chartDataSingle}
+              chartDataSingle={this.props.chartDataSingle}
+              chartDataTop={this.props.chartDataTop}
+              chartDataBottom={this.props.chartDataBottom}
+              chartOptionsTop={this.props.chartOptionsTop}
+              chartOptionsBottom={this.props.chartOptionsBottom}
+              chartOptionsSingle={this.props.chartOptionsSingle}
+              
              />
 
           </div>

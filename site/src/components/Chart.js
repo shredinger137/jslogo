@@ -5,56 +5,30 @@ import { Scatter } from 'react-chartjs-2'
 
 export default class Chart extends Component {
 
+    state = {
+        options: {}
+    }
+    
     chartRef = {}
 
+    buildOptions(){
+        
+    }
+
+    componentDidUpdate(){
+        console.log(this.props.chartDataSingle);
+    }
 
     render() {
         return (
             <div style={{ height: "100%", width: "100%" }}>
-                <Scatter
-                    data={{
-                        datasets:
-                            [
-                                {
-                                    label: "Temp. vs Time",
-                                    data: this.props.chartData
-                                }
-
-                            ]
-                    }}
-
-
-                    options={{
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        animation: {
-                            duration: 0
-                        },
-                        elements: {
-                            point: {
-                                radius: 4,
-                                backgroundColor: "black"
-                            }
-                        }
-                    }
-                    }
-                    redraw={true}
-                    ref={this.chartReference}
-                />
-            </div>
-        )
-
-        /*
-        return (
-            <div style={{ height: "100%", width: "100%" }}>
-                {this.props.chartType == "Single Scatter" ?
+                {this.props.chartType == "single" ?
                     <Scatter
                         data={{
                             datasets:
                                 [
                                     {
-                                        label: "Temp. vs Time",
-                                        data: this.props.chartData
+                                        data: this.props.chartDataSingle
                                     }
 
                                 ]
@@ -62,6 +36,24 @@ export default class Chart extends Component {
 
 
                         options={{
+                            scales: {
+                                yAxes: [{
+                                    scaleLabel: {
+                                        display: true,
+                                        labelString: this.props.chartOptionsSingle.yLabel
+                                    },
+                                    ticks: this.props.chartOptionsSingle.ticks
+                                }],
+                                xAxes: [{
+                                    scaleLabel: {
+                                        display: true,
+                                        labelString: this.props.chartOptionsSingle.xLabel
+                                    }
+                                }]
+                            },
+                            legend: {
+                                display: false
+                            },
                             responsive: true,
                             maintainAspectRatio: false,
                             animation: {
@@ -80,7 +72,7 @@ export default class Chart extends Component {
                     />
                     :
 
-                    this.props.chartType == "Double Scatter" ?
+                    this.props.chartType == "double" ?
                         <>
                         <div style={{ height: "50%" }}>
                             <Scatter
@@ -88,8 +80,8 @@ export default class Chart extends Component {
                                     datasets:
                                         [
                                             {
-                                                label: "Temp. vs Time",
-                                                data: this.props.chartData
+                                                label: "",
+                                                data: this.props.chartDataTop
                                             }
 
                                         ]
@@ -154,7 +146,7 @@ export default class Chart extends Component {
                 }
 
             </div>
-*/
+        )
 
     }   
 }

@@ -44,14 +44,21 @@ end`,
     canvasHeight: 400,
     canvasWidth: 900,
     showChartFrame: false,
-    chartType: "Single Scatter",
-    chartOptionsSingle: {},
+    chartType: "single",
+    chartOptionsSingle: {
+      yLabel: "",
+      xLabel: "",
+      ticks: {}
+    },
     chartDataSingle: [],
-    chartOptionsTop: {},
+    chartOptionsTop: {
+      yLabel: ""
+    },
     chartDataTop: [],
     chartOptionsBottom: {},
     chartDataBottom: [],
-    logoVariables: []
+    logoVariables: [],
+    
   };
 
 
@@ -78,7 +85,9 @@ end`,
                                   this.addToChart.bind(this), 
                                   this.pushToDataTable.bind(this), 
                                   this.updateLogoVariables.bind(this),
-                                  this.pushChartData.bind(this)
+                                  this.pushChartData.bind(this),
+                                  this.updateChartOptions.bind(this),
+                                  this.updateChartType.bind(this)
                                   );
     projects = new Projects(this.updateCode.bind(this));
     interpreter.setup();
@@ -113,6 +122,25 @@ end`,
 
   }
 
+  updateChartType(newType){
+    this.setState({chartType: newType});
+  }
+
+  updateChartOptions(chartType, newOptions){
+    if(chartType == "single"){
+      this.setState({chartOptionsSingle: newOptions});
+    }
+
+    if(chartType == "top"){
+      this.setState({chartOptionsTop: newOptions});
+    }
+
+    if(chartType == "bottom"){
+      this.setState({chartOptionsBottom: newOptions});
+    }
+    
+  }
+
   updateLogoVariables(newVariables) {
     this.setState({ logoVariables: newVariables });
   }
@@ -123,11 +151,23 @@ end`,
     this.setState({ chartData: newData });
   }
 
-  pushChartData(newData) {
-    console.log("pushing");
+  pushChartData(chartType, newData) {
+    console.log(chartType);
     console.log(newData);
-    this.setState({ chartDataSingle: newData });
-    console.log(this.state.chartDataSingle);
+    if(chartType == "single"){
+      this.setState({ chartDataSingle: newData });
+      return;
+    }
+    if(chartType == "top"){
+      this.setState({chartDataTop: newData});
+      console.log(this.state.chartDataTop);
+      return
+    }
+    if(chartType == "bottom"){
+      this.setState({chartDataBottom: newData});
+      return;
+    }
+   
   }
 
   checkIfSerialCapable = () => {
@@ -218,7 +258,6 @@ end`,
           interpreter={this.interpreter}
           chartToggle={this.chartToggle}
         />
-        <br />
         <div className="main">
           {this.state.showNewProjectModal ?
             <NewProjectModal
@@ -237,10 +276,7 @@ end`,
           <button onClick={() => this.setState({ view: "data" })}>Data</button>
           <input id="load" type="file" onChange={() => projects.loadFile()} style={{ display: "none" }} />
           <button onClick={() => this.setState({ turtle: !this.state.turtle })}>Turtle On/Off</button>
-          <button onClick={() => this.setState({ chartType: "Single Scatter" })}>Single Chart</button>
-          <button onClick={() => this.setState({ chartType: "Double Scatter" })}>Double Chart</button>
           <button onClick={() => interpreter.setup()}>Setup</button>
-          <button onClick={() => this.setState({ view: "test" })}>Test Area</button>
 
         </div>
 

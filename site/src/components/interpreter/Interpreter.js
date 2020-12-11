@@ -1,11 +1,14 @@
 /* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off", no-use-before-define: "off" */
+//NOTE: getValue does not return false if something doesn't exist - it returns an error
+//maybe false or undefined would be better, and more in line with expectations?
+//Also this means the conditionals used for graphing aren't right.
 
-//TODO: Change to contenteditable div for code entry, to improve styling. Change 'value' to 'innerHTML' to accomodate this.
-
+//TODO: push to array would be a nice function to have, and much more sensible than "se" everytime
 
 import Tokenizer from './Tokenizer';
 import turtleMath from './turtleMath';
 import { includes } from './includes';
+
 
 Number.prototype.mod = function (n) { return ((this % n) + n) % n; }
 
@@ -20,7 +23,7 @@ var outputStream;
 
 export default class Interpreter {
 
-    constructor(canvasHeight, canvasWidth, addToChart, pushToTable, updateLogoVariables, pushNewChartData) {
+    constructor(canvasHeight, canvasWidth, addToChart, pushToTable, updateLogoVariables, pushNewChartData, updateChartOptions, updateChartType) {
 
         this.updateLogoVariables = updateLogoVariables;
 
@@ -31,7 +34,10 @@ export default class Interpreter {
         //We'll need to allow for an arbitrary number of data lists later on, which may require refactoring some stuff.
         //Sorry.
 
-        this.singleChartXVariable = "_testVariable";
+        this.updateChartOptions = updateChartOptions;
+        this.updateChartType = updateChartType;
+
+        this.singleChartXVariable = "";
         this.topChartXVariable = "";
         this.bottomChartXVariable = "";
 
@@ -180,22 +186,89 @@ export default class Interpreter {
         if (t.getValue("_chartType")) {
             if (axis == "x") {
                 //if axis is x, figure out which chart this is
-                if (t.getValue("_chartType") == "singleChart") {
+                if (t.getValue("_chartType") == "single") {
                     t.singleChartXVariable = variable;
+                }
+                if (t.getValue("_chartType") == "bottom") {
+                    t.bottomChartXVariable = variable;
+                }
+                if (t.getValue("_chartType") == "top") {
+                    t.topChartXVariable = variable;
                 }
             } else {
                 //if axis isn't x, we assume it's y and check which chart this is 
-                if (t.getValue("_chartType") == "singleChart") {
+                if (t.getValue("_chartType") == "single") {
                     t.singleChartYVariable = variable;
+                }
+                if (t.getValue("_chartType") == "top") {
+                    t.topChartYVariable = variable;
+                    console.log("top y");
+                }
+                if (t.getValue("_chartType") == "bottom") {
+                    t.topChartYVariable = variable;
                 }
             }
 
         } else {
-            console.log(this.locals[0]);
             throw "Chart not defined";
         }
 
-        console.log(this.singleChartXVariable);
+
+    }
+
+    initPlot() {
+
+        //Get plot type
+        var chartType = (this.getValueInternal("_chartType"));
+        console.log(chartType);
+
+        //get options and create an object we can read on the other side
+        if (this.getValueInternal("_xLabel")) {
+            var xLabel = (this.getValueInternal("_xLabel"));
+        } else {
+            var xLabel = "";
+        }
+
+        if (this.getValueInternal("_yLabel")) {
+            var yLabel = (this.getValueInternal("_yLabel"));
+        } else {
+            var yLabel = "";
+        }
+
+        var ticks = {};
+
+        var rangeSetting = this.getValueInternal("_range");
+        if (rangeSetting && Array.isArray(rangeSetting) && rangeSetting.length >= 2) {
+            ticks["min"] = rangeSetting[0];
+            ticks["max"] = rangeSetting[1];
+        }
+
+        var range = (this.getValueInternal("_range"));
+        var chartOptions = {
+            xLabel: xLabel,
+            yLabel: yLabel,
+            ticks: ticks,
+        }
+
+        //update view based on plot type; we know that top and bottom means double view
+        if (chartType == "single") {
+            this.updateChartType("single");
+            this.updateChartOptions("single", chartOptions);
+
+        }
+
+        else if (chartType == "top" || chartType == "bottom") {
+            this.updateChartType("double");
+            if (chartType == "top") {
+                this.updateChartOptions("top", chartOptions);
+            } else {
+                this.updateChartOptions("bottom", chartOptions);
+            }
+
+
+        } else {
+            throw "Error: invalid chart type"
+        }
 
     }
 
@@ -810,36 +883,61 @@ export default class Interpreter {
         for (var i in this.locals) {
             if (this.locals[i][name] != undefined) return this.locals[i][name];
         }
+
         throw 'warning: ' + name + ' has no value';
     }
 
-    setValue(name, value) {
+    //unlike the Logo version, this returns false if values do not exist
+    //seems redundant but... here we are. 
+    getValueInternal(name) {
 
+        for (var i in this.locals) {
+            if (this.locals[i][name] != undefined) {
+                console.log("get check");
+                return this.locals[i][name];
+            }
+        }
+
+        return false;
+    }
+
+
+    setValue(name, value) {
+        console.log(name, value);
         var updateChart = false;
         var t = this;
-        if (name == this.topChartXVariable ||
-            name == this.topChartYVariable ||
-            name == this.bottomChartXVariable ||
-            name == this.bottomChartYVariable ||
-            name == this.singleChartXVariable ||
-            name == this.singleChartYVariable) {
-            updateChart = true;
+        var chartType = "";
 
+        if(name == this.singleChartXVariable || name == this.singleChartYVariable){
+            updateChart = true;
+            chartType = "single";
+        }
+
+        if(name == this.topChartXVariable || name == this.topChartYVariable){
+            updateChart = true;
+            chartType = "top";
+        }
+
+        if(name == this.topChartXVariable || name == this.bottomChartYVariable){
+            updateChart = true;
+            chartType = "bottom";
         }
 
         for (var i in t.locals) {
             if (t.locals[i][name] != undefined) {
                 t.locals[i][name] = value;
-                if(updateChart){
-                    this.updateChartData();
+                if (updateChart) {
+                    console.log("run update: " + name + " - " + value);
+                    this.updateChartData(chartType);
                 }
                 return;
             }
         }
         t.locals[t.locals.length - 1][name] = value;
 
-        if(updateChart){
-            this.updateChartData();
+        if (updateChart) {
+            console.log("run update: " + name + " - " + value);
+            this.updateChartData(chartType);
         }
 
         //this.updateLogoVariables(t.locals[0]);
@@ -850,26 +948,53 @@ export default class Interpreter {
 
 
 
-    updateChartData() {
+    updateChartData(chartType) {
+        console.log(chartType);
         var t = this;
-        console.log(this.singleChartXVariable);
         var chartData = [];
-        var counter = 0;
-        if (this.getValue(this.singleChartXVariable)) {
-            if (this.getValue(this.singleChartYVariable)) {
-                for (var xValue of this.getValue(this.singleChartXVariable)) {
-                    if (this.getValue(this.singleChartYVariable)[counter]) {
-                        chartData.push({ x: xValue, y: counter });
+        var counter = 1;
+        var xDataArray = [];
+        var yDataArray = [];
+
+        if(chartType == "single"){
+            xDataArray = t.getValueInternal(this.singleChartXVariable);
+            yDataArray = t.getValueInternal(this.singleChartYVariable);
+        }
+        if(chartType == "top"){
+            xDataArray = this.getValueInternal(this.topChartXVariable);
+            yDataArray = this.getValueInternal(this.topChartYVariable);
+            console.log(this.topChartYVariable);
+        }
+        if(chartType == "bottom"){
+            xDataArray = this.getValueInternal(this.bottomChartXVariable);
+            yDataArray = this.getValueInternal(this.bottomChartYVariable);
+        }
+
+        if(!xDataArray){
+            xDataArray = [];
+        }
+        
+        if(!yDataArray){
+            yDataArray = [];
+        }
+
+        if (xDataArray) {
+            if (yDataArray) {
+                for (var xValue of xDataArray) {
+                    if (yDataArray[counter]) {
+                        chartData.push({ x: xValue, y: yDataArray[counter] });
                         counter++;
                     }
                 }
             }
-
-            t.pushNewChartData(chartData);
+            console.log(chartData);
+            t.pushNewChartData(chartType, chartData);
         }
 
 
     }
+
+
 
     procOutput(t, x) {
         if (t.frame.length == 0) {
@@ -1358,6 +1483,7 @@ export default class Interpreter {
 
 export var prims = {};
 
+
 prims['setChartX'] = { nargs: 1, fcn: function (a) { this.setChartListener("x", a) } }
 prims['setChartY'] = { nargs: 1, fcn: function (a) { this.setChartListener("y", a) } }
 prims['calibrate'] = { nargs: 2, fcn: function (a, b) { return this.calibrate(a, b) } }
@@ -1368,7 +1494,9 @@ prims['loop'] = { nargs: 1, flow: true, fcn: function (a) { this.loop(a); } }
 prims['if'] = { nargs: 2, flow: true, fcn: function (a, b) { this.logo_if(this.getbool(a), b); } }
 prims['ifelse'] = { nargs: 3, flow: true, fcn: function (a, t, f) { this.logo_ifelse(this.getbool(a), t, f); } }
 prims['run'] = { nargs: 1, flow: true, fcn: function (l) { this.logo_run(l); } }
+prims['initPlot'] = { nargs: 0, fcn: function (n) { this.initPlot() } }
 
+prims['.'] = { nargs: 0, flow: true, fcn: function () { this.procOutput(this); } }
 prims['stop'] = { nargs: 0, flow: true, fcn: function () { this.procOutput(this); } }
 prims['output'] = { nargs: 1, flow: true, fcn: function (x) { return this.procOutput(this, x); } }
 prims['wait'] = { nargs: 1, fcn: function (x) { this.mwait(100 * this.getnum(x)); } }
