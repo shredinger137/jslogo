@@ -1,7 +1,8 @@
 to go
   make "xDataOne []
   make "yDataOne []
-  makeSinglePlot
+  makeTopPlot
+  makeBottomPlot
   pushData
 end
 
@@ -11,7 +12,6 @@ to makeSinglePlot
   make "_yLabel "Data
   setChartX "xDataOne
   setChartY "yDataOne
-  make "_range [0 35]
   initPlot
 end
 
@@ -19,7 +19,6 @@ to makeBottomPlot
   make "_chartType "bottom
   setChartX "xDataOne
   setChartY "yDataOne
-  make "_range [0 55]
   initPlot
 end
 
@@ -27,7 +26,8 @@ to makeTopPlot
   make "_chartType "top
   setChartX "xDataOne
   setChartY "yDataOne
-  make "_range [0 25]
+  make "_xLabel "Numbers
+  make "_range [13 55]
   initPlot
 end
 

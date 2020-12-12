@@ -52,10 +52,16 @@ end`,
     },
     chartDataSingle: [],
     chartOptionsTop: {
-      yLabel: ""
+      yLabel: "",
+      xLabel: "",
+      ticks: {}
     },
     chartDataTop: [],
-    chartOptionsBottom: {},
+    chartOptionsBottom: {
+      yLabel: "",
+      xLabel: "",
+      ticks: {}
+    },
     chartDataBottom: [],
     logoVariables: [],
     
@@ -152,15 +158,12 @@ end`,
   }
 
   pushChartData(chartType, newData) {
-    console.log(chartType);
-    console.log(newData);
     if(chartType == "single"){
       this.setState({ chartDataSingle: newData });
       return;
     }
     if(chartType == "top"){
       this.setState({chartDataTop: newData});
-      console.log(this.state.chartDataTop);
       return
     }
     if(chartType == "bottom"){

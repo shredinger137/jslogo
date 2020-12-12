@@ -11,12 +11,8 @@ export default class Chart extends Component {
     
     chartRef = {}
 
-    buildOptions(){
-        
-    }
-
     componentDidUpdate(){
-        console.log(this.props.chartDataSingle);
+        console.log(this.props.chartDataBottom);
     }
 
     render() {
@@ -80,7 +76,6 @@ export default class Chart extends Component {
                                     datasets:
                                         [
                                             {
-                                                label: "",
                                                 data: this.props.chartDataTop
                                             }
 
@@ -89,6 +84,25 @@ export default class Chart extends Component {
 
 
                                 options={{
+
+                                    scales: {
+                                        yAxes: [{
+                                            scaleLabel: {
+                                                display: true,
+                                                labelString: this.props.chartOptionsTop.yLabel
+                                            },
+                                            ticks: this.props.chartOptionsTop.ticks
+                                        }],
+                                        xAxes: [{
+                                            scaleLabel: {
+                                                display: true,
+                                                labelString: this.props.chartOptionsTop.xLabel
+                                            }
+                                        }]
+                                    },
+                                    legend: {
+                                        display: false
+                                    },                                    
                                     responsive: true,
                                     maintainAspectRatio: false,
                                     animation: {
@@ -109,35 +123,53 @@ export default class Chart extends Component {
                         
                          <div style={{ height: "50%" }}>
                          <Scatter
-                             data={{
-                                 datasets:
-                                     [
-                                         {
-                                             label: "Temp. vs Time",
-                                             data: this.props.chartData
-                                         }
+                                data={{
+                                    datasets:
+                                        [
+                                            {
+                                                data: this.props.chartDataBottom
+                                            }
 
-                                     ]
-                             }}
+                                        ]
+                                }}
 
 
-                             options={{
-                                 responsive: true,
-                                 maintainAspectRatio: false,
-                                 animation: {
-                                     duration: 0
-                                 },
-                                 elements: {
-                                     point: {
-                                         radius: 4,
-                                         backgroundColor: "black"
-                                     }
-                                 }
-                             }
-                             }
-                             redraw={true}
-                             ref={this.chartReference}
-                         />
+                                options={{
+
+                                    scales: {
+                                        yAxes: [{
+                                            scaleLabel: {
+                                                display: true,
+                                                labelString: this.props.chartOptionsBottom.yLabel
+                                            },
+                                            ticks: this.props.chartOptionsBottom.ticks
+                                        }],
+                                        xAxes: [{
+                                            scaleLabel: {
+                                                display: true,
+                                                labelString: this.props.chartOptionsBottom.xLabel
+                                            }
+                                        }]
+                                    },
+                                    legend: {
+                                        display: false
+                                    },                                    
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    animation: {
+                                        duration: 0
+                                    },
+                                    elements: {
+                                        point: {
+                                            radius: 4,
+                                            backgroundColor: "black"
+                                        }
+                                    }
+                                }
+                                }
+                                redraw={true}
+                                ref={this.chartReference}
+                            />
                      </div>
                      </>
 

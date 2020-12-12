@@ -202,10 +202,10 @@ export default class Interpreter {
                 }
                 if (t.getValue("_chartType") == "top") {
                     t.topChartYVariable = variable;
-                    console.log("top y");
+
                 }
                 if (t.getValue("_chartType") == "bottom") {
-                    t.topChartYVariable = variable;
+                    t.bottomChartYVariable = variable;
                 }
             }
 
@@ -220,7 +220,6 @@ export default class Interpreter {
 
         //Get plot type
         var chartType = (this.getValueInternal("_chartType"));
-        console.log(chartType);
 
         //get options and create an object we can read on the other side
         if (this.getValueInternal("_xLabel")) {
@@ -235,7 +234,9 @@ export default class Interpreter {
             var yLabel = "";
         }
 
-        var ticks = {};
+        var ticks = {
+            dummy: null
+        };
 
         var rangeSetting = this.getValueInternal("_range");
         if (rangeSetting && Array.isArray(rangeSetting) && rangeSetting.length >= 2) {
@@ -243,7 +244,6 @@ export default class Interpreter {
             ticks["max"] = rangeSetting[1];
         }
 
-        var range = (this.getValueInternal("_range"));
         var chartOptions = {
             xLabel: xLabel,
             yLabel: yLabel,
@@ -264,10 +264,13 @@ export default class Interpreter {
             } else {
                 this.updateChartOptions("bottom", chartOptions);
             }
-
+            this.setValue("_range", null)
+            this.setValue("_xLabel", null)
+            this.setValue("_yLabel", null)
+            //this should reset the variables maybe?
 
         } else {
-            throw "Error: invalid chart type"
+            
         }
 
     }
@@ -770,8 +773,10 @@ export default class Interpreter {
 
     printToConsole(x) {
         var cc = document.getElementById("cc");
-        cc.value = cc.value + x + "\n";
-        cc.scrollTop = cc.scrollHeight;
+        if(cc !== null){
+            cc.value = cc.value + x + "\n";
+            cc.scrollTop = cc.scrollHeight;
+        }
     }
 
     evalNext() {
@@ -893,7 +898,6 @@ export default class Interpreter {
 
         for (var i in this.locals) {
             if (this.locals[i][name] != undefined) {
-                console.log("get check");
                 return this.locals[i][name];
             }
         }
@@ -903,32 +907,33 @@ export default class Interpreter {
 
 
     setValue(name, value) {
-        console.log(name, value);
         var updateChart = false;
         var t = this;
-        var chartType = "";
+        var chartType = [];
 
         if(name == this.singleChartXVariable || name == this.singleChartYVariable){
             updateChart = true;
-            chartType = "single";
+            chartType.push("single");
         }
 
         if(name == this.topChartXVariable || name == this.topChartYVariable){
             updateChart = true;
-            chartType = "top";
+            chartType.push("top");
         }
 
-        if(name == this.topChartXVariable || name == this.bottomChartYVariable){
+        if(name == this.bottomChartXVariable || name == this.bottomChartYVariable){
             updateChart = true;
-            chartType = "bottom";
+            chartType.push("bottom");
         }
 
         for (var i in t.locals) {
             if (t.locals[i][name] != undefined) {
                 t.locals[i][name] = value;
                 if (updateChart) {
-                    console.log("run update: " + name + " - " + value);
-                    this.updateChartData(chartType);
+                    for(var type of chartType){
+                        this.updateChartData(type);
+                    }
+                    
                 }
                 return;
             }
@@ -936,8 +941,9 @@ export default class Interpreter {
         t.locals[t.locals.length - 1][name] = value;
 
         if (updateChart) {
-            console.log("run update: " + name + " - " + value);
-            this.updateChartData(chartType);
+            for(var type of chartType){
+                this.updateChartData(type);
+            }
         }
 
         //this.updateLogoVariables(t.locals[0]);
@@ -949,7 +955,6 @@ export default class Interpreter {
 
 
     updateChartData(chartType) {
-        console.log(chartType);
         var t = this;
         var chartData = [];
         var counter = 1;
@@ -961,9 +966,10 @@ export default class Interpreter {
             yDataArray = t.getValueInternal(this.singleChartYVariable);
         }
         if(chartType == "top"){
+     
             xDataArray = this.getValueInternal(this.topChartXVariable);
             yDataArray = this.getValueInternal(this.topChartYVariable);
-            console.log(this.topChartYVariable);
+
         }
         if(chartType == "bottom"){
             xDataArray = this.getValueInternal(this.bottomChartXVariable);
@@ -987,7 +993,6 @@ export default class Interpreter {
                     }
                 }
             }
-            console.log(chartData);
             t.pushNewChartData(chartType, chartData);
         }
 
@@ -1480,6 +1485,13 @@ export default class Interpreter {
 
 
 }
+
+/************************************************************
+ * 
+ * Primitives
+ * 
+ * Defines all JSLogo functions that the user can perform
+ ************************************************************/
 
 export var prims = {};
 
