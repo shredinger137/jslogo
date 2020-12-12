@@ -12,6 +12,9 @@ export const languageDef = {
   defaultToken: "",
   number: /\d+(\.\d+)?/,
   keywords: [
+    "setAxisX",
+    "setAxisY",
+    "initPlot",
     "setcolor",
     "print",
     "read0",
@@ -57,6 +60,7 @@ export const languageDef = {
     "ob1on",
     "ob1off",
     "loop",
+    "push"
   ],
   operators: [
     '=', '>', '<', '!', '~', '?', ':', '==', '<=', '>=', '!=',
@@ -92,7 +96,7 @@ export const languageDef = {
     ],
     strings: [
       [/[=|][ @number]*$/, "string.escape"],
-      [/\"[a-zA-Z]*/, "string.escape"],
+      [/\"[a-zA-Z_-]*/, "string.escape"],
     ],
     tags: [
       [/^%[a-zA-Z]\w*/, "tag"],

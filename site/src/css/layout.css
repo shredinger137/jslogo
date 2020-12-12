@@ -26,7 +26,7 @@
 .interfaceGridCode {
     max-width: 98vw;
     margin: 0 auto;
-    height: 75vh;
+    height: 95vh;
 
 }
 
@@ -44,7 +44,7 @@
     height: 75vh;
     display: grid;
     grid-gap: 0px;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1.3fr 1fr 1fr 1fr;
     grid-template-areas:
         "codeEntry chartArea chartArea chartArea"
         "codeEntry  chartArea  chartArea chartArea"

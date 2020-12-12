@@ -231,6 +231,7 @@ end`,
       inherit: true,
       rules: [
         { token: 'custom-words', foreground: 'FFFD8A' },
+        { token: 'number', foreground: 'ADD8E6'}
       ],
       colors: {
       },

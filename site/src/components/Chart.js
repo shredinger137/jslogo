@@ -11,10 +11,6 @@ export default class Chart extends Component {
     
     chartRef = {}
 
-    componentDidUpdate(){
-        console.log(this.props.chartDataBottom);
-    }
-
     render() {
         return (
             <div style={{ height: "100%", width: "100%" }}>

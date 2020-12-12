@@ -1483,6 +1483,17 @@ export default class Interpreter {
         }
     }
 
+    pushToArray(variable, value){
+        var variableValue = this.getValueInternal(variable);
+        
+        if(variableValue && Array.isArray(variableValue)){
+            variableValue.push(value);
+            this.setValue(variable, variableValue);
+        } else {
+            throw `${variable} is not a valid array`;
+        }
+    }
+
 
 }
 
@@ -1496,8 +1507,8 @@ export default class Interpreter {
 export var prims = {};
 
 
-prims['setChartX'] = { nargs: 1, fcn: function (a) { this.setChartListener("x", a) } }
-prims['setChartY'] = { nargs: 1, fcn: function (a) { this.setChartListener("y", a) } }
+prims['setAxisX'] = { nargs: 1, fcn: function (a) { this.setChartListener("x", a) } }
+prims['setAxisY'] = { nargs: 1, fcn: function (a) { this.setChartListener("y", a) } }
 prims['calibrate'] = { nargs: 2, fcn: function (a, b) { return this.calibrate(a, b) } }
 prims['logData'] = { nargs: 1, fcn: function (a) { this.pushToTable(a) } }
 prims['repeat'] = { nargs: 2, flow: true, fcn: function (a, b) { this.repeat(a, b); } }
@@ -1639,6 +1650,7 @@ prims['scale'] = { nargs: 2, fcn: function (n, l) { return this.scale(this.getnu
 prims['true'] = { nargs: 0, fcn: function () { return true; } }
 prims['false'] = { nargs: 0, fcn: function () { return false; } }
 
+prims['push'] = { nargs: 2, fcn: function (a, b) { this.pushToArray(a, b); } }
 prims['make'] = { nargs: 2, fcn: function (a, b) { this.setValue(a, b); } }
 prims['let'] = { nargs: 2, fcn: function (a, b) { this.setValue(a, b); } }
 //This is only for backwards compatability. Let is not different from make right now.

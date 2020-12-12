@@ -10,22 +10,22 @@ to makeSinglePlot
   make "_chartType "single
   make "_xLabel "Time
   make "_yLabel "Data
-  setChartX "xDataOne
-  setChartY "yDataOne
+  setAxisX "xDataOne
+  setAxisY "yDataOne
   initPlot
 end
 
 to makeBottomPlot
   make "_chartType "bottom
-  setChartX "xDataOne
-  setChartY "yDataOne
+  setAxisX "xDataOne
+  setAxisY "yDataOne
   initPlot
 end
 
 to makeTopPlot
   make "_chartType "top
-  setChartX "xDataOne
-  setChartY "yDataOne
+  setAxisX "xDataOne
+  setAxisY "yDataOne
   make "_xLabel "Numbers
   make "_range [13 55]
   initPlot
