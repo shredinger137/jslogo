@@ -60,7 +60,10 @@ export const languageDef = {
     "ob1on",
     "ob1off",
     "loop",
-    "push"
+    "push",
+    "mwait",
+    "startfill",
+    "endfill"
   ],
   operators: [
     '=', '>', '<', '!', '~', '?', ':', '==', '<=', '>=', '!=',
@@ -71,7 +74,7 @@ export const languageDef = {
   symbols: /[=><!~?:&|+\-*\/^%]+/,
   tokenizer: {
     root: [
-      [/to\s[a-zA-Z\-re]+|end/, "custom-words"],
+      [/to\s[a-zA-Z\-re]+|\bend\b/, "custom-words"],
       { include: "@whitespace" },
       { include: "@numbers" },
       { include: "@strings" },

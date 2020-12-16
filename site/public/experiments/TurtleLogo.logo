@@ -1,0 +1,37 @@
+
+; Welcome to TurtleLogo!
+;
+; This is a “comment”. Only you 
+; can read it. Logo ignores any 
+; text preceded by a semi-colon
+; Use comments to write notes to
+; yourself about how words are 
+; defined.
+
+
+to box 	;sample line comment
+	repeat 4 [fd 100 rt 90]
+end
+
+to left-box
+	repeat 4 [ fd 100 lt 90 ]
+end
+
+to box-stack
+	repeat 2 [box fd 100]
+end
+
+to box-car
+	box
+	left-box
+end
+
+
+to go
+	clean
+	setcolor 50
+	setpensize 30
+	box
+end
+
+

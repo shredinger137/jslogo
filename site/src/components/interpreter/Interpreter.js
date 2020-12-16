@@ -319,6 +319,8 @@ export default class Interpreter {
 
     forward(n) {
 
+        console.log("in forward");
+
         var t = this;
         if (t.pendown) {
             t.ctx.beginPath();
@@ -329,14 +331,20 @@ export default class Interpreter {
         t.ycor += n * turtleMath.cosdeg(t.heading);
         if (t.pendown) {
             var sx = t.xcor + t.cnvWidth / 2, sy = t.cnvHeight / 2 - t.ycor;
-            if (n >= .1) t.ctx.lineTo(sx, sy);
-            else t.ctx.lineTo(sx, sy + .1);
+            if (n >= .1) {
+                t.ctx.lineTo(sx, sy);
+            }
+            else {
+                console.log("cond3");
+                t.ctx.lineTo(sx, sy + .1);
+            }
             if (t.pensize != 0) t.ctx.stroke();
-            if (t.fillpath) t.fillpath.push(function () { this.ctx.lineTo(sx, sy); });
+            if (t.fillpath) t.fillpath.push(function () { t.ctx.lineTo(sx, sy); });
         }
     }
 
     lineto(x, y) {
+        console.log("in lineto");
         var t = this;
         if (t.pendown) {
             t.ctx.beginPath();
@@ -350,7 +358,11 @@ export default class Interpreter {
             if ((x + y) >= .1) t.ctx.lineTo(sx, sy);
             else t.ctx.lineTo(sx, sy + .1);
             if (t.pensize != 0) t.ctx.stroke();
-            if (t.fillpath) t.fillpath.push(function () { this.ctx.lineTo(sx, sy); });
+            if (t.fillpath) {
+                console.log("pushing from lineto into fillpath");
+                t.fillpath.push(function () { t.ctx.lineTo(sx, sy); });
+                
+            }
         }
     }
 
@@ -458,22 +470,35 @@ export default class Interpreter {
     }
 
     startfill() {
+        var t = this;
+        console.log(t.ctx);
         this.fillpath = [];
         var sx = this.xcor + this.cnvWidth / 2, sy = this.cnvHeight / 2 - this.ycor;
-        this.fillpath.push(function () { this.ctx.moveTo(sx, sy); });
+        this.fillpath.push(function () { t.ctx.moveTo(sx, sy); });
     }
 
     endfill() {
+        console.log("hit endfill");
         if (!this.fillpath) return
+        console.log("end 2");
         this.ctx.beginPath();
+        console.log("end3");
         for (var i in this.fillpath) {
+            console.log("end4");
             if (i > 2000) break;
+            console.log("end5");
+            console.log(this.fillpath);
             this.fillpath[i]();
+            console.log("end6")
         }
         this.ctx.globalAlpha = this.opacity;
+        console.log("end7");
         this.ctx.fill();
+        console.log("end8");
         this.ctx.globalAlpha = 1;
+        console.log("end9");
         this.fillpath = undefined;
+        console.log("end end");
     }
 
     setlinedash(l) {
@@ -496,6 +521,7 @@ export default class Interpreter {
     }
 
     drawLine(x, y) {
+        console.log("in drawLine");
         var canvasElement = document.getElementById("testcanvas");
         var canvas = canvasElement.getContext("2d");
         canvas.beginPath();
@@ -1229,6 +1255,7 @@ export default class Interpreter {
         this.timeout = setTimeout(function () { this.timeout = undefined; this.hold = false; }.bind(this), n);
     }
 
+
     printstr(x) {
         var type = typeof x;
         if (type == 'number') return String(Math.round(x * 10000) / 10000);
@@ -1494,6 +1521,10 @@ export default class Interpreter {
         }
     }
 
+    fillShape(){
+
+    }
+
 
 }
 
@@ -1523,6 +1554,7 @@ prims['.'] = { nargs: 0, flow: true, fcn: function () { this.procOutput(this); }
 prims['stop'] = { nargs: 0, flow: true, fcn: function () { this.procOutput(this); } }
 prims['output'] = { nargs: 1, flow: true, fcn: function (x) { return this.procOutput(this, x); } }
 prims['wait'] = { nargs: 1, fcn: function (x) { this.mwait(100 * this.getnum(x)); } }
+prims['mwait'] = { nargs: 1, fcn: function (x) { this.mwait(this.getnum(x)); } }
 
 prims['+'] = { nargs: 2, priority: -1, fcn: function (a, b) { return a + b; } }
 prims['-'] = { nargs: 2, priority: -1, fcn: function (a, b) { return a - b; } }
