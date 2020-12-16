@@ -262,6 +262,7 @@ end`,
           interpreter={this.interpreter}
           chartToggle={this.chartToggle}
         />
+        <div style={{height: "20px"}}></div>
         <div className="main">
           {this.state.showNewProjectModal ?
             <NewProjectModal
@@ -273,14 +274,12 @@ end`,
 
             :
             null}
-          <p>Canvas: {this.state.canvasWidth} x {this.state.canvasHeight}</p>
           <button onClick={() => { interpreter.runLine("go") }}>Go</button>
           <button onClick={() => this.setState({ view: "main" })}>Main View</button>
           <button onClick={() => this.setState({ view: "graph" })}>Graph</button>
           <button onClick={() => this.setState({ view: "data" })}>Data</button>
-          <input id="load" type="file" onChange={() => projects.loadFile()} style={{ display: "none" }} />
-          <button onClick={() => this.setState({ turtle: !this.state.turtle })}>Turtle On/Off</button>
-          <button onClick={() => interpreter.setup()}>Setup</button>
+          <input id="load" type="file" onChange={() => projects.loadFile()} style={{ display: "none" }} />       
+          <span style={{float: "right"}}>Canvas: {this.state.canvasWidth} x {this.state.canvasHeight}</span>
 
         </div>
 
