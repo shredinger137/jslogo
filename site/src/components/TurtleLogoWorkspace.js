@@ -29,7 +29,7 @@ export default class TurtleLogo extends Component {
     };
     return (
       <div className="interfaceGrid">
-        <div className="codeEntry" id="codeEntryDiv" style={{ border: "1px solid black", maxHeight: "75vh", minHeight: "50vh" }}>
+        <div className="codeEntry" id="codeEntryDiv">
           <MonacoEditor
             language="jslogo"
             theme="jslogo"
