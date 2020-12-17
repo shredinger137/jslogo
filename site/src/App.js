@@ -119,7 +119,6 @@ end`,
     setInterval(() => {
       projects.writeLastCodeToLocalStorage(this.state.code);
     }, 10000);
-
   }
 
 
