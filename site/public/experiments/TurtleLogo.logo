@@ -122,13 +122,14 @@ to tree
     endfill
     penup
     fd 50
+    pendown
 end
 
 to sea
     setcolor 55
     repeat 300
-    [setxy random2 -470 370
-    random2 -320 -50
+    [setxy random2 "-55vw "55vw
+    random2 "-55vh "-35vh
     setheading random2 40 50
     setpensize random2 5 10
     setshade random2 50 90
@@ -144,8 +145,8 @@ end
 to land
     setcolor 12
     repeat 600
-    [setxy random2 -470 370
-    random2 -60 380
+    [setxy random2 "-55vw "55vw
+    random2 "-35vh "50vh
     setpensize random2 20 25
     setshade random2 90 100
     forward 0]
@@ -170,11 +171,13 @@ to map
  ;   pendown
     pendown
     tree
+    penup
     rt 120
     fd 30
     rt 30
     pendown
     tree
+    penup
     fd 30
     fd 30
     pendown
@@ -193,11 +196,13 @@ to map
     rt 5
     pendown
     tree
+    penup
     fd 100
     rt 60
     rt 90
     pendown
     tree
+    penup
     pendown
     rock
     lt 120
@@ -211,6 +216,7 @@ to map
     rt 5
     pendown
     tree
+    penup
     rt 120
     rt 30
     fd 100
@@ -225,6 +231,7 @@ to map
     lt 100
     pendown
     tree
+    penup
     fd 100
     lt 60
     lt 30
