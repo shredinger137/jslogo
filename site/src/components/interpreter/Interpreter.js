@@ -602,38 +602,13 @@ export default class Interpreter {
     oneof(a,b){
         return this.nextRandomDouble()<.5 ? a : b;
     }
-    
-    pickRandom(a,b){
-        var t = this;
-        var ia = Math.floor(a);
-        var ib = Math.floor(b);
-        if((a==ia)&&(b==ib)) return a+(Math.floor(this.nextRandomDouble()*(b-a+1)));
-        else return a+(this.nextRandomDouble()*(b-a));
+
+    pickRandom(min, max){
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
     }
-    
-    nextRandomDouble(){
-        var t = this;
-        var r1 = nextRandom(26);
-        var r2 = nextRandom(27);
-        return (r1*Math.pow(2,27)+r2)/Math.pow(2,53);	
-        
-        function nextRandom(bits){
-            var seed = (new Date).getTime();
-            var k = 0x5DEECE66D;
-            var shift=1, mod=Math.pow(2,48);
-            var part, res=0;
-            for(var i=0;i<9;i++){
-                part = (k%16)*seed%mod*shift;
-                res+=part;
-                k = Math.floor(k/16);
-                shift*=16; mod/=16;
-            }
-            res+=11; res%=Math.pow(2,48);
-            t.seed = res;
-            return Math.floor(res/Math.pow(2,48-bits));
-        }
-    }
-    
+       
 
     /////////////////////////
     //
@@ -1609,7 +1584,7 @@ prims['minus'] = { nargs: 1, fcn: function (a) { return -a; } }
 prims['sin'] = { nargs: 1, fcn: function (a) { return turtleMath.sindeg(this.getnum(a)); } }
 prims['cos'] = { nargs: 1, fcn: function (a) { return turtleMath.cosdeg(this.getnum(a)); } }
 prims['sqrt'] = { nargs: 1, fcn: function (a) { return Math.sqrt(this.getnum(a)); } }
-prims['random2'] = { nargs: 2, fcn: function (a, b) { return this.pickRandom(a, b); } }
+prims['random2'] = { nargs: 2, fcn: function (a, b) { return this.pickRandom(this.getnum(a), this.getnum(b)); } }
 prims['oneof'] = { nargs: 2, fcn: function (a, b) { return this.oneof(a, b); } }
 
 prims['sum'] = { nargs: 2, fcn: function (a, b) { return a + b; } }
