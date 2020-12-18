@@ -562,6 +562,17 @@ export default class Interpreter {
         t.element.left = dx;
         t.element.top = dy;
 
+        console.log(t.xcor, t.ycor);
+        console.log(t.cnvWidth, t.canvasHeight);
+        if(t.ycor > (t.cnvHeight / 2) || t.ycor < ((t.cnvHeight / 2) * -1) || t.xcor > (t.cnvWidth /2) || t.xcor < ((t.cnvWidth / 2) * -1 )){
+            t.element.style.visibility = "hidden";
+            t.outOfBounds = true;
+        } else {
+            if(t.outOfBounds == true){
+                t.element.style.visibility = "visible";
+            }
+        }
+
         function screenLeft() {
             return -img.width / 2 + (t.xcor + t.cnvWidth / 2);
         }
@@ -670,6 +681,10 @@ export default class Interpreter {
     // Low Level
     //
     /////////////////////////
+
+    resize(){
+
+    }
 
 
     setCtxColorShade(color, shade) {
