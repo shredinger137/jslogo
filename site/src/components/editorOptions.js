@@ -63,7 +63,15 @@ export const languageDef = {
     "push",
     "mwait",
     "startfill",
-    "endfill"
+    "endfill",
+    "clean",
+    "setpensize",
+    "lt",
+    "random2",
+    "setshade",
+    "setheading",
+    "setxy",
+    "forward"
   ],
   operators: [
     '=', '>', '<', '!', '~', '?', ':', '==', '<=', '>=', '!=',

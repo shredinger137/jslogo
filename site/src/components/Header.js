@@ -44,6 +44,11 @@ export default class Header extends Component {
                     <img src="/images/upload.png"></img>
                     <span>Load File</span>
                 </div>
+                <a href="https://docs.lbym.org" target="_new">
+                    <div className="buttonDiv">
+                        <span>Docs</span>
+                    </div>
+                </a>
                 <div id="connectButton" className="buttonDiv" style={{ minWidth: "100px", position: "fixed", right: "50px" }}>
                     <img src="/images/connect-icon.png"></img>
                     <span>Connect</span>

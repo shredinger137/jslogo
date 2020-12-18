@@ -54,6 +54,12 @@
     will-change: transform;
     z-index: 1000;
   }
+
+  header a {
+    color: #fff;
+    font-size: 20px;
+    text-decoration: none;
+  }
   
   .header h1 {
     flex: 1;
