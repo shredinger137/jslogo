@@ -1,19 +1,25 @@
+/* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off", no-use-before-define: "off" */
+
 import React, { Component } from 'react';
 import '../css/styles.css';
 import '../css/layout.css';
 import MonacoEditor from 'react-monaco-editor';
-import {Scatter} from 'react-chartjs-2';
+import Chart from './Chart';
+import DataTable from './DataTable';
+
+
 
 export default class TurtleLogo extends Component {
-  chartRef = {}
+
+  componentDidMount(){
+
+  }
 
   componentDidUpdate(){
-    console.log(this.props.chartData);
-    console.log(this.props);
-  }
-  
-  render() {
 
+  }
+
+  render() {
     const options = {
       selectOnLineNumbers: true,
       automaticLayout: true,
@@ -23,7 +29,7 @@ export default class TurtleLogo extends Component {
     };
     return (
       <div className="interfaceGrid">
-        <div className="codeEntry" id="codeEntryDiv" style={{ border: "1px solid black", maxHeight: "75vh", minHeight: "50vh" }}>
+        <div className="codeEntry" id="codeEntryDiv">
           <MonacoEditor
             language="jslogo"
             theme="jslogo"
@@ -39,41 +45,30 @@ export default class TurtleLogo extends Component {
         </div>
 
         <div className="chartArea">
-          <div id="cnvframe" style={{ height: "100%", width: "100%" }}>
+          <div id="cnvframe" className={this.props.view == "main" ? null: "hide"} style={{ height: "100%", width: "100%" }}>
             <canvas className="cnv" id="canvas" ></canvas>
           </div>
-          <div id="chartFrame" className="hide" style={{ height: "100%", width: "100%" }}>
-          <Scatter
-                data={{
-                  datasets:
-                    [
-                      {
-                        label: "Temp. vs Time",
-                        data: this.props.chartData
-                      }
-
-                    ]
-                }}
-
-
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  animation: {
-                    duration: 0
-                  },
-                  elements: {
-                    point: {
-                      radius: 4,
-                      backgroundColor: "black"
-                    }
-                  }
-                }
-                }
-                redraw={true}
-                ref={this.chartReference}
-              />
+          <div id="cnvframe" className={this.props.view == "test" ? null: "hide"} style={{ height: "100%", width: "100%" }}>
+            <canvas id="testcanvas" style={{width: "100%", height: "100%"}}></canvas>
           </div>
+          <div id="chartFrame" className={this.props.view == "graph" ? null : "hide"} style={{ height: "100%", width: "100%" }}>
+            <Chart 
+              chartType={this.props.chartType}
+              chartDataSingle={this.props.chartDataSingle}
+              chartDataTop={this.props.chartDataTop}
+              chartDataBottom={this.props.chartDataBottom}
+              chartOptionsTop={this.props.chartOptionsTop}
+              chartOptionsBottom={this.props.chartOptionsBottom}
+              chartOptionsSingle={this.props.chartOptionsSingle}
+              
+             />
+
+          </div>
+          <div id="dataFrame" className={this.props.view == "data" ? null: "hide"} style={{height: "100%", width: "100%"}}>
+              <DataTable
+                tableData = {this.props.tableData} 
+              />
+            </div>
         </div>
 
         <div className="terminal" id="terminal">

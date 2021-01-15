@@ -12,6 +12,10 @@ export const languageDef = {
   defaultToken: "",
   number: /\d+(\.\d+)?/,
   keywords: [
+    "setAxisX",
+    "setAxisY",
+    "initPlot",
+    "setcolor",
     "print",
     "read0",
     "repeat",
@@ -56,6 +60,18 @@ export const languageDef = {
     "ob1on",
     "ob1off",
     "loop",
+    "push",
+    "mwait",
+    "startfill",
+    "endfill",
+    "clean",
+    "setpensize",
+    "lt",
+    "random2",
+    "setshade",
+    "setheading",
+    "setxy",
+    "forward"
   ],
   operators: [
     '=', '>', '<', '!', '~', '?', ':', '==', '<=', '>=', '!=',
@@ -66,7 +82,7 @@ export const languageDef = {
   symbols: /[=><!~?:&|+\-*\/^%]+/,
   tokenizer: {
     root: [
-      [/to\s[a-zA-Z\-re]+|end/, "custom-words"],
+      [/to\s[a-zA-Z\-re]+|\bend\b/, "custom-words"],
       { include: "@whitespace" },
       { include: "@numbers" },
       { include: "@strings" },
@@ -91,7 +107,7 @@ export const languageDef = {
     ],
     strings: [
       [/[=|][ @number]*$/, "string.escape"],
-      [/\"[a-zA-Z]*/, "string.escape"],
+      [/\"[a-zA-Z_-]*/, "string.escape"],
     ],
     tags: [
       [/^%[a-zA-Z]\w*/, "tag"],

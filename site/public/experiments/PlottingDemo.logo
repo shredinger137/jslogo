@@ -1,0 +1,45 @@
+to go
+  make "xDataOne []
+  make "yDataOne []
+  makeTopPlot
+  makeBottomPlot
+  pushData
+end
+
+to makeSinglePlot
+  one-plot
+  x-label "Time
+  y-label "Data
+  x-data "xDataOne
+  y-data "yDataOne
+  initPlot
+end
+
+to makeBottomPlot
+  make "_chartType "bottom
+  x-data "xDataOne
+  y-data "yDataOne
+  initPlot
+end
+
+to makeTopPlot
+  make "_chartType "top
+  x-data "xDataOne
+  y-data "yDataOne
+  x-label "Numbers
+  make "_range [13 55]
+  initPlot
+end
+
+to pushData
+  make "count 0
+  make "xDataOne []
+  make "yDataOne []
+  repeat 25 [
+    make "xDataOne se :xDataOne :count
+    make "yDataOne se :yDataOne :count
+    make "count :count + 1
+    wait 10
+  ]
+
+end

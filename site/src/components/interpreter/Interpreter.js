@@ -1,10 +1,14 @@
 /* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off", no-use-before-define: "off" */
+//NOTE: getValue does not return false if something doesn't exist - it returns an error
+//maybe false or undefined would be better, and more in line with expectations?
+//Also this means the conditionals used for graphing aren't right.
 
-//TODO: Change to contenteditable div for code entry, to improve styling. Change 'value' to 'innerHTML' to accomodate this.
-
+//TODO: push to array would be a nice function to have, and much more sensible than "se" everytime
 
 import Tokenizer from './Tokenizer';
 import turtleMath from './turtleMath';
+import { includes } from './includes';
+
 
 Number.prototype.mod = function (n) { return ((this % n) + n) % n; }
 
@@ -19,13 +23,36 @@ var outputStream;
 
 export default class Interpreter {
 
-    constructor(canvasHeight, canvasWidth, addToChart) {
+    constructor(canvasHeight, canvasWidth, addToChart, pushToTable, updateLogoVariables, pushNewChartData, updateChartOptions, updateChartType) {
+
+        this.updateLogoVariables = updateLogoVariables;
+
+        //charts are given assigned variables for data; these are effectively listened for in 'make', so that 
+        //if the variable in question is one of the chart data ones we know to update the chart data in our app.
+
+        //Note that we enable charts in steps. Currently, for example, more than one data field can't be pushed up.
+        //We'll need to allow for an arbitrary number of data lists later on, which may require refactoring some stuff.
+        //Sorry.
+
+        this.updateChartOptions = updateChartOptions;
+        this.updateChartType = updateChartType;
+
+        this.singleChartXVariable = "";
+        this.topChartXVariable = "";
+        this.bottomChartXVariable = "";
+
+        this.singleChartYVariable = "";
+        this.topChartYVariable = "";
+        this.bottomChartYVariable = "";
+
+        this.pushNewChartData = pushNewChartData;
+
         this.allReceivedData = [0];
         this.ticker = this.ticker.bind(this);
         this.isDone = this.isDone.bind(this);
 
         this.addToChart = addToChart;
-
+        this.pushToTable = pushToTable;
         //turtle
 
         this.cnvWidth = canvasWidth;
@@ -38,7 +65,7 @@ export default class Interpreter {
         this.heading = 0;
         this.color = 0;
         //shade started off at 50 in the previous version. Unclear on why. Zero works a lot better, 50 kept giving us red.
-        this.shade = 0;
+        this.shade = 50;
         this.opacity = 1;
         this.pendown = true;
         this.pensize = 1;
@@ -136,7 +163,9 @@ export default class Interpreter {
         canvas.height = t.cnvHeight * t.dpi;
         t.ctx.scale(t.dpi, t.dpi);
         t.ctx.textBaseline = "middle";
+        t.clean();
         window.requestAnimationFrame(this.ticker);
+
 
 
         function imgLoaded() {
@@ -145,6 +174,114 @@ export default class Interpreter {
             t.element.style.width = t.size + 'px';
             t.element.style.height = t.size + 'px';
             t.move();
+        }
+
+    }
+
+    setChartListener(axis, variable) {
+
+        var t = this;
+        //maybe make these objects, instead of a bunch of string? Might help when we expand this to be general.
+
+        if (t.getValue("_chartType")) {
+            if (axis == "x") {
+                //if axis is x, figure out which chart this is
+                if (t.getValue("_chartType") == "single") {
+                    t.singleChartXVariable = variable;
+                }
+                if (t.getValue("_chartType") == "bottom") {
+                    t.bottomChartXVariable = variable;
+                }
+                if (t.getValue("_chartType") == "top") {
+                    t.topChartXVariable = variable;
+                }
+            } else {
+                //if axis isn't x, we assume it's y and check which chart this is 
+                if (t.getValue("_chartType") == "single") {
+                    t.singleChartYVariable = variable;
+                }
+                if (t.getValue("_chartType") == "top") {
+                    t.topChartYVariable = variable;
+
+                }
+                if (t.getValue("_chartType") == "bottom") {
+                    t.bottomChartYVariable = variable;
+                }
+            }
+
+        } else {
+            throw "Chart not defined";
+        }
+
+
+    }
+
+    initPlot() {
+
+        //Get plot type
+        var chartType = (this.getValueInternal("_chartType"));
+
+        //get options and create an object we can read on the other side
+        if (this.getValueInternal("_xLabel")) {
+            var xLabel = (this.getValueInternal("_xLabel"));
+        } else {
+            var xLabel = "";
+        }
+
+        if (this.getValueInternal("_yLabel")) {
+            var yLabel = (this.getValueInternal("_yLabel"));
+        } else {
+            var yLabel = "";
+        }
+
+        var ticks = {
+            dummy: null
+        };
+        
+        var xTicks = {
+            dummy: null
+        }
+
+        var rangeSetting = this.getValueInternal("_range");
+        if (rangeSetting && Array.isArray(rangeSetting) && rangeSetting.length >= 2) {
+            ticks["min"] = rangeSetting[0];
+            ticks["max"] = rangeSetting[1];
+        }
+
+        var domainSetting = this.getValueInternal("_domain");
+        if (domainSetting && Array.isArray(domainSetting) && domainSetting.length >= 2) {
+            xTicks["xmin"] = domainSetting[0];
+            xTicks["xmax"] = domainSetting[1];
+        }
+
+        var chartOptions = {
+            xLabel: xLabel,
+            yLabel: yLabel,
+            ticks: ticks,
+            xTicks: xTicks
+        }
+
+        //update view based on plot type; we know that top and bottom means double view
+        if (chartType == "single") {
+            this.updateChartType("single");
+            this.updateChartOptions("single", chartOptions);
+
+        }
+
+        else if (chartType == "top" || chartType == "bottom") {
+            this.updateChartType("double");
+            if (chartType == "top") {
+                this.updateChartOptions("top", chartOptions);
+            } else {
+                this.updateChartOptions("bottom", chartOptions);
+            }
+            this.setValue("_range", null)
+            this.setValue("_xLabel", null)
+            this.setValue("_yLabel", null)
+            //this should reset the variables maybe?
+
+        } else {
+            
         }
 
     }
@@ -203,10 +340,14 @@ export default class Interpreter {
         t.ycor += n * turtleMath.cosdeg(t.heading);
         if (t.pendown) {
             var sx = t.xcor + t.cnvWidth / 2, sy = t.cnvHeight / 2 - t.ycor;
-            if (n >= .1) t.ctx.lineTo(sx, sy);
-            else t.ctx.lineTo(sx, sy + .1);
+            if (n >= .1) {
+                t.ctx.lineTo(sx, sy);
+            }
+            else {
+                t.ctx.lineTo(sx, sy + .1);
+            }
             if (t.pensize != 0) t.ctx.stroke();
-            if (t.fillpath) t.fillpath.push(function () { this.ctx.lineTo(sx, sy); });
+            if (t.fillpath) t.fillpath.push(function () { t.ctx.lineTo(sx, sy); });
         }
     }
 
@@ -224,7 +365,10 @@ export default class Interpreter {
             if ((x + y) >= .1) t.ctx.lineTo(sx, sy);
             else t.ctx.lineTo(sx, sy + .1);
             if (t.pensize != 0) t.ctx.stroke();
-            if (t.fillpath) t.fillpath.push(function () { this.ctx.lineTo(sx, sy); });
+            if (t.fillpath) {
+                t.fillpath.push(function () { t.ctx.lineTo(sx, sy); });
+                
+            }
         }
     }
 
@@ -318,7 +462,6 @@ export default class Interpreter {
 
         if ((typeof c) == 'object') { this.color = c[0]; this.shade = c[1]; }
         else this.color = c;
-        console.log("setcolor: " + c);
         this.setCtxColorShade(this.color, this.shade);
     }
 
@@ -333,9 +476,10 @@ export default class Interpreter {
     }
 
     startfill() {
+        var t = this;
         this.fillpath = [];
         var sx = this.xcor + this.cnvWidth / 2, sy = this.cnvHeight / 2 - this.ycor;
-        this.fillpath.push(function () { this.ctx.moveTo(sx, sy); });
+        this.fillpath.push(function () { t.ctx.moveTo(sx, sy); });
     }
 
     endfill() {
@@ -370,6 +514,15 @@ export default class Interpreter {
         t.ctx.restore();
     }
 
+    drawLine(x, y) {
+        var canvasElement = document.getElementById("testcanvas");
+        var canvas = canvasElement.getContext("2d");
+        canvas.beginPath();
+        canvas.moveTo(0, 0);
+        canvas.lineTo(x, y);
+        canvas.stroke();
+    }
+
     setfont(f) {
         this.font = f;
         this.ctx.font = this.fontsize + 'px ' + f;
@@ -402,6 +555,14 @@ export default class Interpreter {
         t.element.left = dx;
         t.element.top = dy;
 
+        if(t.ycor > (t.cnvHeight / 2) || t.ycor < ((t.cnvHeight / 2) * -1) || t.xcor > (t.cnvWidth /2) || t.xcor < ((t.cnvWidth / 2) * -1 )){
+            t.element.style.visibility = "hidden";
+            t.outOfBounds = true;
+        } else {
+            if(t.outOfBounds == true){
+                t.element.style.visibility = "visible";
+            }
+        }
 
         function screenLeft() {
             return -img.width / 2 + (t.xcor + t.cnvWidth / 2);
@@ -413,7 +574,7 @@ export default class Interpreter {
     }
 
     clean() {
-
+        var t = this;
         var t = this;
         this.xcor = 0;
         t.ycor = 0;
@@ -421,9 +582,9 @@ export default class Interpreter {
         t.setCtxColorShade(-9999, 98); // #FAFAFA
         t.ctx.fillRect(0, 0, t.cnvWidth, t.cnvHeight);
         t.color = 0;
-        t.shade = 0;
+        t.shade = 50;
         t.setCtxColorShade(t.color, t.shade);
-        t.pensize = 1;
+        t.pensize = 4;
         t.ctx.lineWidth = t.pensize;
         t.opacity = 1;
         t.pendown = true;
@@ -437,6 +598,19 @@ export default class Interpreter {
         t.ctx.setLineDash([]);
         t.showTurtle();
     }
+
+    //Random
+
+    oneof(a,b){
+        return this.nextRandomDouble()<.5 ? a : b;
+    }
+
+    pickRandom(min, max){
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+       
 
     /////////////////////////
     //
@@ -499,9 +673,12 @@ export default class Interpreter {
     //
     /////////////////////////
 
+    resize(){
+
+    }
+
 
     setCtxColorShade(color, shade) {
-        console.log("setCtxColorShade: " + color + ", " + shade);
         var t = this;
         setCtxColor(mergeColorShade(color, shade));
 
@@ -510,7 +687,6 @@ export default class Interpreter {
             if (sh > 100) sh = 200 - sh;
             if (color == -9999) return blend(0x000000, 0xffffff, sh / 100);
             var c = colorFromNumber(color);
-            console.log("c: " + c);
             if (sh == 50) return c;
             else if (sh < 50) return blend(c, 0x000000, (50 - sh) / 60);
             else return blend(c, 0xffffff, (sh - 50) / 53);
@@ -533,10 +709,7 @@ export default class Interpreter {
         }
 
         function setCtxColor(c) {
-            console.log("setCtxColor: " + c);
             var cc = '#' + (c + 0x1000000).toString(16).substring(1);
-            console.log(cc);
-            console.log(t.ctx);
             t.ctx.strokeStyle = cc;
             t.ctx.fillStyle = cc;
         }
@@ -547,13 +720,8 @@ export default class Interpreter {
 
     //procs js
     readProcs() {
-        var includes = document.getElementById("includes").value;
         var procs = document.getElementById("procs").value;
         var toBeEvaluated = procs + "\n" + includes;
-
-        //TODO: Add includes here. It can be a different div maybe, if we want to go that route, and it can be added to procs.value.
-        //Then the thing submitted to procString would be the entire procs area + the includes.
-
         this.procString(toBeEvaluated, 'normal');
 
     }
@@ -650,8 +818,10 @@ export default class Interpreter {
 
     printToConsole(x) {
         var cc = document.getElementById("cc");
-        cc.value = cc.value + x + "\n";
-        cc.scrollTop = cc.scrollHeight;
+        if(cc !== null){
+            cc.value = cc.value + x + "\n";
+            cc.scrollTop = cc.scrollHeight;
+        }
     }
 
     evalNext() {
@@ -763,21 +933,118 @@ export default class Interpreter {
         for (var i in this.locals) {
             if (this.locals[i][name] != undefined) return this.locals[i][name];
         }
+
         throw 'warning: ' + name + ' has no value';
     }
 
+    //unlike the Logo version, this returns false if values do not exist
+    //seems redundant but... here we are. 
+    getValueInternal(name) {
+
+        for (var i in this.locals) {
+            if (this.locals[i][name] != undefined) {
+                return this.locals[i][name];
+            }
+        }
+
+        return false;
+    }
+
+
     setValue(name, value) {
+        var updateChart = false;
         var t = this;
+        var chartType = [];
+
+        if(name == this.singleChartXVariable || name == this.singleChartYVariable){
+            updateChart = true;
+            chartType.push("single");
+        }
+
+        if(name == this.topChartXVariable || name == this.topChartYVariable){
+            updateChart = true;
+            chartType.push("top");
+        }
+
+        if(name == this.bottomChartXVariable || name == this.bottomChartYVariable){
+            updateChart = true;
+            chartType.push("bottom");
+        }
+
         for (var i in t.locals) {
             if (t.locals[i][name] != undefined) {
                 t.locals[i][name] = value;
+                if (updateChart) {
+                    for(var type of chartType){
+                        this.updateChartData(type);
+                    }
+                    
+                }
                 return;
             }
         }
         t.locals[t.locals.length - 1][name] = value;
+
+        if (updateChart) {
+            for(var type of chartType){
+                this.updateChartData(type);
+            }
+        }
+
+        //this.updateLogoVariables(t.locals[0]);
+        //TODO: Uncomment to enable local variables in user facing app.
     }
 
     makeLocal(name) { this.locals[0][name] = 0; }
+
+
+
+    updateChartData(chartType) {
+        var t = this;
+        var chartData = [];
+        var counter = 1;
+        var xDataArray = [];
+        var yDataArray = [];
+
+        if(chartType == "single"){
+            xDataArray = t.getValueInternal(this.singleChartXVariable);
+            yDataArray = t.getValueInternal(this.singleChartYVariable);
+        }
+        if(chartType == "top"){
+     
+            xDataArray = this.getValueInternal(this.topChartXVariable);
+            yDataArray = this.getValueInternal(this.topChartYVariable);
+
+        }
+        if(chartType == "bottom"){
+            xDataArray = this.getValueInternal(this.bottomChartXVariable);
+            yDataArray = this.getValueInternal(this.bottomChartYVariable);
+        }
+
+        if(!xDataArray){
+            xDataArray = [];
+        }
+        
+        if(!yDataArray){
+            yDataArray = [];
+        }
+
+        if (xDataArray) {
+            if (yDataArray) {
+                for (var xValue of xDataArray) {
+                    if (yDataArray[counter]) {
+                        chartData.push({ x: xValue, y: yDataArray[counter] });
+                        counter++;
+                    }
+                }
+            }
+            t.pushNewChartData(chartType, chartData);
+        }
+
+
+    }
+
+
 
     procOutput(t, x) {
         if (t.frame.length == 0) {
@@ -1007,6 +1274,7 @@ export default class Interpreter {
         this.timeout = setTimeout(function () { this.timeout = undefined; this.hold = false; }.bind(this), n);
     }
 
+
     printstr(x) {
         var type = typeof x;
         if (type == 'number') return String(Math.round(x * 10000) / 10000);
@@ -1019,7 +1287,21 @@ export default class Interpreter {
     }
 
     getnum(x) {
-        var n = Number(x);
+        var n;
+        if (typeof x == "string") {
+            if (x.includes("vh")) {
+                var cleaned = x.replace("vh", "");
+                n = Number(cleaned) / 100 * this.cnvHeight;
+            }
+            if (x.includes("vw")) {
+                var cleaned = x.replace("vw", "");
+                n = Number(cleaned) / 100 * this.cnvWidth;
+            }
+        }
+        else {
+            n = Number(x);
+        }
+
         if (isNaN(n) || (String(x) == 'false') || (String(x) == 'true')) throw "error: " + this.cfun + " doesn't like " + this.printstr(x) + ' as input';
         return n;
     }
@@ -1102,15 +1384,13 @@ export default class Interpreter {
     }
 
     calibrate(calibrateValues, valueToCalibrate) {
-        console.log(calibrateValues);
-        console.log(Array.isArray(calibrateValues));
-        if(Array.isArray(calibrateValues)){
-            if(calibrateValues.length == 4){
+        if (Array.isArray(calibrateValues)) {
+            if (calibrateValues.length == 4) {
                 //we assume the format is adcvalue1, realvalue1, adcvalue2, realvalue2
                 var slope = (calibrateValues[1] - calibrateValues[3]) / (calibrateValues[0] - calibrateValues[2]);
                 var value = calibrateValues[1] + (valueToCalibrate - calibrateValues[0]) * slope;
-                return(Math.floor(value * 100)/100);
-            } 
+                return (Math.floor(value * 100) / 100);
+            }
             //no error handling; seems like a TODO
         }
 
@@ -1145,6 +1425,7 @@ export default class Interpreter {
     twobytes(n) { return [n & 0xff, (n >> 8) & 0xff]; }
 
     sendReceive(sendMessage, n, fcn) {
+
 
         if (port && port.readable) {
             this.respfcn = fcn;
@@ -1248,22 +1529,62 @@ export default class Interpreter {
         }
     }
 
+    pushToArray(variable, value){
+        var variableValue = this.getValueInternal(variable);
+        
+        if(variableValue && Array.isArray(variableValue)){
+            variableValue.push(value);
+            this.setValue(variable, variableValue);
+        } else {
+            throw `${variable} is not a valid array`;
+        }
+    }
+
+    fillShape(){
+
+    }
+
 
 }
 
+/************************************************************
+ * 
+ * Primitives
+ * 
+ * Defines all JSLogo functions that the user can perform
+ ************************************************************/
+
 export var prims = {};
 
-prims['calibrate'] = { nargs: 2, fcn: function(a, b) { return this.calibrate(a, b) }}
+/* Charts */
+prims['x-data'] = { nargs: 1, fcn: function (a) { this.setChartListener("x", a) } }
+prims['y-data'] = { nargs: 1, fcn: function (a) { this.setChartListener("y", a) } }
+prims['x-label'] = { nargs: 1, fcn: function (a) {this.setValue("_xLabel", a)}}
+prims['y-label'] = { nargs: 1, fcn: function (a) {this.setValue("_yLabel", a)}}
+prims['one-plot'] = { nargs: 0, fcn: function () {this.setValue("_chartType", "single")}}
+prims['limits-y'] = {nargs: 2, fcn: function (a, b) {this.setValue("_range", [a, b])}}
+prims['limits-x'] = {nargs: 2, fcn: function(a,b) {this.setValue("_domain", [a, b])}}
+prims['limits'] = {nargs: 4, fcn: function(a, b, c, d){
+    this.setValue("_domain", [a, b]);
+    this.setValue("_range", [c, d]);
+}}
+
+
+prims['calibrate'] = { nargs: 2, fcn: function (a, b) { return this.calibrate(a, b) } }
+prims['logData'] = { nargs: 1, fcn: function (a) { this.pushToTable(a) } }
 prims['repeat'] = { nargs: 2, flow: true, fcn: function (a, b) { this.repeat(a, b); } }
 prims['forever'] = { nargs: 1, flow: true, fcn: function (a) { this.loop(a); } }
 prims['loop'] = { nargs: 1, flow: true, fcn: function (a) { this.loop(a); } }
 prims['if'] = { nargs: 2, flow: true, fcn: function (a, b) { this.logo_if(this.getbool(a), b); } }
 prims['ifelse'] = { nargs: 3, flow: true, fcn: function (a, t, f) { this.logo_ifelse(this.getbool(a), t, f); } }
 prims['run'] = { nargs: 1, flow: true, fcn: function (l) { this.logo_run(l); } }
+prims['initPlot'] = { nargs: 0, fcn: function (n) { this.initPlot() } }
 
+prims['.'] = { nargs: 0, flow: true, fcn: function () { this.procOutput(this); } }
 prims['stop'] = { nargs: 0, flow: true, fcn: function () { this.procOutput(this); } }
 prims['output'] = { nargs: 1, flow: true, fcn: function (x) { return this.procOutput(this, x); } }
 prims['wait'] = { nargs: 1, fcn: function (x) { this.mwait(100 * this.getnum(x)); } }
+prims['mwait'] = { nargs: 1, fcn: function (x) { this.mwait(this.getnum(x)); } }
 
 prims['+'] = { nargs: 2, priority: -1, fcn: function (a, b) { return a + b; } }
 prims['-'] = { nargs: 2, priority: -1, fcn: function (a, b) { return a - b; } }
@@ -1280,8 +1601,8 @@ prims['minus'] = { nargs: 1, fcn: function (a) { return -a; } }
 prims['sin'] = { nargs: 1, fcn: function (a) { return turtleMath.sindeg(this.getnum(a)); } }
 prims['cos'] = { nargs: 1, fcn: function (a) { return turtleMath.cosdeg(this.getnum(a)); } }
 prims['sqrt'] = { nargs: 1, fcn: function (a) { return Math.sqrt(this.getnum(a)); } }
-prims['random2'] = { nargs: 2, fcn: function (a, b) { return this.random.pickRandom(a, b); } }
-prims['oneof'] = { nargs: 2, fcn: function (a, b) { return this.random.oneof(a, b); } }
+prims['random2'] = { nargs: 2, fcn: function (a, b) { return this.pickRandom(this.getnum(a), this.getnum(b)); } }
+prims['oneof'] = { nargs: 2, fcn: function (a, b) { return this.oneof(a, b); } }
 
 prims['sum'] = { nargs: 2, fcn: function (a, b) { return a + b; } }
 prims['product'] = { nargs: 2, fcn: function (a, b) { return a * b; } }
@@ -1375,6 +1696,7 @@ prims['storeinbox2'] = { nargs: 1, fcn: function (n) { this.boxes[1] = n; } }
 prims['box2'] = { nargs: 0, fcn: function () { return this.boxes[1]; } }
 prims['storeinbox3'] = { nargs: 1, fcn: function (n) { this.boxes[2] = n; } }
 prims['box3'] = { nargs: 0, fcn: function () { return this.boxes[2]; } }
+prims['now'] = { nargs: 0, fcn: function () { return Math.floor(Date.now() / 1000) } }
 
 prims['resett'] = { nargs: 0, fcn: function (n) { this.resett(); } }
 prims['timer'] = { nargs: 0, fcn: function () { return this.timer(); } }
@@ -1390,6 +1712,7 @@ prims['scale'] = { nargs: 2, fcn: function (n, l) { return this.scale(this.getnu
 prims['true'] = { nargs: 0, fcn: function () { return true; } }
 prims['false'] = { nargs: 0, fcn: function () { return false; } }
 
+prims['push'] = { nargs: 2, fcn: function (a, b) { this.pushToArray(a, b); } }
 prims['make'] = { nargs: 2, fcn: function (a, b) { this.setValue(a, b); } }
 prims['let'] = { nargs: 2, fcn: function (a, b) { this.setValue(a, b); } }
 //This is only for backwards compatability. Let is not different from make right now.
@@ -1412,6 +1735,7 @@ prims['dp6on'] = { nargs: 0, fcn: function () { this.pinOn(6); this.mwait(1); } 
 prims['dp6off'] = { nargs: 0, fcn: function () { this.pinOff(6); this.mwait(1); } }
 prims['dp7on'] = { nargs: 0, fcn: function () { this.pinOn(7); this.mwait(1); } }
 prims['dp7off'] = { nargs: 0, fcn: function () { this.pinOff(7); this.mwait(1); } }
+prims['lineto'] = { nargs: 2, fcn: function (a, b) { this.drawLine(a, b); } }
 
 prims['read0'] = { nargs: 0, fcn: function () { this.readSensor(0); return this.cfun; } }
 prims['read1'] = { nargs: 0, fcn: function () { this.readSensor(1); return this.cfun; } }

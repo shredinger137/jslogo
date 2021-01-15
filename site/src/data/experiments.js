@@ -7,7 +7,15 @@ export const experimentsList = [
     {
        name: "Sensors",
        fileLocation: "/experiments/Sensors.logo"
+    },
+
+    {
+        name: "Plotting Demo",
+        fileLocation: "/experiments/PlottingDemo.logo"
+     },
+     {
+        name: "TurtleLogo",
+        fileLocation: "/experiments/TurtleLogo.logo"
     }
-    
 ];
 

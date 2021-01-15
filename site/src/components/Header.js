@@ -14,39 +14,50 @@ export default class Header extends Component {
 
     }
 
-    showMenu(){
-        document.getElementById("menu").classList.toggle("menuExpanded");
-    }
-
-    loadFile(){
-        document.getElementById("menu").classList.remove("menuExpanded");
+    loadFile() {
         document.getElementById("load").click();
         document.getElementById("procs").focus();
     }
 
-    saveAs(){
+    saveAs() {
         projects.saveAs();
-        document.getElementById("menu").classList.remove("menuExpanded");
     }
 
-    toggleNewProject(){
+    toggleNewProject() {
         this.props.toggleNewProjectModal();
-        document.getElementById("menu").classList.remove("menuExpanded");
     }
 
 
     render() {
         return (
             <header className="header">
-                <span onClick={() => this.showMenu()} tabIndex="0" onKeyPress={() => this.showMenu()}>Menu</span>
-                <div id="menu" className="menu">
-                    <span><b>Projects</b></span>
-                    <ul>
-                        <li><span onClick={() => this.toggleNewProject()}>New Project</span></li>
-                        <li><span onClick={() => this.loadFile()}>Load File</span></li>
-                        <li onClick={() => this.saveAs()}>Save File</li>
-                    </ul>
+                <span style={{ width: "10px" }}></span>
+                <div className="buttonDiv" onClick={() => this.toggleNewProject()}>
+                    <img src="/images/newProject.png"></img>
+                    <span>New Project</span>
                 </div>
+                <div className="buttonDiv" onClick={() => this.saveAs()}>
+                    <img src="/images/download.png"></img>
+                    <span>Save File</span>
+                </div>
+                <div className="buttonDiv" onClick={() => this.loadFile()}>
+                    <img src="/images/upload.png"></img>
+                    <span>Load File</span>
+                </div>
+                <a href="https://docs.lbym.org" target="_new">
+                    <div className="buttonDiv">
+                        <span>Docs</span>
+                    </div>
+                </a>
+                <div id="connectButton" className="buttonDiv" style={{ minWidth: "100px", position: "fixed", right: "50px" }}>
+                    <img src="/images/connect-icon.png"></img>
+                    <span>Connect</span>
+                </div>
+                <div id="disconnectButton" className="buttonDiv" style={{ display: "none", position: "fixed", right: "50px" }}>
+                    <img src="/images/connect-icon.png"></img>
+                    <span>Disconnect</span>
+                </div>
+                <span style={{ width: "10px" }}></span>
             </header>
         );
     }

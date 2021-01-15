@@ -1,50 +1,36 @@
 .terminal {
     grid-area: terminal;
-    height: 25vh;
+    z-index: 9999;
+
 }
 
 .terminal textarea {
+    z-index: 999;
     height: 100%;
     width: 100%;
+
 }
 
 .codeEntry {
     grid-area: codeEntry;
-}
 
-.codeEntry textarea {
-    height: 100%;
-    width: 100%;
+
 }
 
 .chartArea {
     grid-area: chartArea;
     border-style: solid; 
-    height: 50vh;
-}
-
-.interfaceGridCode {
-    max-width: 98vw;
-    margin: 0 auto;
-    height: 75vh;
-
-}
-
-.interfaceGridCode .codeEntry, .codeEntry textarea {
-    height: 75%;
-}
-
-.interfaceGridCode .terminal {
-    height: 25%;
+   
 }
 
 .interfaceGrid {
     max-width: 98vw;
     margin: 0 auto;
-    height: 75vh;
+    height: 80vh;
     display: grid;
     grid-gap: 0px;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1.3fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr .6fr;
     grid-template-areas:
         "codeEntry chartArea chartArea chartArea"
         "codeEntry  chartArea  chartArea chartArea"
