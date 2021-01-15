@@ -7,26 +7,26 @@ to go
 end
 
 to makeSinglePlot
-  make "_chartType "single
-  make "_xLabel "Time
-  make "_yLabel "Data
-  setAxisX "xDataOne
-  setAxisY "yDataOne
+  one-plot
+  x-label "Time
+  y-label "Data
+  x-data "xDataOne
+  y-data "yDataOne
   initPlot
 end
 
 to makeBottomPlot
   make "_chartType "bottom
-  setAxisX "xDataOne
-  setAxisY "yDataOne
+  x-data "xDataOne
+  y-data "yDataOne
   initPlot
 end
 
 to makeTopPlot
   make "_chartType "top
-  setAxisX "xDataOne
-  setAxisY "yDataOne
-  make "_xLabel "Numbers
+  x-data "xDataOne
+  y-data "yDataOne
+  x-label "Numbers
   make "_range [13 55]
   initPlot
 end

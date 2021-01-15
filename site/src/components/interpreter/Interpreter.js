@@ -237,6 +237,10 @@ export default class Interpreter {
         var ticks = {
             dummy: null
         };
+        
+        var xTicks = {
+            dummy: null
+        }
 
         var rangeSetting = this.getValueInternal("_range");
         if (rangeSetting && Array.isArray(rangeSetting) && rangeSetting.length >= 2) {
@@ -244,10 +248,17 @@ export default class Interpreter {
             ticks["max"] = rangeSetting[1];
         }
 
+        var domainSetting = this.getValueInternal("_domain");
+        if (domainSetting && Array.isArray(domainSetting) && domainSetting.length >= 2) {
+            xTicks["xmin"] = domainSetting[0];
+            xTicks["xmax"] = domainSetting[1];
+        }
+
         var chartOptions = {
             xLabel: xLabel,
             yLabel: yLabel,
             ticks: ticks,
+            xTicks: xTicks
         }
 
         //update view based on plot type; we know that top and bottom means double view
@@ -319,8 +330,6 @@ export default class Interpreter {
 
     forward(n) {
 
-        console.log("in forward");
-
         var t = this;
         if (t.pendown) {
             t.ctx.beginPath();
@@ -335,7 +344,6 @@ export default class Interpreter {
                 t.ctx.lineTo(sx, sy);
             }
             else {
-                console.log("cond3");
                 t.ctx.lineTo(sx, sy + .1);
             }
             if (t.pensize != 0) t.ctx.stroke();
@@ -344,7 +352,6 @@ export default class Interpreter {
     }
 
     lineto(x, y) {
-        console.log("in lineto");
         var t = this;
         if (t.pendown) {
             t.ctx.beginPath();
@@ -359,7 +366,6 @@ export default class Interpreter {
             else t.ctx.lineTo(sx, sy + .1);
             if (t.pensize != 0) t.ctx.stroke();
             if (t.fillpath) {
-                console.log("pushing from lineto into fillpath");
                 t.fillpath.push(function () { t.ctx.lineTo(sx, sy); });
                 
             }
@@ -471,34 +477,22 @@ export default class Interpreter {
 
     startfill() {
         var t = this;
-        console.log(t.ctx);
         this.fillpath = [];
         var sx = this.xcor + this.cnvWidth / 2, sy = this.cnvHeight / 2 - this.ycor;
         this.fillpath.push(function () { t.ctx.moveTo(sx, sy); });
     }
 
     endfill() {
-        console.log("hit endfill");
         if (!this.fillpath) return
-        console.log("end 2");
         this.ctx.beginPath();
-        console.log("end3");
         for (var i in this.fillpath) {
-            console.log("end4");
             if (i > 2000) break;
-            console.log("end5");
-            console.log(this.fillpath);
             this.fillpath[i]();
-            console.log("end6")
         }
         this.ctx.globalAlpha = this.opacity;
-        console.log("end7");
         this.ctx.fill();
-        console.log("end8");
         this.ctx.globalAlpha = 1;
-        console.log("end9");
         this.fillpath = undefined;
-        console.log("end end");
     }
 
     setlinedash(l) {
@@ -521,7 +515,6 @@ export default class Interpreter {
     }
 
     drawLine(x, y) {
-        console.log("in drawLine");
         var canvasElement = document.getElementById("testcanvas");
         var canvas = canvasElement.getContext("2d");
         canvas.beginPath();
@@ -562,8 +555,6 @@ export default class Interpreter {
         t.element.left = dx;
         t.element.top = dy;
 
-        console.log(t.xcor, t.ycor);
-        console.log(t.cnvWidth, t.canvasHeight);
         if(t.ycor > (t.cnvHeight / 2) || t.ycor < ((t.cnvHeight / 2) * -1) || t.xcor > (t.cnvWidth /2) || t.xcor < ((t.cnvWidth / 2) * -1 )){
             t.element.style.visibility = "hidden";
             t.outOfBounds = true;
@@ -1565,9 +1556,20 @@ export default class Interpreter {
 
 export var prims = {};
 
+/* Charts */
+prims['x-data'] = { nargs: 1, fcn: function (a) { this.setChartListener("x", a) } }
+prims['y-data'] = { nargs: 1, fcn: function (a) { this.setChartListener("y", a) } }
+prims['x-label'] = { nargs: 1, fcn: function (a) {this.setValue("_xLabel", a)}}
+prims['y-label'] = { nargs: 1, fcn: function (a) {this.setValue("_yLabel", a)}}
+prims['one-plot'] = { nargs: 0, fcn: function () {this.setValue("_chartType", "single")}}
+prims['limits-y'] = {nargs: 2, fcn: function (a, b) {this.setValue("_range", [a, b])}}
+prims['limits-x'] = {nargs: 2, fcn: function(a,b) {this.setValue("_domain", [a, b])}}
+prims['limits'] = {nargs: 4, fcn: function(a, b, c, d){
+    this.setValue("_domain", [a, b]);
+    this.setValue("_range", [c, d]);
+}}
 
-prims['setAxisX'] = { nargs: 1, fcn: function (a) { this.setChartListener("x", a) } }
-prims['setAxisY'] = { nargs: 1, fcn: function (a) { this.setChartListener("y", a) } }
+
 prims['calibrate'] = { nargs: 2, fcn: function (a, b) { return this.calibrate(a, b) } }
 prims['logData'] = { nargs: 1, fcn: function (a) { this.pushToTable(a) } }
 prims['repeat'] = { nargs: 2, flow: true, fcn: function (a, b) { this.repeat(a, b); } }
