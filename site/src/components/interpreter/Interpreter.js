@@ -94,8 +94,10 @@ export default class Interpreter {
         var t = this;
 
         this.procs = document.getElementById("procs");
+        this.terminal = document.getElementById("cc")
+
         this.procs.onfocus = function () { this.focused = true; };
-        this.procs.onblur = function () { this.focused = false; t.readProcs() };
+        this.terminal.onfocus = function () { this.focused = false; t.readProcs() };
         this.procs.onkeydown = handleKeyDown;
 
         function handleKeyDown(e) {
@@ -1346,6 +1348,7 @@ export default class Interpreter {
     }
 
     runLine(str) {
+        this.readProcs();
         var line = this.parse(str);
         this.reset(line);
     }

@@ -123,7 +123,7 @@ end`,
 
 
   componentDidUpdate() {
-    interpreter.readProcs();
+    //interpreter.readProcs();
 
   }
 
