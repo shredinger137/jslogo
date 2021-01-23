@@ -39,9 +39,9 @@ end
 
 to OB1-blink :t
 		repeat :t [			;repeat t times
-		OB1on				;turn on on-board LED
+		ob1on				;turn on on-board LED
 		wait 10				;wait 10 deciseconds		
-		OB1off				;turn off on-board LED
+		ob1off				;turn off on-board LED
 		wait 10				;wait 10 deciseconds
 	]
 end
