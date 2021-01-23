@@ -14,7 +14,7 @@ export const experimentsList = [
         fileLocation: "/experiments/PlottingDemo.logo"
      },
      {
-        name: "TurtleLogo",
+        name: "TurtleWords",
         fileLocation: "/experiments/TurtleLogo.logo"
     }
 ];
