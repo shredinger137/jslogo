@@ -5,7 +5,6 @@
 import React, { Component, useEffect } from 'react';
 import './css/styles.css';
 import './css/layout.css';
-import './css/codemirror.css';
 import Interpreter from './components/interpreter/Interpreter';
 import Projects from './components/Projects.js';
 import Header from './components/Header.js';
@@ -15,6 +14,10 @@ import NewProjectModal from './components/NewProjectModal';
 import { options, languageDef, configuration } from './components/editorOptions'
 import { includes } from './components/interpreter/includes.js';
 import Dexie, { DBCoreRangeType } from 'dexie'
+import MonacoEditor from 'react-monaco-editor';
+import Chart from './components/Chart';
+import DataTable from './components/DataTable';
+import Terminal from './components/Terminal';
 
 
 var interpreter;
@@ -64,7 +67,7 @@ end`,
     },
     chartDataBottom: [],
     logoVariables: [],
-    
+
   };
 
 
@@ -72,6 +75,10 @@ end`,
 
 
   componentDidMount() {
+
+    //TODO: The 'component did mount' refers to app.js, not turtlelogo.js; meaning the elements aren't correct.
+
+
 
     localDatabase = new Dexie('lbym');
 
@@ -87,16 +94,21 @@ end`,
     });
 
     interpreter = new Interpreter(document.getElementById("cnvframe").offsetHeight,
-                                  document.getElementById("cnvframe").offsetWidth, 
-                                  this.addToChart.bind(this), 
-                                  this.pushToDataTable.bind(this), 
-                                  this.updateLogoVariables.bind(this),
-                                  this.pushChartData.bind(this),
-                                  this.updateChartOptions.bind(this),
-                                  this.updateChartType.bind(this)
-                                  );
+      document.getElementById("cnvframe").offsetWidth,
+      this.addToChart.bind(this),
+      this.pushToDataTable.bind(this),
+      this.updateLogoVariables.bind(this),
+      this.pushChartData.bind(this),
+      this.updateChartOptions.bind(this),
+      this.updateChartType.bind(this)
+    );
     projects = new Projects(this.updateCode.bind(this));
     interpreter.setup();
+
+    window.onresize = interpreter.handleResize.bind(interpreter);
+    console.log(window);
+
+
 
     const connectButton = document.getElementById('connectButton');
     connectButton.addEventListener('click', interpreter.openSerialPort.bind(interpreter));
@@ -127,23 +139,23 @@ end`,
 
   }
 
-  updateChartType(newType){
-    this.setState({chartType: newType});
+  updateChartType(newType) {
+    this.setState({ chartType: newType });
   }
 
-  updateChartOptions(chartType, newOptions){
-    if(chartType == "single"){
-      this.setState({chartOptionsSingle: newOptions});
+  updateChartOptions(chartType, newOptions) {
+    if (chartType == "single") {
+      this.setState({ chartOptionsSingle: newOptions });
     }
 
-    if(chartType == "top"){
-      this.setState({chartOptionsTop: newOptions});
+    if (chartType == "top") {
+      this.setState({ chartOptionsTop: newOptions });
     }
 
-    if(chartType == "bottom"){
-      this.setState({chartOptionsBottom: newOptions});
+    if (chartType == "bottom") {
+      this.setState({ chartOptionsBottom: newOptions });
     }
-    
+
   }
 
   updateLogoVariables(newVariables) {
@@ -157,19 +169,19 @@ end`,
   }
 
   pushChartData(chartType, newData) {
-    if(chartType == "single"){
+    if (chartType == "single") {
       this.setState({ chartDataSingle: newData });
       return;
     }
-    if(chartType == "top"){
-      this.setState({chartDataTop: newData});
+    if (chartType == "top") {
+      this.setState({ chartDataTop: newData });
       return
     }
-    if(chartType == "bottom"){
-      this.setState({chartDataBottom: newData});
+    if (chartType == "bottom") {
+      this.setState({ chartDataBottom: newData });
       return;
     }
-   
+
   }
 
   checkIfSerialCapable = () => {
@@ -230,7 +242,7 @@ end`,
       inherit: true,
       rules: [
         { token: 'custom-words', foreground: 'FFFD8A' },
-        { token: 'number', foreground: 'ADD8E6'}
+        { token: 'number', foreground: 'ADD8E6' }
       ],
       colors: {
       },
@@ -261,7 +273,7 @@ end`,
           interpreter={this.interpreter}
           chartToggle={this.chartToggle}
         />
-        <div style={{height: "20px"}}></div>
+        <div style={{ height: "20px" }}></div>
         <div className="main">
           {this.state.showNewProjectModal ?
             <NewProjectModal
@@ -274,56 +286,60 @@ end`,
             :
             null}
           <button onClick={() => { interpreter.runLine("go") }}>Go</button>
+          <button onClick={() => { document.getElementById("chartAreaWrapper").style.visibility = "hidden" }}>Hide</button>
+          <button onClick={() => { document.getElementById("chartAreaWrapper").style.visibility = "visible" }}>Show</button>
           <button onClick={() => this.setState({ view: "main" })}>Main View</button>
           <button onClick={() => this.setState({ view: "graph" })}>Graph</button>
           <button onClick={() => this.setState({ view: "data" })}>Data</button>
-          <input id="load" type="file" onChange={() => projects.loadFile()} style={{ display: "none" }} />       
-          <span style={{float: "right"}}>Canvas: {this.state.canvasWidth} x {this.state.canvasHeight}</span>
+          <input id="load" type="file" onChange={() => projects.loadFile()} style={{ display: "none" }} />
+          <span style={{ float: "right" }}>Canvas: {this.state.canvasWidth} x {this.state.canvasHeight}</span>
 
         </div>
 
-        <div>
-          {this.state.turtle ?
-            <TurtleLogo
-              code={this.state.code}
-              updateCode={this.updateCode.bind(this)}
-              editorDidMount={this.editorDidMount}
-              editorWillMount={this.editorWillMount}
-              interpreter={interpreter}
-              chartType={this.state.chartType}
-              addToChart={this.addToChart.bind(this)}
-              view={this.state.view}
-              tableData={this.state.tableData}
-              chartOptionsSingle={this.state.chartOptionsSingle}
-              chartDataSingle={this.state.chartDataSingle}
-              chartOptionsTop={this.state.chartOptionsTop}
-              chartDataTop={this.state.chartDataTop}
-              chartOptionsBottom={this.state.chartOptionsBottom}
-              chartDataBottom={this.state.chartDataBottom}
-            />
-            :
-            <JSLogo
-              code={this.state.code}
-              updateCode={this.updateCode.bind(this)}
-              editorDidMount={this.editorDidMount}
-              editorWillMount={this.editorWillMount}
-              interpreter={interpreter}
+        <div className="interfaceGrid">
+          <div className="codeEntry" id="codeEntryDiv">
+            <MonacoEditor
+              language="jslogo"
+              theme="jslogo"
+              value={this.state.code}
               options={options}
-              chartType={this.state.chartType}
-              addToChart={this.addToChart.bind(this)}
-              view={this.state.view}
-              tableData={this.state.tableData}
-              chartOptionsSingle={this.state.chartOptionsSingle}
-              chartDataSingle={this.state.chartDataSingle}
-              chartOptionsTop={this.state.chartOptionsTop}
-              chartDataTop={this.state.chartDataTop}
-              chartOptionsBottom={this.state.chartOptionsBottom}
-              chartDataBottom={this.state.chartDataBottom}
+              onChange={this.updateCode}
+              editorDidMount={this.editorDidMount}
+              editorWillMount={this.editorWillMount}
             />
+            <textarea id="procs" style={{ whiteSpace: "nowrap", display: "none" }} value={this.state.code} >
+            </textarea>
+            <textarea id="includes" spellCheck="false" style={{ display: "none", whiteSpace: "nowrap", overflow: "visible" }} />
+          </div>
 
-          }
+          <div className="chartArea" id="chartAreaWrapper">
+            <div id="cnvframe" className={this.state.view == "main" ? null : "hide"} style={{ height: "100%", width: "100%" }}>
+              <canvas className="cnv" id="canvas" ></canvas>
+            </div>
+            <div id="chartFrame" className={this.state.view == "graph" ? null : "hide"} style={{ height: "100%", width: "100%" }}>
+              <Chart
+                chartType={this.state.chartType}
+                chartDataSingle={this.state.chartDataSingle}
+                chartDataTop={this.state.chartDataTop}
+                chartDataBottom={this.state.chartDataBottom}
+                chartOptionsTop={this.state.chartOptionsTop}
+                chartOptionsBottom={this.state.chartOptionsBottom}
+                chartOptionsSingle={this.state.chartOptionsSingle}
 
+              />
+
+            </div>
+            <div id="dataFrame" className={this.state.view == "data" ? null : "hide"} style={{ height: "100%", width: "100%" }}>
+              <DataTable
+                tableData={this.state.tableData}
+              />
+            </div>
+          </div>
+          <Terminal
+            interpreter={interpreter}
+          />
         </div>
+
         <textarea id="includes" style={{ display: "none" }} value={this.state.includes} />
 
 

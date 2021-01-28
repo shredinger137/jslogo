@@ -1,6 +1,6 @@
 .terminal {
     grid-area: terminal;
-    z-index: 9999;
+    z-index: 999;
 
 }
 
@@ -19,11 +19,16 @@
 
 .chartArea {
     grid-area: chartArea;
-    border-style: solid; 
+    border-top: solid; 
+    border-right: solid;
+    border-left: solid;
+    z-index: 5;
    
 }
 
-.interfaceGrid {
+
+
+.interfaceGrid_old {
     max-width: 98vw;
     margin: 0 auto;
     height: 80vh;
@@ -46,4 +51,33 @@
 
 .codeEntry div, .codeEntry textarea{
     border: none;
+}
+
+
+.interfaceGrid {
+    position: relative;
+    margin: 0 auto;
+    height: 80vh;
+    width: 98vw;
+}
+
+.chartArea {
+    position: absolute;
+    top: 0;
+    left: 40vw;
+    width: 58vw;
+    height: 60vh;
+}
+
+.codeEntry {
+    width: 40vw;
+    height: 80vh;
+}
+
+.terminal {
+    position: absolute;
+    height: calc(80vh - 60vh);
+    top: 60vh;
+    left: 40vw;
+    width: 58vw;
 }

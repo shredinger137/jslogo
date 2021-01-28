@@ -1,5 +1,7 @@
 /* eslint eqeqeq: "off", no-useless-escape: "off", no-throw-literal: "off", no-use-before-define: "off" */
 
+//KNOWN ISSUE: The syntax highlighter will not process keywords with dashes in them.
+
 export const options = {
   lineNumbers: false,
   scrollBeyondLastLine: false,
@@ -12,8 +14,6 @@ export const languageDef = {
   defaultToken: "",
   number: /\d+(\.\d+)?/,
   keywords: [
-    "setAxisX",
-    "setAxisY",
     "initPlot",
     "setcolor",
     "print",
@@ -71,13 +71,25 @@ export const languageDef = {
     "setshade",
     "setheading",
     "setxy",
-    "forward"
+    "forward",
+    "bk",
+    "ht",
+    "st",
+    "hide-turtle",
+    "show-turtle",
+    "x-data",
+    "y-data",
+    "one-plot",
+    "top-plot",
+    "bottom-plot",
+    "x-label",
+    "y-label"
   ],
   operators: [
     '=', '>', '<', '!', '~', '?', ':', '==', '<=', '>=', '!=',
     '&&', '||', '++', '--', '+', '-', '*', '/', '&', '|', '^', '%',
     '<<', '>>', '>>>', '+=', '-=', '*=', '/=', '&=', '|=', '^=',
-    '%=', '<<=', '>>=', '>>>='
+    '%=', '<<=', '>>=', '>>>=', 'se'
   ],
   symbols: /[=><!~?:&|+\-*\/^%]+/,
   tokenizer: {
