@@ -6,14 +6,24 @@ import React, { useState, useEffect } from 'react';
 
 function Terminal(props) {
 
+
+    const [terminalEntries, setTerminalData] = useState([]);
+    const [terminalSelection, setTerminalSelection] = useState(0);
+
     useEffect(() => {
         scrollToBottom();
         //uncomment to get a bunch of test entries in terminal
         //  document.getElementById("terminalData").innerHTML = `<span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br />`
     })
-    
-    const [terminalEntries, setTerminalData] = useState([]);
-    const [terminalSelection, setTerminalSelection] = useState(0);
+
+    //TODO: This is where we want to handle the change in selection. Also, 0 is not meaningful right now, so we need to offset the result by one.
+
+    useEffect(() => {
+        getSelectedLine()
+    },
+        [terminalSelection]
+    );
+
 
     function handleEnter() {
 
@@ -23,13 +33,13 @@ function Terminal(props) {
         newData.push(inputValue);
         document.getElementById("terminalData").innerHTML += `<span style={{ paddingLeft: ".75rem" }}>${inputValue}</span><br />`;
         setTerminalData(newData)
-    
+
         document.getElementById("prompt").innerHTML = "";
 
         scrollToBottom();
     }
 
-    function scrollToBottom(){
+    function scrollToBottom() {
         document.getElementById("terminalData").scrollTop = document.getElementById("terminalData").scrollHeight;
     }
 
@@ -43,41 +53,60 @@ function Terminal(props) {
 
     }
 
+    function getSelectedLine() {
+        console.log(terminalSelection);
+        var entries = [...terminalEntries];
+        entries.reverse();
+
+        if (terminalSelection - 1 > -1 && terminalSelection - 1 <= entries.length) {
+            var selectedEntry = entries[terminalSelection - 1];
+            if (selectedEntry) {
+                document.getElementById("prompt").innerHTML = selectedEntry;
+            }
+        } else if(terminalSelection - 1 < 0){
+            console.log("test");
+            document.getElementById("prompt").innerHTML = "";
+            setTerminalSelection(0);
+        }
+    }
+
     function handleKeyDown(e) {
-        
+
+
         if (e.key == "Enter") {
             e.preventDefault();
             handleEnter();
-            
-        } 
-    
-        if (e.key == "ArrowUp") {
-            e.preventDefault();
-            setTerminalSelection(terminalSelection + 1);
-            var entries = [...terminalEntries];
-            entries.reverse();
-            var selectedEntry = entries[terminalSelection];
-            if(selectedEntry){
-                document.getElementById("prompt").innerHTML = selectedEntry;
-            }
-
-           
-        } else {
-            setTerminalSelection(0);
+            return;
         }
 
-        scrollToBottom();
+        if (e.key == "ArrowUp") {
+            e.preventDefault();
+            if(terminalSelection < terminalEntries.length){
+                setTerminalSelection(terminalSelection + 1);
+            }
 
+            return;
+        }
+
+        if (e.key == "ArrowDown") {
+            e.preventDefault();
+            setTerminalSelection(terminalSelection - 1);
+            return;
+        }
+
+        setTerminalSelection(0);
+        scrollToBottom();
+        return;
     }
 
     //Note: the CC textarea isn't being used, but is referenced in 'interpreter'; keeping it here to prevent side effects of it not existing
 
 
     return (
-        <div tabIndex="0" id="terminal-wrapper" onClick={() => { document.getElementById('prompt').focus() }} className="terminal" style={{ border: "solid", outline: "none", maxHeight: "25vh", zIndex: "1", backgroundColor: "white"}} id="terminal-new">
+        <div tabIndex="0" id="terminal-wrapper" onClick={() => { document.getElementById('prompt').focus() }} className="terminal" style={{ border: "solid", outline: "none", maxHeight: "25vh", zIndex: "1", backgroundColor: "white" }} id="terminal-new">
             <div id="terminalData" style={divStyle}> </div>
-                <span>></span><span id="prompt" contentEditable={true} style={{ outline: "none", width: "100%" }} onKeyDown = {(e) => { handleKeyDown(e) }}></span>           
-        <textarea id="cc" style={{display: "none"}}></textarea>
+            <span>></span><span id="prompt" contentEditable={true} style={{ outline: "none", width: "100%" }} onKeyDown={(e) => { handleKeyDown(e) }}></span>
+            <textarea id="cc" style={{ display: "none" }}></textarea>
         </div>
     )
 
