@@ -64,13 +64,13 @@
 .chartArea {
     position: absolute;
     top: 0;
-    left: 40vw;
-    width: 58vw;
+    left: 32vw;
+    width: 66vw;
     height: 60vh;
 }
 
 .codeEntry {
-    width: 40vw;
+    width: 32vw;
     height: 80vh;
 }
 
@@ -78,6 +78,6 @@
     position: absolute;
     height: calc(80vh - 60vh);
     top: 60vh;
-    left: 40vw;
-    width: 58vw;
+    left: 32vw;
+    width: 66vw;
 }
