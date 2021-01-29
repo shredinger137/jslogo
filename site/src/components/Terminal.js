@@ -91,10 +91,11 @@ function Terminal(props) {
             setTerminalSelection(terminalSelection - 1);
             return;
         }
-
-        if (e.key == "Escape") {
+        
+        if (e.key == "Escape"){
             e.preventDefault();
             setTerminalSelection(0);
+            return;
         }
 
         scrollToBottom();
