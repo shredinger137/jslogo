@@ -54,7 +54,6 @@ function Terminal(props) {
     }
 
     function getSelectedLine() {
-        console.log(terminalSelection);
         var entries = [...terminalEntries];
         entries.reverse();
 
@@ -64,7 +63,6 @@ function Terminal(props) {
                 document.getElementById("prompt").innerHTML = selectedEntry;
             }
         } else if(terminalSelection - 1 < 0){
-            console.log("test");
             document.getElementById("prompt").innerHTML = "";
             setTerminalSelection(0);
         }
