@@ -89,10 +89,14 @@ export default class Interpreter {
         var t = this;
 
         this.procs = document.getElementById("procs");
-        this.terminal = document.getElementById("cc")
+        this.terminal = document.getElementById("cc");
+        this.prompt = document.getElementById("prompt");
+
+        //these might be redundant, terminal and prompt
 
         this.procs.onfocus = function () { this.focused = true; };
-        this.terminal.onfocus = function () { this.focused = false; t.readProcs() };
+        this.terminal.onfocus = function () { this.focused = false; t.readProcs(); console.log("focus") };
+        this.prompt.onfocus = function () { this.focused = false; t.readProcs(); console.log("focus") };
         this.procs.onkeydown = handleKeyDown;
 
         function handleKeyDown(e) {

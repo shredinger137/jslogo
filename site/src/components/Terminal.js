@@ -103,6 +103,7 @@ function Terminal(props) {
     }
 
     //Note: the CC textarea isn't being used, but is referenced in 'interpreter'; keeping it here to prevent side effects of it not existing
+    //If you have issues with listeners, check the constructor in Interpreter. It adds listeners to a few elements.
 
 
     return (

@@ -301,7 +301,7 @@ end`,
               theme="jslogo"
               value={this.state.code}
               options={options}
-              onChange={this.updateCode}
+              onChange={this.updateCode.bind(this)}
               editorDidMount={this.editorDidMount}
               editorWillMount={this.editorWillMount}
             />
