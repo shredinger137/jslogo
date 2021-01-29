@@ -89,10 +89,14 @@ export default class Interpreter {
         var t = this;
 
         this.procs = document.getElementById("procs");
-        this.terminal = document.getElementById("cc")
+        this.terminal = document.getElementById("cc");
+        this.prompt = document.getElementById("prompt");
+
+        //these might be redundant, terminal and prompt
 
         this.procs.onfocus = function () { this.focused = true; };
-        this.terminal.onfocus = function () { this.focused = false; t.readProcs() };
+        this.terminal.onfocus = function () { this.focused = false; t.readProcs();  };
+        this.prompt.onfocus = function () { this.focused = false; t.readProcs();  };
         this.procs.onkeydown = handleKeyDown;
 
         function handleKeyDown(e) {
@@ -152,8 +156,8 @@ export default class Interpreter {
         this.img.onload = imgLoaded;
         var canvas = document.getElementById('canvas');
         this.ctx = canvas.getContext('2d');
-       // canvas.width = t.cnvWidth * t.dpi;
-      //  canvas.height = t.cnvHeight * t.dpi;
+        // canvas.width = t.cnvWidth * t.dpi;
+        //  canvas.height = t.cnvHeight * t.dpi;
         canvas.width = document.getElementById("cnvframe").clientWidth;
         canvas.height = document.getElementById("cnvframe").clientHeight;
         console.log(document.getElementById("cnvframe").clientHeight)
@@ -328,7 +332,7 @@ export default class Interpreter {
 
     forward(n) {
 
-       // n = n * this.scale;
+        // n = n * this.scale;
 
         var ctx = document.getElementById("canvas").getContext("2d");
 
@@ -385,7 +389,7 @@ export default class Interpreter {
     }
 
     arc(a, r) {
-  //      r = r * this.scale;
+        //      r = r * this.scale;
         var t = this;
         if (a == 0) return;
         if (r == 0) { t.seth(t.heading + a); }
@@ -513,8 +517,8 @@ export default class Interpreter {
     }
 
     drawLine(x, y) {
-      //  x = x * this.scale;
-      //  y = y * this.scale;
+        //  x = x * this.scale;
+        //  y = y * this.scale;
         var canvasElement = document.getElementById("testcanvas");
         var canvas = canvasElement.getContext("2d");
         canvas.beginPath();
@@ -581,9 +585,9 @@ export default class Interpreter {
 
 
     handleResize() {
-        
 
-        
+
+
         var canvas = document.getElementById("canvas");
         var frame = document.getElementById("cnvframe");
         var wrapper = document.getElementById("chartAreaWrapper");
