@@ -92,7 +92,12 @@ function Terminal(props) {
             return;
         }
 
-        setTerminalSelection(0);
+        if (e.key == "Escape"){
+            e.preventDefault();
+            setTerminalSelection(0);
+            return;
+        }
+
         scrollToBottom();
         return;
     }
