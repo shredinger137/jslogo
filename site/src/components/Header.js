@@ -3,62 +3,57 @@ import '../css/styles.css';
 import '../css/layout.css';
 import Projects from './Projects.js';
 var projects;
+projects = new Projects();
 
-export default class Header extends Component {
+function Header(props) {
+    
 
-    componentDidMount() {
-        projects = new Projects();
-    }
-
-    componentDidUpdate() {
-
-    }
-
-    loadFile() {
+    function loadFile() {
         document.getElementById("load").click();
         document.getElementById("procs").focus();
     }
 
-    saveAs() {
+    function saveAs() {
         projects.saveAs();
     }
 
-    toggleNewProject() {
-        this.props.toggleNewProjectModal();
+    function toggleNewProject() {
+        props.toggleNewProjectModal();
     }
 
 
-    render() {
-        return (
-            <header className="header">
-                <span style={{ width: "10px" }}></span>
-                <div className="buttonDiv" onClick={() => this.toggleNewProject()}>
-                    <img src="/images/newProject.png"></img>
-                    <span>New Project</span>
+   return (
+        <header className="header">
+            <span style={{ width: "10px" }}></span>
+            <div className="buttonDiv" onClick={() => toggleNewProject()}>
+                <img src="/images/newProject.png"></img>
+                <span>New Project</span>
+            </div>
+            <div className="buttonDiv" onClick={() => saveAs()}>
+                <img src="/images/download.png"></img>
+                <span>Save File</span>
+            </div>
+            <div className="buttonDiv" onClick={() => loadFile()}>
+                <img src="/images/upload.png"></img>
+                <span>Load File</span>
+            </div>
+            <a href="https://docs.lbym.org" target="_new">
+                <div className="buttonDiv">
+                    <span>Docs</span>
                 </div>
-                <div className="buttonDiv" onClick={() => this.saveAs()}>
-                    <img src="/images/download.png"></img>
-                    <span>Save File</span>
-                </div>
-                <div className="buttonDiv" onClick={() => this.loadFile()}>
-                    <img src="/images/upload.png"></img>
-                    <span>Load File</span>
-                </div>
-                <a href="https://docs.lbym.org" target="_new">
-                    <div className="buttonDiv">
-                        <span>Docs</span>
-                    </div>
-                </a>
-                <div id="connectButton" className="buttonDiv" style={{ minWidth: "100px", position: "fixed", right: "50px" }}>
-                    <img src="/images/connect-icon.png"></img>
-                    <span>Connect</span>
-                </div>
-                <div id="disconnectButton" className="buttonDiv" style={{ display: "none", position: "fixed", right: "50px" }}>
-                    <img src="/images/connect-icon.png"></img>
-                    <span>Disconnect</span>
-                </div>
-                <span style={{ width: "10px" }}></span>
-            </header>
-        );
-    }
+            </a>
+            <div id="connectButton" className="buttonDiv" style={{ minWidth: "100px", position: "fixed", right: "50px" }}>
+                <img src="/images/connect-icon.png"></img>
+                <span>Connect</span>
+            </div>
+            <div id="disconnectButton" className="buttonDiv" style={{ display: "none", position: "fixed", right: "50px" }}>
+                <img src="/images/connect-icon.png"></img>
+                <span>Disconnect</span>
+            </div>
+            <span style={{ width: "10px" }}></span>
+        </header>
+    );
+
 }
+
+export default Header;

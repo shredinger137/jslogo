@@ -30,10 +30,6 @@ export default class Interpreter {
         //charts are given assigned variables for data; these are effectively listened for in 'make', so that 
         //if the variable in question is one of the chart data ones we know to update the chart data in our app.
 
-        //Note that we enable charts in steps. Currently, for example, more than one data field can't be pushed up.
-        //We'll need to allow for an arbitrary number of data lists later on, which may require refactoring some stuff.
-        //Sorry.
-
         this.updateChartOptions = updateChartOptions;
         this.updateChartType = updateChartType;
 
@@ -47,7 +43,6 @@ export default class Interpreter {
 
         this.pushNewChartData = pushNewChartData;
 
-        this.allReceivedData = [0];
         this.ticker = this.ticker.bind(this);
         this.isDone = this.isDone.bind(this);
 
@@ -57,6 +52,7 @@ export default class Interpreter {
 
         this.cnvWidth = canvasWidth;
         this.cnvHeight = canvasHeight;
+        this.scale = canvasWidth / 700;
         // this.img;
         this.ctx = document.getElementById('canvas');
         this.xcor = 0;
@@ -64,7 +60,6 @@ export default class Interpreter {
         //this.element;
         this.heading = 0;
         this.color = 0;
-        //shade started off at 50 in the previous version. Unclear on why. Zero works a lot better, 50 kept giving us red.
         this.shade = 50;
         this.opacity = 1;
         this.pendown = true;
@@ -94,8 +89,14 @@ export default class Interpreter {
         var t = this;
 
         this.procs = document.getElementById("procs");
+        this.terminal = document.getElementById("cc");
+        this.prompt = document.getElementById("prompt");
+
+        //these might be redundant, terminal and prompt
+
         this.procs.onfocus = function () { this.focused = true; };
-        this.procs.onblur = function () { this.focused = false; t.readProcs() };
+        this.terminal.onfocus = function () { this.focused = false; t.readProcs(); console.log("focus") };
+        this.prompt.onfocus = function () { this.focused = false; t.readProcs(); console.log("focus") };
         this.procs.onkeydown = handleKeyDown;
 
         function handleKeyDown(e) {
@@ -138,17 +139,13 @@ export default class Interpreter {
     }
 
 
-    openText() {
 
-    }
 
 
     setup() {
 
+
         var t = this;
-        //commented out sept. 2020 - doesn't seem to be needed
-        // var procs = document.getElementById('procs');
-        // procs.focus();
         this.element = document.createElement('div');
         this.element.setAttribute('class', 'turtle');
         var cnvframe = document.getElementById('cnvframe');
@@ -159,12 +156,16 @@ export default class Interpreter {
         this.img.onload = imgLoaded;
         var canvas = document.getElementById('canvas');
         this.ctx = canvas.getContext('2d');
-        canvas.width = t.cnvWidth * t.dpi;
-        canvas.height = t.cnvHeight * t.dpi;
-        t.ctx.scale(t.dpi, t.dpi);
+       // canvas.width = t.cnvWidth * t.dpi;
+      //  canvas.height = t.cnvHeight * t.dpi;
+        canvas.width = document.getElementById("cnvframe").clientWidth;
+        canvas.height = document.getElementById("cnvframe").clientHeight;
+        console.log(document.getElementById("cnvframe").clientHeight)
+       // t.ctx.scale(t.dpi, t.dpi);
         t.ctx.textBaseline = "middle";
         t.clean();
         window.requestAnimationFrame(this.ticker);
+        this.handleResize();
 
 
 
@@ -237,7 +238,7 @@ export default class Interpreter {
         var ticks = {
             dummy: null
         };
-        
+
         var xTicks = {
             dummy: null
         }
@@ -281,10 +282,12 @@ export default class Interpreter {
             //this should reset the variables maybe?
 
         } else {
-            
+
         }
 
     }
+
+    //this section is not yet being used
 
     handleCCKeyDown(e) {
         var k = e.keyCode;
@@ -330,22 +333,21 @@ export default class Interpreter {
 
     forward(n) {
 
+     //   n = n * this.scale;
+
+        var ctx = document.getElementById("canvas").getContext("2d");
+
         var t = this;
         if (t.pendown) {
             t.ctx.beginPath();
             t.ctx.moveTo(t.xcor + t.cnvWidth / 2, t.cnvHeight / 2 - t.ycor);
-
         }
         t.xcor += n * turtleMath.sindeg(t.heading);
         t.ycor += n * turtleMath.cosdeg(t.heading);
         if (t.pendown) {
             var sx = t.xcor + t.cnvWidth / 2, sy = t.cnvHeight / 2 - t.ycor;
-            if (n >= .1) {
-                t.ctx.lineTo(sx, sy);
-            }
-            else {
-                t.ctx.lineTo(sx, sy + .1);
-            }
+            if (n >= .1) t.ctx.lineTo(sx, sy);
+            else t.ctx.lineTo(sx, sy + .1);
             if (t.pensize != 0) t.ctx.stroke();
             if (t.fillpath) t.fillpath.push(function () { t.ctx.lineTo(sx, sy); });
         }
@@ -367,7 +369,7 @@ export default class Interpreter {
             if (t.pensize != 0) t.ctx.stroke();
             if (t.fillpath) {
                 t.fillpath.push(function () { t.ctx.lineTo(sx, sy); });
-                
+
             }
         }
     }
@@ -388,6 +390,7 @@ export default class Interpreter {
     }
 
     arc(a, r) {
+       // r = r * this.scale;
         var t = this;
         if (a == 0) return;
         if (r == 0) { t.seth(t.heading + a); }
@@ -515,6 +518,8 @@ export default class Interpreter {
     }
 
     drawLine(x, y) {
+   //     x = x * this.scale;
+      //  y = y * this.scale;
         var canvasElement = document.getElementById("testcanvas");
         var canvas = canvasElement.getContext("2d");
         canvas.beginPath();
@@ -542,36 +547,80 @@ export default class Interpreter {
 
     move() {
 
+        var canvas = document.getElementById("canvas");
         var t = this;
         if (!t.img.complete) return;
         var img = t.element.firstChild;
 
         var dx = screenLeft();
         var dy = screenTop();
-        var s = 1;
+        //var s = 1;
+        var s = canvas.offsetHeight / t.cnvHeight * t.zoom;
 
         t.element.style.webkitTransform = `translate(${dx}px, ${dy}px) rotate(${t.heading}deg) scale(${s}, ${s})`;
         // 'translate(' + dx + 'px, ' + dy + 'px) rotate(' + t.heading + 'deg)' + ' scale(' + s + ',' + s + ')';
         t.element.left = dx;
         t.element.top = dy;
 
-        if(t.ycor > (t.cnvHeight / 2) || t.ycor < ((t.cnvHeight / 2) * -1) || t.xcor > (t.cnvWidth /2) || t.xcor < ((t.cnvWidth / 2) * -1 )){
+        if (t.ycor > (t.cnvHeight / 2) || t.ycor < ((t.cnvHeight / 2) * -1) || t.xcor > (t.cnvWidth / 2) || t.xcor < ((t.cnvWidth / 2) * -1)) {
             t.element.style.visibility = "hidden";
             t.outOfBounds = true;
         } else {
-            if(t.outOfBounds == true){
+            if (t.outOfBounds == true) {
                 t.element.style.visibility = "visible";
             }
         }
 
-        function screenLeft() {
-            return -img.width / 2 + (t.xcor + t.cnvWidth / 2);
-        }
-        function screenTop() {
-            return -img.height / 2 + (t.cnvHeight / 2 - t.ycor);
-        }
+
+        function screenLeft() { return -img.width / 2 + (t.xcor + t.cnvWidth / 2) * canvas.offsetWidth / t.cnvWidth; }
+        function screenTop() { return -img.height / 2 + (t.cnvHeight / 2 - t.ycor) * canvas.offsetHeight / t.cnvHeight; }
+
 
     }
+
+
+
+
+    getDocumentHeight() { return Math.max(document.body.clientHeight, document.documentElement.clientHeight); }
+    getDocumentWidth() { return Math.max(document.body.clientWidth, document.documentElement.clientWidth); }
+
+
+    handleResize() {
+        
+
+        
+        var canvas = document.getElementById("canvas");
+        var frame = document.getElementById("cnvframe");
+        var wrapper = document.getElementById("chartAreaWrapper");
+
+        canvas.style.width = (wrapper.offsetWidth - 5) + "px";
+        canvas.style.height = (wrapper.offsetHeight - 5) + "px";
+        this.move();
+
+        /*
+        var wrapperWidth = wrapper.offsetWidth;
+        var forcedHeight = wrapperWidth / 1.25;
+        var wrapperHeight = wrapper.offsetHeight;
+
+        frame.style.width = wrapperWidth + "px";
+        canvas.style.width = wrapperWidth + "px";
+
+        frame.style.height = wrapperHeight + "px";
+        canvas.style.height = wrapperHeight + "px";
+
+        this.cnvHeight = wrapperHeight;
+        this.cnvWidth = wrapperWidth;
+
+        this.move();
+*/
+
+
+
+    }
+
+
+
+
 
     clean() {
         var t = this;
@@ -601,16 +650,16 @@ export default class Interpreter {
 
     //Random
 
-    oneof(a,b){
-        return this.nextRandomDouble()<.5 ? a : b;
+    oneof(a, b) {
+        return this.nextRandomDouble() < .5 ? a : b;
     }
 
-    pickRandom(min, max){
+    pickRandom(min, max) {
         min = Math.ceil(min);
         max = Math.floor(max);
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
-       
+
 
     /////////////////////////
     //
@@ -673,7 +722,7 @@ export default class Interpreter {
     //
     /////////////////////////
 
-    resize(){
+    resize() {
 
     }
 
@@ -817,8 +866,12 @@ export default class Interpreter {
     }
 
     printToConsole(x) {
+        var terminal = document.getElementById("terminalData");
+        var entry = `<span style={{ paddingLeft: ".75rem" }}>${x}</span><br />`
+        terminal.innerHTML += entry;
+
         var cc = document.getElementById("cc");
-        if(cc !== null){
+        if (cc !== null) {
             cc.value = cc.value + x + "\n";
             cc.scrollTop = cc.scrollHeight;
         }
@@ -956,17 +1009,17 @@ export default class Interpreter {
         var t = this;
         var chartType = [];
 
-        if(name == this.singleChartXVariable || name == this.singleChartYVariable){
+        if (name == this.singleChartXVariable || name == this.singleChartYVariable) {
             updateChart = true;
             chartType.push("single");
         }
 
-        if(name == this.topChartXVariable || name == this.topChartYVariable){
+        if (name == this.topChartXVariable || name == this.topChartYVariable) {
             updateChart = true;
             chartType.push("top");
         }
 
-        if(name == this.bottomChartXVariable || name == this.bottomChartYVariable){
+        if (name == this.bottomChartXVariable || name == this.bottomChartYVariable) {
             updateChart = true;
             chartType.push("bottom");
         }
@@ -975,10 +1028,10 @@ export default class Interpreter {
             if (t.locals[i][name] != undefined) {
                 t.locals[i][name] = value;
                 if (updateChart) {
-                    for(var type of chartType){
+                    for (var type of chartType) {
                         this.updateChartData(type);
                     }
-                    
+
                 }
                 return;
             }
@@ -986,7 +1039,7 @@ export default class Interpreter {
         t.locals[t.locals.length - 1][name] = value;
 
         if (updateChart) {
-            for(var type of chartType){
+            for (var type of chartType) {
                 this.updateChartData(type);
             }
         }
@@ -1006,26 +1059,26 @@ export default class Interpreter {
         var xDataArray = [];
         var yDataArray = [];
 
-        if(chartType == "single"){
+        if (chartType == "single") {
             xDataArray = t.getValueInternal(this.singleChartXVariable);
             yDataArray = t.getValueInternal(this.singleChartYVariable);
         }
-        if(chartType == "top"){
-     
+        if (chartType == "top") {
+
             xDataArray = this.getValueInternal(this.topChartXVariable);
             yDataArray = this.getValueInternal(this.topChartYVariable);
 
         }
-        if(chartType == "bottom"){
+        if (chartType == "bottom") {
             xDataArray = this.getValueInternal(this.bottomChartXVariable);
             yDataArray = this.getValueInternal(this.bottomChartYVariable);
         }
 
-        if(!xDataArray){
+        if (!xDataArray) {
             xDataArray = [];
         }
-        
-        if(!yDataArray){
+
+        if (!yDataArray) {
             yDataArray = [];
         }
 
@@ -1346,6 +1399,7 @@ export default class Interpreter {
     }
 
     runLine(str) {
+        this.readProcs();
         var line = this.parse(str);
         this.reset(line);
     }
@@ -1488,6 +1542,15 @@ export default class Interpreter {
         while (true) {
             const { value, done } = await reader.read();
             if (value) {
+
+                //This is an example of how to get a string instead of a number. It can be used, for example, to do a 'read all'. 
+                //This could be something like adc0:adc1:adc2:adc3... and it gets parsed here. But we don't know what type we've received
+                //currently, we need to check something first.
+
+                // var string = new TextDecoder("utf-8").decode(value);
+                //   console.log(string);
+
+
                 var newValue;
                 this.handleReceiveData(value);
                 if (value[1] != 0) {
@@ -1495,7 +1558,6 @@ export default class Interpreter {
                 } else {
                     newValue = value[0];
                 }
-                this.allReceivedData.push(newValue);
 
             }
             if (done) {
@@ -1529,10 +1591,10 @@ export default class Interpreter {
         }
     }
 
-    pushToArray(variable, value){
+    pushToArray(variable, value) {
         var variableValue = this.getValueInternal(variable);
-        
-        if(variableValue && Array.isArray(variableValue)){
+
+        if (variableValue && Array.isArray(variableValue)) {
             variableValue.push(value);
             this.setValue(variable, variableValue);
         } else {
@@ -1540,7 +1602,7 @@ export default class Interpreter {
         }
     }
 
-    fillShape(){
+    fillShape() {
 
     }
 
@@ -1559,15 +1621,17 @@ export var prims = {};
 /* Charts */
 prims['x-data'] = { nargs: 1, fcn: function (a) { this.setChartListener("x", a) } }
 prims['y-data'] = { nargs: 1, fcn: function (a) { this.setChartListener("y", a) } }
-prims['x-label'] = { nargs: 1, fcn: function (a) {this.setValue("_xLabel", a)}}
-prims['y-label'] = { nargs: 1, fcn: function (a) {this.setValue("_yLabel", a)}}
-prims['one-plot'] = { nargs: 0, fcn: function () {this.setValue("_chartType", "single")}}
-prims['limits-y'] = {nargs: 2, fcn: function (a, b) {this.setValue("_range", [a, b])}}
-prims['limits-x'] = {nargs: 2, fcn: function(a,b) {this.setValue("_domain", [a, b])}}
-prims['limits'] = {nargs: 4, fcn: function(a, b, c, d){
-    this.setValue("_domain", [a, b]);
-    this.setValue("_range", [c, d]);
-}}
+prims['x-label'] = { nargs: 1, fcn: function (a) { this.setValue("_xLabel", a) } }
+prims['y-label'] = { nargs: 1, fcn: function (a) { this.setValue("_yLabel", a) } }
+prims['one-plot'] = { nargs: 0, fcn: function () { this.setValue("_chartType", "single") } }
+prims['limits-y'] = { nargs: 2, fcn: function (a, b) { this.setValue("_range", [a, b]) } }
+prims['limits-x'] = { nargs: 2, fcn: function (a, b) { this.setValue("_domain", [a, b]) } }
+prims['limits'] = {
+    nargs: 4, fcn: function (a, b, c, d) {
+        this.setValue("_domain", [a, b]);
+        this.setValue("_range", [c, d]);
+    }
+}
 
 
 prims['calibrate'] = { nargs: 2, fcn: function (a, b) { return this.calibrate(a, b) } }
