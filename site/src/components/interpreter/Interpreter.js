@@ -590,10 +590,8 @@ export default class Interpreter {
 
         canvas.style.width = (wrapper.offsetWidth - 5) + "px";
         canvas.style.height = (wrapper.offsetHeight - 5) + "px";
-
-        console.log(wrapper.clientWidth);
-
         this.move();
+
         /*
         var wrapperWidth = wrapper.offsetWidth;
         var forcedHeight = wrapperWidth / 1.25;
@@ -1396,7 +1394,6 @@ export default class Interpreter {
     }
 
     runLine(str) {
-        console.log("runline");
         this.readProcs();
         var line = this.parse(str);
         this.reset(line);
