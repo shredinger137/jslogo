@@ -51,6 +51,7 @@
 
 .codeEntry div, .codeEntry textarea{
     border: none;
+
 }
 
 
@@ -62,6 +63,7 @@
 }
 
 .chartArea {
+    resize: both;
     position: absolute;
     top: 0;
     left: 32vw;
