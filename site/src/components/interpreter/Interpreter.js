@@ -328,7 +328,7 @@ export default class Interpreter {
 
     forward(n) {
 
-        n = n * this.scale;
+       // n = n * this.scale;
 
         var ctx = document.getElementById("canvas").getContext("2d");
 
@@ -385,7 +385,7 @@ export default class Interpreter {
     }
 
     arc(a, r) {
-        r = r * this.scale;
+  //      r = r * this.scale;
         var t = this;
         if (a == 0) return;
         if (r == 0) { t.seth(t.heading + a); }
@@ -513,8 +513,8 @@ export default class Interpreter {
     }
 
     drawLine(x, y) {
-        x = x * this.scale;
-        y = y * this.scale;
+      //  x = x * this.scale;
+      //  y = y * this.scale;
         var canvasElement = document.getElementById("testcanvas");
         var canvas = canvasElement.getContext("2d");
         canvas.beginPath();
