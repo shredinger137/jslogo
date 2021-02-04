@@ -78,7 +78,7 @@ end`,
 
     //TODO: The 'component did mount' refers to app.js, not turtlelogo.js; meaning the elements aren't correct.
 
-
+    console.log("update");
 
     localDatabase = new Dexie('lbym');
 
