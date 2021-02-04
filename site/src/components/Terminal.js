@@ -1,3 +1,5 @@
+/* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off", no-use-before-define: "off" */
+
 import React, { useState, useEffect } from 'react';
 
 //TODO: Handle ctrl + letter shortcuts from the interpreter class; consider cleaning up stuff; change print to end up here

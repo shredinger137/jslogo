@@ -78,7 +78,7 @@
 
 .terminal {
     position: absolute;
-    height: calc(80vh - 60vh);
+    height: calc(80vh - 60vh - 6px);
     top: 60vh;
     left: 32vw;
     width: 66vw;

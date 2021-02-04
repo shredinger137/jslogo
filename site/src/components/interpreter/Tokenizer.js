@@ -35,7 +35,7 @@ export default class Tokenizer {
         }
 
         function next() {
-            if (peekChar() === "'") return readString();
+            if (peekChar() === "'" || peekChar() === "|") return readString();
             var res = '';
             if (delim()) res = nextChar();
             else {

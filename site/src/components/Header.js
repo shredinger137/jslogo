@@ -2,11 +2,17 @@ import React, { Component } from 'react';
 import '../css/styles.css';
 import '../css/layout.css';
 import Projects from './Projects.js';
+import firebase from 'firebase';
+import 'firebase/auth'
+import { useFirebaseApp, useAuth, useUser } from 'reactfire';
+
 var projects;
 projects = new Projects();
 
 function Header(props) {
-    
+
+    const { data: user } = useUser();
+    const reactAuth = useAuth();
 
     function loadFile() {
         document.getElementById("load").click();
@@ -21,10 +27,20 @@ function Header(props) {
         props.toggleNewProjectModal();
     }
 
+    const signOut = () => {
+        firebase.auth().signOut();
+      }
 
-   return (
+
+    const signIn = async () => {
+        await reactAuth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+      };
+
+
+    return (
         <header className="header">
             <span style={{ width: "10px" }}></span>
+
             <div className="buttonDiv" onClick={() => toggleNewProject()}>
                 <img src="/images/newProject.png"></img>
                 <span>New Project</span>
@@ -51,6 +67,17 @@ function Header(props) {
                 <span>Disconnect</span>
             </div>
             <span style={{ width: "10px" }}></span>
+            {user ?
+                <div className="buttonDiv">
+                    <span onClick={signOut}>Logout</span>
+                </div>
+                :
+                <div className="buttonDiv">
+                    <span onClick={signIn}>Login</span>
+                </div>
+
+            }
+
         </header>
     );
 

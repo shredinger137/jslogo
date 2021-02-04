@@ -26,6 +26,7 @@ export default class Interpreter {
     constructor(canvasHeight, canvasWidth, addToChart, pushToTable, updateLogoVariables, pushNewChartData, updateChartOptions, updateChartType) {
 
         this.updateLogoVariables = updateLogoVariables;
+        this.lastProc = "";
 
         //charts are given assigned variables for data; these are effectively listened for in 'make', so that 
         //if the variable in question is one of the chart data ones we know to update the chart data in our app.
@@ -95,8 +96,8 @@ export default class Interpreter {
         //these might be redundant, terminal and prompt
 
         this.procs.onfocus = function () { this.focused = true; };
-        this.terminal.onfocus = function () { this.focused = false; t.readProcs();  };
-        this.prompt.onfocus = function () { this.focused = false; t.readProcs();  };
+        this.terminal.onfocus = function () { this.focused = false; t.readProcs(); };
+        this.prompt.onfocus = function () { this.focused = false; t.readProcs(); };
         this.procs.onkeydown = handleKeyDown;
 
         function handleKeyDown(e) {
@@ -160,8 +161,7 @@ export default class Interpreter {
         //  canvas.height = t.cnvHeight * t.dpi;
         canvas.width = document.getElementById("cnvframe").clientWidth;
         canvas.height = document.getElementById("cnvframe").clientHeight;
-        console.log(document.getElementById("cnvframe").clientHeight)
-        t.ctx.scale(t.dpi, t.dpi);
+       // t.ctx.scale(t.dpi, t.dpi);
         t.ctx.textBaseline = "middle";
         t.clean();
         window.requestAnimationFrame(this.ticker);
@@ -585,38 +585,15 @@ export default class Interpreter {
 
 
     handleResize() {
-
-
-
+        
         var canvas = document.getElementById("canvas");
-        var frame = document.getElementById("cnvframe");
         var wrapper = document.getElementById("chartAreaWrapper");
 
         canvas.style.width = (wrapper.offsetWidth - 5) + "px";
         canvas.style.height = (wrapper.offsetHeight - 5) + "px";
-
-        console.log(wrapper.clientWidth);
-
+        document.getElementById("canvasDimensionsLabel").innerHTML = `Canvas: ${wrapper.offsetWidth - 5}w x ${wrapper.offsetHeight - 5}h`
+        
         this.move();
-        /*
-        var wrapperWidth = wrapper.offsetWidth;
-        var forcedHeight = wrapperWidth / 1.25;
-        var wrapperHeight = wrapper.offsetHeight;
-
-        frame.style.width = wrapperWidth + "px";
-        canvas.style.width = wrapperWidth + "px";
-
-        frame.style.height = wrapperHeight + "px";
-        canvas.style.height = wrapperHeight + "px";
-
-        this.cnvHeight = wrapperHeight;
-        this.cnvWidth = wrapperWidth;
-
-        this.move();
-*/
-
-
-
     }
 
 
@@ -779,10 +756,12 @@ export default class Interpreter {
     //The only difference I saw so far was that Tokenize was called from the class before, and that's been replaced. Still not evaluating arguments passed to words.
 
     procString(str, type) {
+        var t = this;
         gatherSource();
         parseProcs();
 
         function gatherSource() {
+
             var thisproc = undefined;
             for (var i in prims) if ((prims[i].type) == 'normal') delete prims[i];
             var lines = str.split('\n');
@@ -795,6 +774,7 @@ export default class Interpreter {
                 var sl = Tokenizer.parse(l);
                 if ((sl[0] == 'to') && (sl[1] != undefined)) {
                     thisproc = sl[1];
+
                     prims[thisproc] = { nargs: sl.length - 2 };
                     prims[thisproc].fcn = '';
                     prims[thisproc].inputs = sl.slice(2);
@@ -867,15 +847,32 @@ export default class Interpreter {
     }
 
     printToConsole(x) {
+        console.log(typeof x)
+        if(Array.isArray(x)){
+            console.log("array");
+            var stringHolder = "";
+            for(var value of x){
+                stringHolder += ` ${value}`;
+            }
+            x = stringHolder;
+        }
+
         var terminal = document.getElementById("terminalData");
         var entry = `<span style={{ paddingLeft: ".75rem" }}>${x}</span><br />`
         terminal.innerHTML += entry;
+        terminal.innerHTML += this.lastProc;
+        terminal.scrollTop = document.getElementById("terminalData").scrollHeight;
 
         var cc = document.getElementById("cc");
         if (cc !== null) {
             cc.value = cc.value + x + "\n";
             cc.scrollTop = cc.scrollHeight;
         }
+    }
+
+    cleanConsole(){
+        var terminal = document.getElementById("terminalData");
+        terminal.innerHTML = "";
     }
 
     evalNext() {
@@ -1335,10 +1332,11 @@ export default class Interpreter {
         if (type == 'object') {
             var res = '';
             for (var i in x) { res += this.printstr(x[i]); res += ' '; }
-            return '[' + res.substring(0, res.length - 1) + ']';
+            return res.substring(0, res.length - 1);
         }
         else return String(x);
     }
+
 
     getnum(x) {
         var n;
@@ -1439,14 +1437,21 @@ export default class Interpreter {
         this.sendReceive(cmd, 1, fcn);
     }
 
-    calibrate(calibrateValues, valueToCalibrate) {
-        if (Array.isArray(calibrateValues)) {
-            if (calibrateValues.length == 4) {
-                //we assume the format is adcvalue1, realvalue1, adcvalue2, realvalue2
-                var slope = (calibrateValues[1] - calibrateValues[3]) / (calibrateValues[0] - calibrateValues[2]);
-                var value = calibrateValues[1] + (valueToCalibrate - calibrateValues[0]) * slope;
-                return (Math.floor(value * 100) / 100);
+    calibrateList(newString, valuesToCalibrate, calibrationValues) {
+        if (Array.isArray(calibrationValues) && Array.isArray(valuesToCalibrate)) {
+            if (calibrationValues.length == 4) {
+
+                var calibrationResults = [];
+                var slope = (calibrationValues[1] - calibrationValues[3]) / (calibrationValues[0] - calibrationValues[2]);
+
+                for(var value of valuesToCalibrate){
+                    calibrationResults.push(Math.floor((calibrationValues[1] + (value - calibrationValues[0]) * slope) * 100) / 100)
+                }
+
+                this.setValue(newString, calibrationResults);
+                return;
             }
+            
             //no error handling; seems like a TODO
         }
 
@@ -1622,6 +1627,7 @@ export var prims = {};
 
 /* Charts */
 prims['x-data'] = { nargs: 1, fcn: function (a) { this.setChartListener("x", a) } }
+prims['plot-title'] = { nargs: 1, fcn: function (a) { this.setValue("_chartTitle", a) } }
 prims['y-data'] = { nargs: 1, fcn: function (a) { this.setChartListener("y", a) } }
 prims['x-label'] = { nargs: 1, fcn: function (a) { this.setValue("_xLabel", a) } }
 prims['y-label'] = { nargs: 1, fcn: function (a) { this.setValue("_yLabel", a) } }
@@ -1636,7 +1642,7 @@ prims['limits'] = {
 }
 
 
-prims['calibrate'] = { nargs: 2, fcn: function (a, b) { return this.calibrate(a, b) } }
+prims['calibrate-list'] = { nargs: 3, fcn: function (a, b, c) { return this.calibrateList(a, b, c) } }
 prims['logData'] = { nargs: 1, fcn: function (a) { this.pushToTable(a) } }
 prims['repeat'] = { nargs: 2, flow: true, fcn: function (a, b) { this.repeat(a, b); } }
 prims['forever'] = { nargs: 1, flow: true, fcn: function (a) { this.loop(a); } }
@@ -1644,7 +1650,7 @@ prims['loop'] = { nargs: 1, flow: true, fcn: function (a) { this.loop(a); } }
 prims['if'] = { nargs: 2, flow: true, fcn: function (a, b) { this.logo_if(this.getbool(a), b); } }
 prims['ifelse'] = { nargs: 3, flow: true, fcn: function (a, t, f) { this.logo_ifelse(this.getbool(a), t, f); } }
 prims['run'] = { nargs: 1, flow: true, fcn: function (l) { this.logo_run(l); } }
-prims['initPlot'] = { nargs: 0, fcn: function (n) { this.initPlot() } }
+prims['show-plot'] = { nargs: 0, fcn: function (n) { this.initPlot() } }
 
 prims['.'] = { nargs: 0, flow: true, fcn: function () { this.procOutput(this); } }
 prims['stop'] = { nargs: 0, flow: true, fcn: function () { this.procOutput(this); } }
@@ -1698,7 +1704,11 @@ prims['pick'] = { nargs: 1, fcn: function (l) { return l[this.random.pickRandom(
 
 prims['print'] = { nargs: 1, fcn: function (x) { this.printToConsole(this.printstr(x)); } }
 
+prims['typeof'] = { nargs: 1, fcn: function (x) { return(typeof x) } }
+
+
 prims['clean'] = { nargs: 0, fcn: function (n) { this.clean(); } }
+prims['clear'] = { nargs: 0, fcn: function () {this.cleanConsole();}}
 prims['forward'] = { nargs: 1, fcn: function (n) { this.forward(this.getnum(n)); } }
 prims['fd'] = { nargs: 1, fcn: function (n) { this.forward(this.getnum(n)); } }
 prims['back'] = { nargs: 1, fcn: function (n) { this.forward(this.getnum(-n)); } }
@@ -1755,13 +1765,6 @@ prims['flushtime'] = { nargs: 1, fcn: function (n) { flushtime = this.getnum(n);
 prims['( '] = { nargs: 1, fcn: function (x) { this.evline.shift(); return x; } }
 prims['se '] = { nargs: 'ipm', fcn: function () { return this.ipm_se(arguments); } }
 
-
-prims['storeinbox1'] = { nargs: 1, fcn: function (n) { this.boxes[0] = n; } }
-prims['box1'] = { nargs: 0, fcn: function () { return this.boxes[0]; } }
-prims['storeinbox2'] = { nargs: 1, fcn: function (n) { this.boxes[1] = n; } }
-prims['box2'] = { nargs: 0, fcn: function () { return this.boxes[1]; } }
-prims['storeinbox3'] = { nargs: 1, fcn: function (n) { this.boxes[2] = n; } }
-prims['box3'] = { nargs: 0, fcn: function () { return this.boxes[2]; } }
 prims['now'] = { nargs: 0, fcn: function () { return Math.floor(Date.now() / 1000) } }
 
 prims['resett'] = { nargs: 0, fcn: function (n) { this.resett(); } }

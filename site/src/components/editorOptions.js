@@ -14,6 +14,64 @@ export const languageDef = {
   defaultToken: "",
   number: /\d+(\.\d+)?/,
   keywords: [
+
+  ],
+  operators: [
+    '=', '>', '<', '!', '~', '?', ':', '==', '<=', '>=', '!=',
+    '&&', '||', '++', '--', '+', '-', '*', '/', '&', '|', '^', '%',
+    '<<', '>>', '>>>', '+=', '-=', '*=', '/=', '&=', '|=', '^=',
+    '%=', '<<=', '>>=', '>>>=', 'se'
+  ],
+  symbols: /[=><!~?:&|+\-*\/^%]+/,
+  tokenizer: {
+    root: [
+      [/to\s[a-zA-Z\-re]+|\bend\b/, "custom-words"],
+      
+      { include: "@whitespace" },
+      { include: "@numbers" },
+      { include: "@strings" },
+      { include: "@tags" },
+      [/\w+/, { cases: { "@keywords": "keyword" } }],
+      [/@symbols/, {
+        cases: {
+          '@operators': 'operator',
+        }
+      }],
+    ],
+
+    whitespace: [
+      [/\s+/, "white"],
+      [/;.*$/, 'comment'],
+      [/;.*$/, 'comment'],
+    ],
+    numbers: [
+      [/number/, "number"],
+    ],
+    strings: [
+      [/[=|][ @number]*$/, "string.escape"],
+      [/\"[a-zA-Z_-]*/, "string.escape"],
+    ],
+    tags: [
+      [/^%[a-zA-Z]\w*/, "tag"],
+      [/#[a-zA-Z]\w*/, "tag"],
+    ],
+  },
+}
+
+// This config defines the editor's behavior.
+export const configuration = {
+  comments: {
+    lineComment: ";",
+  },
+  brackets: [
+    ["{", "}"], ["[", "]"], ["(", ")",]
+  ],
+}
+
+
+/*
+Keywords disabled because hyphens don't work right. Look into defining it in a way that takes regex instead. I suspect any string won't parse the hyphen.
+
     "initPlot",
     "setcolor",
     "print",
@@ -84,56 +142,5 @@ export const languageDef = {
     "bottom-plot",
     "x-label",
     "y-label"
-  ],
-  operators: [
-    '=', '>', '<', '!', '~', '?', ':', '==', '<=', '>=', '!=',
-    '&&', '||', '++', '--', '+', '-', '*', '/', '&', '|', '^', '%',
-    '<<', '>>', '>>>', '+=', '-=', '*=', '/=', '&=', '|=', '^=',
-    '%=', '<<=', '>>=', '>>>=', 'se'
-  ],
-  symbols: /[=><!~?:&|+\-*\/^%]+/,
-  tokenizer: {
-    root: [
-      [/to\s[a-zA-Z\-re]+|\bend\b/, "custom-words"],
-      { include: "@whitespace" },
-      { include: "@numbers" },
-      { include: "@strings" },
-      { include: "@tags" },
-      [/\w+/, { cases: { "@keywords": "keyword" } }],
-      [/@symbols/, {
-        cases: {
-          '@operators': 'operator',
-        }
-      }],
-    ],
-    comment: [
-      [/;/, 'comment'],
 
-    ],
-    whitespace: [
-      [/\s+/, "white"],
-      [/;.*$/, 'comment'],
-    ],
-    numbers: [
-      [/number/, "number"],
-    ],
-    strings: [
-      [/[=|][ @number]*$/, "string.escape"],
-      [/\"[a-zA-Z_-]*/, "string.escape"],
-    ],
-    tags: [
-      [/^%[a-zA-Z]\w*/, "tag"],
-      [/#[a-zA-Z]\w*/, "tag"],
-    ],
-  },
-}
-
-// This config defines the editor's behavior.
-export const configuration = {
-  comments: {
-    lineComment: ";",
-  },
-  brackets: [
-    ["{", "}"], ["[", "]"], ["(", ")",],["to","end"]
-  ],
-}
+    */

@@ -106,7 +106,6 @@ end`,
     interpreter.setup();
 
     window.onresize = interpreter.handleResize.bind(interpreter);
-    console.log(window);
 
 
 
@@ -292,7 +291,7 @@ end`,
           <button onClick={() => this.setState({ view: "graph" })}>Graph</button>
           <button onClick={() => this.setState({ view: "data" })}>Data</button>
           <input id="load" type="file" onChange={() => projects.loadFile()} style={{ display: "none" }} />
-          <span style={{ float: "right" }}>Canvas: {this.state.canvasWidth} x {this.state.canvasHeight}</span>
+          <span style={{ float: "right" }} id="canvasDimensionsLabel"></span>
 
         </div>
 
@@ -307,7 +306,7 @@ end`,
               editorDidMount={this.editorDidMount}
               editorWillMount={this.editorWillMount}
             />
-            <textarea id="procs" style={{ whiteSpace: "nowrap", display: "none" }} value={this.state.code} >
+            <textarea id="procs" style={{ whiteSpace: "nowrap", display: "none" }} value={this.state.code} readOnly>
             </textarea>
             <textarea id="includes" spellCheck="false" style={{ display: "none", whiteSpace: "nowrap", overflow: "visible" }} />
           </div>

@@ -1,3 +1,5 @@
+/* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off", no-use-before-define: "off" */
+
 import React from 'react';
 
 function DataTable(props) {
