@@ -6,21 +6,21 @@ stages:
 prep: 
   stage: prep
   script:
-    - cp /repos/lbym-app/config/dev.config ./site/config.js
+    - cp /repos/lbym-app/config/dev.config ./site/src/config.js
   only:
     - dev
 
 prep: 
   stage: prep
   script:
-    - cp /repos/lbym-app/config/release.config ./site/config.js
+    - cp /repos/lbym-app/config/release.config ./site/src/config.js
   only:
     - release
 
 prep: 
   stage: prep
   script:
-    - cp /repos/lbym-app/config/production.config ./site/config.js
+    - cp /repos/lbym-app/config/production.config ./site/src/config.js
   only:
     - master
     
