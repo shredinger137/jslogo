@@ -4,11 +4,11 @@ import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import { FirebaseAppProvider } from 'reactfire';
-import firebaseConfig from './firebaseConfig';
+import {config} from './config';
 
 
 ReactDOM.render(
-<FirebaseAppProvider firebaseConfig={firebaseConfig}>
+<FirebaseAppProvider firebaseConfig={config.firebase}>
     <Suspense fallback={<h3>Loading...</h3>}>
       <React.StrictMode>
         <App />
@@ -18,7 +18,24 @@ ReactDOM.render(
   document.getElementById('root')
 );
 
+function test() {
+  console.log("update");
+}
+
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.register();
+serviceWorker.register({
+  onUpdate: registration => {
+    const waitingServiceWorker = registration.waiting
+
+    if (waitingServiceWorker) {
+      waitingServiceWorker.addEventListener("statechange", event => {
+        if (event.target.state === "activated") {
+          window.location.reload()
+        }
+      });
+      waitingServiceWorker.postMessage({ type: "SKIP_WAITING" });
+    }
+  }
+});
