@@ -19,6 +19,4 @@ ReactDOM.render(
 );
 
 
-serviceWorker.register({
-  onUpdate: window.location.reload()
-});
+serviceWorker.register();
