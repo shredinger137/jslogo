@@ -46,7 +46,7 @@
     flex-direction: row;
     flex-wrap: nowrap;
     font-size: 20px;
-    height: 56px;
+    height: 55px;
     justify-content: flex-start;
     position: fixed;
     transition: transform 0.233s cubic-bezier(0, 0, 0.21, 1) 0.1s;
@@ -57,7 +57,6 @@
 
   header a {
     color: #fff;
-    font-size: 20px;
     text-decoration: none;
   }
   
@@ -73,7 +72,7 @@
     flex: 1;
     overflow-x: hidden;
     overflow-y: auto;
-    padding-top: 70px;
+    padding-top: 55px;
     padding-left: 1em;
     padding-right: 1em;
   }
@@ -81,40 +80,7 @@
   .hidden {
     display: none;
   }
-  
 
-  
-  .mb-button {
-    align-self: center;
-    background-color: #666;
-    border-radius: 100%;
-    box-shadow:
-      0 4px 5px 0 rgba(0, 0, 0, 0.14),
-      0 2px 9px 1px rgba(0, 0, 0, 0.12),
-      0 4px 2px -2px rgba(0, 0, 0, 0.2);
-    height: 30px;
-    width: 30px;
-    
-  }
-  
-  .mb-matrix {
-    margin-left: 10px;
-    margin-right: 10px;
-  }
-
-  .hidden {
-    display: none;
-  }
-  
-  .pressed {
-    background-color: #D81B60;  
-    box-shadow: inset 0px 0px 5px #c1c1c1;
-    outline: none;
-  }
-
-  textarea {
-    resize: none;
-  }
 
 	.menu {
     padding-right: 20px;

@@ -1,3 +1,16 @@
+/*
+Header height: 56px
+Buttons: around 77px
+
+Assuming header area: 150x with a little padding
+*/
+
+:root {
+    --interfaceHeight: calc(96vh - 100px);
+    --codeEntryWidth: 44vw;
+    --chartHeight: 75vh;
+  }
+
 .terminal {
     grid-area: terminal;
     z-index: 999;
@@ -27,23 +40,6 @@
 }
 
 
-
-.interfaceGrid_old {
-    max-width: 98vw;
-    margin: 0 auto;
-    height: 80vh;
-    display: grid;
-    grid-gap: 0px;
-    grid-template-columns: 1.3fr 1fr 1fr 1fr;
-    grid-template-rows: 1fr 1fr .6fr;
-    grid-template-areas:
-        "codeEntry chartArea chartArea chartArea"
-        "codeEntry  chartArea  chartArea chartArea"
-        "codeEntry  terminal    terminal terminal";
-        background-color: #fff;
-        color: #444;
-}
-
 .hide {
     display: none;
 }
@@ -58,7 +54,7 @@
 .interfaceGrid {
     position: relative;
     margin: 0 auto;
-    height: 80vh;
+    height: var(--interfaceHeight);
     width: 98vw;
 }
 
@@ -66,20 +62,20 @@
     resize: both;
     position: absolute;
     top: 0;
-    left: 32vw;
-    width: 66vw;
-    height: 60vh;
+    right: 0;
+    width: calc(98vw - var(--codeEntryWidth));
+    height: var(--chartHeight);
 }
 
 .codeEntry {
-    width: 32vw;
-    height: 80vh;
+    width: var(--codeEntryWidth);
+    height: var(--interfaceHeight);
 }
 
 .terminal {
     position: absolute;
-    height: calc(80vh - 60vh - 6px);
-    top: 60vh;
-    left: 32vw;
-    width: 66vw;
+    height: calc(var(--interfaceHeight) - var(--chartHeight) - 1px);
+    bottom: 0;
+    right: 0;
+    width: calc(98vw - var(--codeEntryWidth));
 }

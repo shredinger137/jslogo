@@ -34,6 +34,8 @@ export default class Interpreter {
         this.updateChartOptions = updateChartOptions;
         this.updateChartType = updateChartType;
 
+        this.turtleScale = 1;
+
         this.singleChartXVariable = "";
         this.topChartXVariable = "";
         this.bottomChartXVariable = "";
@@ -53,7 +55,7 @@ export default class Interpreter {
 
         this.cnvWidth = canvasWidth;
         this.cnvHeight = canvasHeight;
-        this.scale = canvasWidth / 700;
+        this.scale = 1;
         // this.img;
         this.ctx = document.getElementById('canvas');
         this.xcor = 0;
@@ -175,6 +177,8 @@ export default class Interpreter {
             t.element.style.height = t.size + 'px';
             t.move();
         }
+
+        this.handleResize();
 
     }
 
@@ -332,7 +336,8 @@ export default class Interpreter {
 
     forward(n) {
 
-        // n = n * this.scale;
+         n = n / this.turtleScale;
+
 
         var ctx = document.getElementById("canvas").getContext("2d");
 
@@ -375,8 +380,8 @@ export default class Interpreter {
 
     setxy(x, y) {
         var t = this;
-        t.xcor = x;
-        t.ycor = y;
+        t.xcor = x / this.turtleScale;
+        t.ycor = y / this.turtleScale;
         var sx = t.xcor + t.cnvWidth / 2, sy = t.cnvHeight / 2 - t.ycor;
         if (t.fillpath) t.fillpath.push(function () { this.ctx.moveTo(sx, sy); });
     }
@@ -389,7 +394,7 @@ export default class Interpreter {
     }
 
     arc(a, r) {
-        //      r = r * this.scale;
+        r = r / this.turtleScale;
         var t = this;
         if (a == 0) return;
         if (r == 0) { t.seth(t.heading + a); }
@@ -517,8 +522,8 @@ export default class Interpreter {
     }
 
     drawLine(x, y) {
-        //  x = x * this.scale;
-        //  y = y * this.scale;
+        x = x / this.turtleScale;
+        y = y / this.turtleScale;
         var canvasElement = document.getElementById("testcanvas");
         var canvas = canvasElement.getContext("2d");
         canvas.beginPath();
@@ -585,13 +590,35 @@ export default class Interpreter {
 
 
     handleResize() {
+        //We're going to get the total size of the document first, then calculate the necessary size of the other elements.
+        //There's a default size for each component, and a required aspect ratio to the canvas. The canvas also needs to set
+        //turtleScale, which locks the coordinate system to 700x560. This is step one - later, a drag to resize handler
+        //will be needed to change the relative width of the code area.
         
+        var interfaceGridHeight = document.getElementById("mainInterfaceGrid").offsetHeight;
+        var interfaceGridWidth = document.getElementById("mainInterfaceGrid").offsetWidth;
+
+
+
+
+
+
+        var newScale;
         var canvas = document.getElementById("canvas");
         var wrapper = document.getElementById("chartAreaWrapper");
 
+        var widthScale = 700 / (wrapper.offsetWidth - 5);
+        var heightScale = 560 / (wrapper.offsetHeight - 5);
+        if(widthScale > heightScale){
+            newScale = Math.floor(widthScale * 1000) / 1000;
+        } else {
+            newScale = Math.floor(heightScale * 1000) / 1000;
+        }
+        this.turtleScale = newScale;
+
         canvas.style.width = (wrapper.offsetWidth - 5) + "px";
         canvas.style.height = (wrapper.offsetHeight - 5) + "px";
-        document.getElementById("canvasDimensionsLabel").innerHTML = `Canvas: ${wrapper.offsetWidth - 5}w x ${wrapper.offsetHeight - 5}h`
+        document.getElementById("canvasDimensionsLabel").innerHTML = `Canvas: ${Math.floor((wrapper.offsetWidth - 5) * newScale)}w x ${Math.floor((wrapper.offsetHeight - 5) * newScale)}h`
         
         this.move();
     }

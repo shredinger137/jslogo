@@ -76,10 +76,6 @@ end`,
 
   componentDidMount() {
 
-    //TODO: The 'component did mount' refers to app.js, not turtlelogo.js; meaning the elements aren't correct.
-
-    console.log("update2");
-
     localDatabase = new Dexie('lbym');
 
     console.log("Serial API Check:");
@@ -295,7 +291,7 @@ end`,
 
         </div>
 
-        <div className="interfaceGrid">
+        <div className="interfaceGrid" id="mainInterfaceGrid">
           <div className="codeEntry" id="codeEntryDiv">
             <MonacoEditor
               language="jslogo"
