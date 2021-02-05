@@ -22,17 +22,16 @@ export default class NewProjectModal extends Component {
             this.setState({
                 projectsAvailable: experimentsList
             })
-            this.props.countLines();
         }
     }
 
     loadCodeFromProject(projectName) {
         //TODO: We're not using the 'unsaved changes' value correctly. We should not prompt if it's not unsaved.
         //TODO: Eventually all files will have a 'fileLocation' field, in which case this conditional can be removed.
-
+        console.log("update");
         var scopedUpdateCode = this.props.updateCode;
+        console.log(scopedUpdateCode);
 
-        if (this.props.unsavedChanges) {
             if (window.confirm("Any unsaved changes will be lost. Continue?")) {
                 for (var project of this.state.projectsAvailable) {
                     if (project.name === projectName) {
@@ -54,7 +53,7 @@ export default class NewProjectModal extends Component {
             } else {
                 this.props.toggleModal();
             }
-        }
+
 
 
     }
