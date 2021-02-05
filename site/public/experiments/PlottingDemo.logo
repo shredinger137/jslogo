@@ -12,14 +12,14 @@ to makeSinglePlot
   y-label "Data
   x-data "xDataOne
   y-data "yDataOne
-  initPlot
+  show-plot
 end
 
 to makeBottomPlot
   make "_chartType "bottom
   x-data "xDataOne
   y-data "yDataOne
-  initPlot
+  show-plot
 end
 
 to makeTopPlot
@@ -28,7 +28,7 @@ to makeTopPlot
   y-data "yDataOne
   x-label "Numbers
   make "_range [13 55]
-  initPlot
+  show-plot
 end
 
 to pushData

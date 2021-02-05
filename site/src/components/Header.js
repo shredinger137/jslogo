@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useEffect } from 'react';
 import '../css/styles.css';
 import '../css/layout.css';
 import Projects from './Projects.js';
@@ -9,7 +9,15 @@ import { useFirebaseApp, useAuth, useUser } from 'reactfire';
 var projects;
 projects = new Projects();
 
+
+
 function Header(props) {
+
+    useEffect(() => {
+        if(window.isUpdateAvailable){
+            document.getElementById("updateText").style.visibility = "visible";
+        }
+      });
 
     const { data: user } = useUser();
     const reactAuth = useAuth();
@@ -77,6 +85,7 @@ function Header(props) {
                 </div>
 
             }
+            <div id="updateText" style={{marginLeft: "200px", fontSize: ".8rem", marginTop: "20px", visibility: "hidden"}}><span>An update is available. Close and re-open the site to apply it.</span></div>
 
         </header>
     );

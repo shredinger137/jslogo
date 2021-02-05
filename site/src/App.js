@@ -40,10 +40,7 @@ class App extends Component {
     unsavedChanges: false,
     showNewProjectModal: false,
     linesOfCode: [1],
-    code:
-      `to go
-  print 5
-end`,
+    code: "",
     canvasHeight: 400,
     canvasWidth: 900,
     showChartFrame: false,
@@ -69,8 +66,6 @@ end`,
     logoVariables: [],
 
   };
-
-
 
 
 
@@ -114,7 +109,7 @@ end`,
     this.setState({
       includes: includes
     });
-    this.countLineAndSetState();
+
     projects.initializeDatabase();
 
     projects.getRecoverEntry().then(recoveryProject => {
@@ -195,26 +190,12 @@ end`,
     })
   }
 
-
-
   updateCode(newCode) {
     this.setState({
       code: newCode,
     });
   }
 
-
-  countLineAndSetState() {
-
-    var count = document.getElementById('procs').value.split(/\r\n|\r|\n/).length;
-    var countArray = Array.from(Array(count + 1).keys());
-    countArray.shift();
-    this.setState({
-      linesOfCode: countArray,
-      unsavedChanges: true
-    });
-
-  }
 
   toggleShowNewProjectModal() {
     this.setState({ showNewProjectModal: !this.state.showNewProjectModal });
@@ -273,7 +254,6 @@ end`,
           {this.state.showNewProjectModal ?
             <NewProjectModal
               toggleModal={this.toggleShowNewProjectModal.bind(this)}
-              countLines={this.countLineAndSetState.bind(this)}
               unsavedChanges={this.state.unsavedChanges}
               updateCode={this.updateCode.bind(this)}
             />
@@ -283,7 +263,7 @@ end`,
           <button onClick={() => { interpreter.runLine("go") }}>Go</button>
           <button onClick={() => { document.getElementById("chartAreaWrapper").style.visibility = "hidden" }}>Hide</button>
           <button onClick={() => { document.getElementById("chartAreaWrapper").style.visibility = "visible" }}>Show</button>
-          <button onClick={() => this.setState({ view: "main" })}>Main View</button>
+          <button onClick={() => {this.setState({ view: "main" }); interpreter.runLine("st")  }}>Main View</button>
           <button onClick={() => this.setState({ view: "graph" })}>Graph</button>
           <button onClick={() => this.setState({ view: "data" })}>Data</button>
           <input id="load" type="file" onChange={() => projects.loadFile()} style={{ display: "none" }} />
