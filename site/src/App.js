@@ -261,8 +261,6 @@ class App extends Component {
             :
             null}
           <button onClick={() => { interpreter.runLine("go") }}>Go</button>
-          <button onClick={() => { document.getElementById("chartAreaWrapper").style.visibility = "hidden" }}>Hide</button>
-          <button onClick={() => { document.getElementById("chartAreaWrapper").style.visibility = "visible" }}>Show</button>
           <button onClick={() => {this.setState({ view: "main" }); interpreter.runLine("st")  }}>Main View</button>
           <button onClick={() => this.setState({ view: "graph" })}>Graph</button>
           <button onClick={() => this.setState({ view: "data" })}>Data</button>

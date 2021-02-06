@@ -28,7 +28,6 @@ export default class NewProjectModal extends Component {
     loadCodeFromProject(projectName) {
         //TODO: We're not using the 'unsaved changes' value correctly. We should not prompt if it's not unsaved.
         //TODO: Eventually all files will have a 'fileLocation' field, in which case this conditional can be removed.
-        console.log("update");
         var scopedUpdateCode = this.props.updateCode;
         console.log(scopedUpdateCode);
 
@@ -58,10 +57,15 @@ export default class NewProjectModal extends Component {
 
     }
 
+
+    stopProp(e){
+        e.stopPropagation();
+    }
+
     render() {
         return (
-            <div id="newProjectModal" className="modal">
-                <div className="modalContent">
+            <div id="newProjectModal" className="modal" onClick={() => this.props.toggleModal()}>
+                <div className="modalContent" onClick={(e) => this.stopProp(e)}>
                     <span className="close" onClick={() => this.props.toggleModal()}>&times;</span>
                     <h3>New Project</h3>
                     <br />
