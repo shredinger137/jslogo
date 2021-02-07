@@ -1,19 +1,14 @@
 /* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off", no-use-before-define: "off" */
 
-//TODO: CountLinesAndSetState no longer valid; remove
-
-import React, { Component, useEffect } from 'react';
+import React, { Component } from 'react';
 import './css/styles.css';
 import './css/layout.css';
 import Interpreter from './components/interpreter/Interpreter';
 import Projects from './components/Projects.js';
 import Header from './components/Header.js';
-import TurtleLogo from './components/TurtleLogoWorkspace';
-import JSLogo from './components/JSLogoWorkspace';
 import NewProjectModal from './components/NewProjectModal';
-import { options, languageDef, configuration } from './components/editorOptions'
+import { languageDef, configuration } from './components/editorOptions'
 import { includes } from './components/interpreter/includes.js';
-import Dexie, { DBCoreRangeType } from 'dexie'
 import MonacoEditor from 'react-monaco-editor';
 import Chart from './components/Chart';
 import DataTable from './components/DataTable';
@@ -22,10 +17,6 @@ import Terminal from './components/Terminal';
 
 var interpreter;
 var projects;
-var localDatabase;
-
-//TODO: Make 'unsavedChanges' global, since it's going to affect multiple things later. Or otherwise use it properly.
-
 
 
 class App extends Component {
@@ -35,15 +26,10 @@ class App extends Component {
   state = {
     tableData: [[]],
     view: "main",
-    turtle: true,
-    workspace: "turtle",
-    unsavedChanges: false,
     showNewProjectModal: false,
-    linesOfCode: [1],
     code: "",
     canvasHeight: 400,
     canvasWidth: 900,
-    showChartFrame: false,
     chartType: "single",
     chartOptionsSingle: {
       yLabel: "",
@@ -71,7 +57,6 @@ class App extends Component {
 
   componentDidMount() {
 
-    localDatabase = new Dexie('lbym');
 
     console.log("Serial API Check:");
     console.log(this.checkIfSerialCapable());
@@ -254,7 +239,6 @@ class App extends Component {
           {this.state.showNewProjectModal ?
             <NewProjectModal
               toggleModal={this.toggleShowNewProjectModal.bind(this)}
-              unsavedChanges={this.state.unsavedChanges}
               updateCode={this.updateCode.bind(this)}
             />
 

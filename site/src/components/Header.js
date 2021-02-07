@@ -2,9 +2,9 @@ import React, { useEffect } from 'react';
 import '../css/styles.css';
 import '../css/layout.css';
 import Projects from './Projects.js';
-import firebase from 'firebase';
+import firebase from 'firebase/app'
 import 'firebase/auth'
-import { useFirebaseApp, useAuth, useUser } from 'reactfire';
+import { useAuth, useUser } from 'reactfire';
 
 var projects;
 projects = new Projects();
@@ -50,15 +50,15 @@ function Header(props) {
             <span style={{ width: "10px" }}></span>
 
             <div className="buttonDiv" onClick={() => toggleNewProject()}>
-                <img src="/images/newProject.png"></img>
+                <img src="/images/newProject.png" alt="New project icon"></img>
                 <span>New Project</span>
             </div>
             <div className="buttonDiv" onClick={() => saveAs()}>
-                <img src="/images/download.png"></img>
+                <img src="/images/download.png" alt="Download icon"></img>
                 <span>Save File</span>
             </div>
             <div className="buttonDiv" onClick={() => loadFile()}>
-                <img src="/images/upload.png"></img>
+                <img src="/images/upload.png" alt="Upload icon"></img>
                 <span>Load File</span>
             </div>
             <a href="https://docs.lbym.org" target="_new">
@@ -67,11 +67,11 @@ function Header(props) {
                 </div>
             </a>
             <div id="connectButton" className="buttonDiv" style={{ minWidth: "100px", position: "fixed", right: "50px" }}>
-                <img src="/images/connect-icon.png"></img>
+                <img src="/images/connect-icon.png"  alt="Connect icon"></img>
                 <span>Connect</span>
             </div>
             <div id="disconnectButton" className="buttonDiv" style={{ display: "none", position: "fixed", right: "50px" }}>
-                <img src="/images/connect-icon.png"></img>
+                <img src="/images/connect-icon.png" alt="Connect icon"></img>
                 <span>Disconnect</span>
             </div>
             <span style={{ width: "10px" }}></span>

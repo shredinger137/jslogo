@@ -60,14 +60,14 @@ function DataTable(props) {
                 <tbody>
                     {props.tableData.map(dataLine => {
                         return (
-                            <tr>
-                                <td>{dataLine[0]}</td>
-                                <td>{dataLine[1]}</td>
-                                <td>{dataLine[2]}</td>
-                                <td>{dataLine[3]}</td>
-                                <td>{dataLine[4]}</td>
-                                <td>{dataLine[5]}</td>
-                                <td>{dataLine[6]}</td>
+                            <tr key={`${dataLine[0]}row`}>
+                                <td key={dataLine[0]} >{dataLine[0]}</td>
+                                <td key={dataLine[1]}>{dataLine[1]}</td>
+                                <td key={dataLine[2]}>{dataLine[2]}</td>
+                                <td key={dataLine[3]}>{dataLine[3]}</td>
+                                <td key={dataLine[4]}>{dataLine[4]}</td>
+                                <td key={dataLine[5]}>{dataLine[5]}</td>
+                                <td key={dataLine[6]}>{dataLine[6]}</td>
                             </tr>
                         )
 

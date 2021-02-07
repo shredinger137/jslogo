@@ -221,21 +221,22 @@ export default class Interpreter {
     }
 
     initPlot() {
+        var xLabel, yLabel;
 
         //Get plot type
         var chartType = (this.getValueInternal("_chartType"));
 
         //get options and create an object we can read on the other side
         if (this.getValueInternal("_xLabel")) {
-            var xLabel = (this.getValueInternal("_xLabel"));
+            xLabel = (this.getValueInternal("_xLabel"));
         } else {
-            var xLabel = "";
+            xLabel = "";
         }
 
         if (this.getValueInternal("_yLabel")) {
-            var yLabel = (this.getValueInternal("_yLabel"));
+            yLabel = (this.getValueInternal("_yLabel"));
         } else {
-            var yLabel = "";
+            yLabel = "";
         }
 
         var ticks = {
@@ -337,9 +338,6 @@ export default class Interpreter {
     forward(n) {
 
          n = n / this.turtleScale;
-
-
-        var ctx = document.getElementById("canvas").getContext("2d");
 
         var t = this;
         if (t.pendown) {
@@ -594,13 +592,6 @@ export default class Interpreter {
         //There's a default size for each component, and a required aspect ratio to the canvas. The canvas also needs to set
         //turtleScale, which locks the coordinate system to 700x560. This is step one - later, a drag to resize handler
         //will be needed to change the relative width of the code area.
-        
-        var interfaceGridHeight = document.getElementById("mainInterfaceGrid").offsetHeight;
-        var interfaceGridWidth = document.getElementById("mainInterfaceGrid").offsetWidth;
-
-
-
-
 
 
         var newScale;
@@ -628,7 +619,6 @@ export default class Interpreter {
 
 
     clean() {
-        var t = this;
         var t = this;
         this.xcor = 0;
         t.ycor = 0;
@@ -783,7 +773,6 @@ export default class Interpreter {
     //The only difference I saw so far was that Tokenize was called from the class before, and that's been replaced. Still not evaluating arguments passed to words.
 
     procString(str, type) {
-        var t = this;
         gatherSource();
         parseProcs();
 
@@ -874,9 +863,7 @@ export default class Interpreter {
     }
 
     printToConsole(x) {
-        console.log(typeof x)
         if(Array.isArray(x)){
-            console.log("array");
             var stringHolder = "";
             for(var value of x){
                 stringHolder += ` ${value}`;
@@ -1367,13 +1354,15 @@ export default class Interpreter {
 
     getnum(x) {
         var n;
+        var cleaned;
+
         if (typeof x == "string") {
             if (x.includes("vh")) {
-                var cleaned = x.replace("vh", "");
+                cleaned = x.replace("vh", "");
                 n = Number(cleaned) / 100 * this.cnvHeight;
             }
             if (x.includes("vw")) {
-                var cleaned = x.replace("vw", "");
+                cleaned = x.replace("vw", "");
                 n = Number(cleaned) / 100 * this.cnvWidth;
             }
         }
@@ -1425,7 +1414,6 @@ export default class Interpreter {
     }
 
     runLine(str) {
-        console.log("runline");
         this.readProcs();
         var line = this.parse(str);
         this.reset(line);
@@ -1639,6 +1627,7 @@ export default class Interpreter {
     fillShape() {
 
     }
+
 
 
 }

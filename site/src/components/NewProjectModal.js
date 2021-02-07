@@ -1,3 +1,5 @@
+/* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off", no-use-before-define: "off", no-loop-func: "off" */
+
 import React, { Component } from 'react';
 import '../css/styles.css';
 import '../css/layout.css';

@@ -1,4 +1,5 @@
 /* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off", no-use-before-define: "off" */
+ // eslint-disable-next-line react-hooks/exhaustive-deps
 
 import React, { useState, useEffect } from 'react';
 
@@ -108,7 +109,14 @@ function Terminal(props) {
 
 
     return (
-        <div tabIndex="0" id="terminal-wrapper" onClick={() => { document.getElementById('prompt').focus() }} className="terminal" style={{ border: "solid", outline: "none", maxHeight: "25vh", zIndex: "1", backgroundColor: "white" }} id="terminal-new">
+        <div 
+            tabIndex="0" 
+            id="terminal-wrapper" 
+            onClick={() => { document.getElementById('prompt').focus() }} 
+            className="terminal" 
+            style={{ border: "solid", outline: "none", maxHeight: "25vh", zIndex: "1", backgroundColor: "white" }} 
+            >
+
             <div id="terminalData" style={divStyle}> </div>
             <span>></span><span id="prompt" contentEditable={true} style={{ outline: "none", width: "100%" }} onKeyDown={(e) => { handleKeyDown(e) }}></span>
             <p></p>
