@@ -93,6 +93,19 @@
     transform: translate3d(-400px, 0, 0); 
     z-index: 999;
   }
+
+  .userMenu {
+    height: 100vh;
+    background-color: darkblue;
+    position: absolute;
+    left: 0;
+    top: 55px;
+    transform: translateX(-500px);
+  }
+
+  .userMenuShow {
+    transform: none;
+  }
   
   .menu ul {
     list-style: none;

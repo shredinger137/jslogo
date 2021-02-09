@@ -6,6 +6,7 @@ import firebase from 'firebase/app'
 import 'firebase/auth'
 import { useAuth, useUser } from 'reactfire';
 import ProjectManager from './ProjectManager';
+import UserMenu from './UserMenu';
 
 var projects;
 projects = new Projects();
@@ -13,6 +14,18 @@ projects = new Projects();
 
 
 function Header(props) {
+
+    const userLogoStyle = {
+        borderRadius: "50%",
+        width: "40px",
+        height: "40px",
+        marginTop: "8px",
+        backgroundColor: "darkblue",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center"
+    }
+
 
     useEffect(() => {
         if (window.isUpdateAvailable) {
@@ -36,8 +49,9 @@ function Header(props) {
         props.toggleNewProjectModal();
     }
 
-    const signOut = () => {
-        firebase.auth().signOut();
+    const toggleUserMenu = () => {
+        var menu = document.getElementById("userMenuWrapper");
+        menu.classList.toggle("userMenuShow");
     }
 
 
@@ -50,8 +64,8 @@ function Header(props) {
         <header className="header">
             <span style={{ width: "20px" }}></span>
             {user ?
-                <div className="buttonDiv">
-                    <span onClick={signOut}>Logout</span>
+                <div onClick={toggleUserMenu} className="buttonDiv" style={userLogoStyle}>
+                    <p>{user.displayName.substr(0, 1)}</p>
                 </div>
                 :
                 <div className="buttonDiv">
@@ -85,6 +99,15 @@ function Header(props) {
                 <span>Disconnect</span>
             </div>
             <span style={{ width: "10px" }}></span>
+
+            {user ?
+                <div id="userMenuWrapper" class="userMenu">
+                    <UserMenu toggleUserMenu = {toggleUserMenu.bind(this)} />
+                </div>
+                :
+                null
+            }
+
 
             <div id="updateText" style={{ marginLeft: "200px", fontSize: ".8rem", marginTop: "20px", visibility: "hidden" }}><span>An update is available. Close and re-open the site to apply it.</span></div>
 
