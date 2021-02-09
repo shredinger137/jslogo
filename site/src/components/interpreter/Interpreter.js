@@ -122,16 +122,6 @@ export default class Interpreter {
         this.timeout = undefined;
         this.clockspeed = 1;
 
-        //cc js
-        this.commandConsole = document.getElementById('cc');
-        this.commandConsole.autocapitalize = 'off';
-        this.commandConsole.autocorrect = 'off';
-        this.commandConsole.autocomplete = 'off';
-        this.commandConsole.spellcheck = false;
-        this.commandConsole.focused = false;
-
-        this.commandConsole.selectionStart = this.commandConsole.value.length + 1;
-        this.commandConsole.selectionEnd = this.commandConsole.value.length + 1;
 
         this.respfcn = undefined;
         this.respCount = 0;
@@ -143,10 +133,16 @@ export default class Interpreter {
 
 
 
+    /*
+     *************************************
+     * 
+     * Setup and Turtle
+     * 
+     *************************************
+     */
 
 
     setup() {
-
 
         var t = this;
         this.element = document.createElement('div');
@@ -163,7 +159,7 @@ export default class Interpreter {
         //  canvas.height = t.cnvHeight * t.dpi;
         canvas.width = document.getElementById("cnvframe").clientWidth;
         canvas.height = document.getElementById("cnvframe").clientHeight;
-       // t.ctx.scale(t.dpi, t.dpi);
+        // t.ctx.scale(t.dpi, t.dpi);
         t.ctx.textBaseline = "middle";
         t.clean();
         window.requestAnimationFrame(this.ticker);
@@ -182,162 +178,9 @@ export default class Interpreter {
 
     }
 
-    setChartListener(axis, variable) {
-
-        var t = this;
-        //maybe make these objects, instead of a bunch of string? Might help when we expand this to be general.
-
-        if (t.getValue("_chartType")) {
-            if (axis == "x") {
-                //if axis is x, figure out which chart this is
-                if (t.getValue("_chartType") == "single") {
-                    t.singleChartXVariable = variable;
-                }
-                if (t.getValue("_chartType") == "bottom") {
-                    t.bottomChartXVariable = variable;
-                }
-                if (t.getValue("_chartType") == "top") {
-                    t.topChartXVariable = variable;
-                }
-            } else {
-                //if axis isn't x, we assume it's y and check which chart this is 
-                if (t.getValue("_chartType") == "single") {
-                    t.singleChartYVariable = variable;
-                }
-                if (t.getValue("_chartType") == "top") {
-                    t.topChartYVariable = variable;
-
-                }
-                if (t.getValue("_chartType") == "bottom") {
-                    t.bottomChartYVariable = variable;
-                }
-            }
-
-        } else {
-            throw "Chart not defined";
-        }
-
-
-    }
-
-    initPlot() {
-        var xLabel, yLabel;
-
-        //Get plot type
-        var chartType = (this.getValueInternal("_chartType"));
-
-        //get options and create an object we can read on the other side
-        if (this.getValueInternal("_xLabel")) {
-            xLabel = (this.getValueInternal("_xLabel"));
-        } else {
-            xLabel = "";
-        }
-
-        if (this.getValueInternal("_yLabel")) {
-            yLabel = (this.getValueInternal("_yLabel"));
-        } else {
-            yLabel = "";
-        }
-
-        var ticks = {
-            dummy: null
-        };
-
-        var xTicks = {
-            dummy: null
-        }
-
-        var rangeSetting = this.getValueInternal("_range");
-        if (rangeSetting && Array.isArray(rangeSetting) && rangeSetting.length >= 2) {
-            ticks["min"] = rangeSetting[0];
-            ticks["max"] = rangeSetting[1];
-        }
-
-        var domainSetting = this.getValueInternal("_domain");
-        if (domainSetting && Array.isArray(domainSetting) && domainSetting.length >= 2) {
-            xTicks["xmin"] = domainSetting[0];
-            xTicks["xmax"] = domainSetting[1];
-        }
-
-        var chartOptions = {
-            xLabel: xLabel,
-            yLabel: yLabel,
-            ticks: ticks,
-            xTicks: xTicks
-        }
-
-        //update view based on plot type; we know that top and bottom means double view
-        if (chartType == "single") {
-            this.updateChartType("single");
-            this.updateChartOptions("single", chartOptions);
-
-        }
-
-        else if (chartType == "top" || chartType == "bottom") {
-            this.updateChartType("double");
-            if (chartType == "top") {
-                this.updateChartOptions("top", chartOptions);
-            } else {
-                this.updateChartOptions("bottom", chartOptions);
-            }
-            this.setValue("_range", null)
-            this.setValue("_xLabel", null)
-            this.setValue("_yLabel", null)
-            //this should reset the variables maybe?
-
-        } else {
-
-        }
-
-    }
-
-    //this section is not yet being used
-
-    handleCCKeyDown(e) {
-        var k = e.keyCode;
-        if (k == 13) {
-            if (e.shiftKey) this.insertcr(e);
-            else this.handlecr(e);
-        }
-        if (e.ctrlKey) {
-            if (e.keyCode == 70) { e.preventDefault(); e.stopPropagation(); }
-            if (e.keyCode == 71) { e.preventDefault(); e.stopPropagation(); this.runLine('go'); }
-            if (e.keyCode == 190) { this.insert('stopped!\n'); this.reset([]); }
-        }
-    }
-
-    handlecr(e) {
-        var pos = document.getElementById('cc').selectionStart;
-        var t = document.getElementById('cc').value;
-        var start = t.lastIndexOf('\n', pos - 1), end = t.indexOf('\n', pos);
-        if (end < 0) end = t.length;
-        document.getElementById('cc').selectionStart = end + 1;
-        if (end != t.length) e.preventDefault();
-        var str = t.substring(start + 1, end);
-        this.runLine(str);
-    }
-
-    insertcr(e) {
-        e.preventDefault();
-        var pos = document.getElementById('cc').selectionStart;
-        var t = document.getElementById('cc').value;
-        var before = t.substring(0, pos);
-        var after = t.substring(pos);
-        document.getElementById('cc').value = before + '\n' + after;
-        document.getElementById('cc').selectionStart = pos + 1;
-        document.getElementById('cc').selectionEnd = pos + 1;
-    }
-
-    /////////////////////////
-    //
-    // Turtle
-    //
-    /////////////////////////
-
-
     forward(n) {
 
-         n = n / this.turtleScale;
+        n = n / this.turtleScale;
 
         var t = this;
         if (t.pendown) {
@@ -449,12 +292,6 @@ export default class Interpreter {
     showTurtle() { this.element.style.visibility = 'visible'; }
     hideTurtle() { this.element.style.visibility = 'hidden'; }
 
-    /////////////////////////
-    //
-    // Pen
-    //
-    /////////////////////////
-
     fillscreen(c, s) {
 
         if ((typeof c) == 'object') c = c[0];
@@ -504,6 +341,204 @@ export default class Interpreter {
         this.ctx.setLineDash(l);
     }
 
+
+
+
+
+
+
+
+
+
+    /*
+     *************************************
+     * 
+     * Plotting / Graphs
+     * 
+     *************************************
+     */
+
+
+    setChartListener(axis, variable) {
+
+        var t = this;
+        //maybe make these objects, instead of a bunch of string? Might help when we expand this to be general.
+
+        if (t.getValue("_chartType")) {
+            if (axis == "x") {
+                //if axis is x, figure out which chart this is
+                if (t.getValue("_chartType") == "single") {
+                    t.singleChartXVariable = variable;
+                }
+                if (t.getValue("_chartType") == "bottom") {
+                    t.bottomChartXVariable = variable;
+                }
+                if (t.getValue("_chartType") == "top") {
+                    t.topChartXVariable = variable;
+                }
+            } else {
+                //if axis isn't x, we assume it's y and check which chart this is 
+                if (t.getValue("_chartType") == "single") {
+                    t.singleChartYVariable = variable;
+                }
+                if (t.getValue("_chartType") == "top") {
+                    t.topChartYVariable = variable;
+
+                }
+                if (t.getValue("_chartType") == "bottom") {
+                    t.bottomChartYVariable = variable;
+                }
+            }
+
+        } else {
+            throw "Chart not defined";
+        }
+
+
+    }
+
+
+    initPlot() {
+        var xLabel, yLabel;
+
+        //Get plot type
+        var chartType = (this.getValueInternal("_chartType"));
+
+        //get options and create an object we can read on the other side
+        if (this.getValueInternal("_xLabel")) {
+            xLabel = (this.getValueInternal("_xLabel"));
+        } else {
+            xLabel = "";
+        }
+
+        if (this.getValueInternal("_yLabel")) {
+            yLabel = (this.getValueInternal("_yLabel"));
+        } else {
+            yLabel = "";
+        }
+
+        var ticks = {
+            dummy: null
+        };
+
+        var xTicks = {
+            dummy: null
+        }
+
+        var rangeSetting = this.getValueInternal("_range");
+        if (rangeSetting && Array.isArray(rangeSetting) && rangeSetting.length >= 2) {
+            ticks["min"] = rangeSetting[0];
+            ticks["max"] = rangeSetting[1];
+        }
+
+        var domainSetting = this.getValueInternal("_domain");
+        if (domainSetting && Array.isArray(domainSetting) && domainSetting.length >= 2) {
+            xTicks["xmin"] = domainSetting[0];
+            xTicks["xmax"] = domainSetting[1];
+        }
+
+        var chartOptions = {
+            xLabel: xLabel,
+            yLabel: yLabel,
+            ticks: ticks,
+            xTicks: xTicks
+        }
+
+        //update view based on plot type; we know that top and bottom means double view
+        if (chartType == "single") {
+            this.updateChartType("single");
+            this.updateChartOptions("single", chartOptions);
+
+        }
+
+        else if (chartType == "top" || chartType == "bottom") {
+            this.updateChartType("double");
+            if (chartType == "top") {
+                this.updateChartOptions("top", chartOptions);
+            } else {
+                this.updateChartOptions("bottom", chartOptions);
+            }
+            this.setValue("_range", null)
+            this.setValue("_xLabel", null)
+            this.setValue("_yLabel", null)
+            //this should reset the variables maybe?
+
+        } else {
+
+        }
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //TODO: This may be redundant; functions are now contained in terminal.js
+    handleCCKeyDown(e) {
+        var k = e.keyCode;
+        if (k == 13) {
+            if (e.shiftKey) this.insertcr(e);
+            else this.handlecr(e);
+        }
+        if (e.ctrlKey) {
+            if (e.keyCode == 70) { e.preventDefault(); e.stopPropagation(); }
+            if (e.keyCode == 71) { e.preventDefault(); e.stopPropagation(); this.runLine('go'); }
+            if (e.keyCode == 190) { this.insert('stopped!\n'); this.reset([]); }
+        }
+    }
+
+    handlecr(e) {
+        var pos = document.getElementById('cc').selectionStart;
+        var t = document.getElementById('cc').value;
+        var start = t.lastIndexOf('\n', pos - 1), end = t.indexOf('\n', pos);
+        if (end < 0) end = t.length;
+        document.getElementById('cc').selectionStart = end + 1;
+        if (end != t.length) e.preventDefault();
+        var str = t.substring(start + 1, end);
+        this.runLine(str);
+    }
+
+    insertcr(e) {
+        e.preventDefault();
+        var pos = document.getElementById('cc').selectionStart;
+        var t = document.getElementById('cc').value;
+        var before = t.substring(0, pos);
+        var after = t.substring(pos);
+        document.getElementById('cc').value = before + '\n' + after;
+        document.getElementById('cc').selectionStart = pos + 1;
+        document.getElementById('cc').selectionEnd = pos + 1;
+    }
+
+
     /////////////////////////
     //
     // Text
@@ -519,16 +554,6 @@ export default class Interpreter {
         t.ctx.restore();
     }
 
-    drawLine(x, y) {
-        x = x / this.turtleScale;
-        y = y / this.turtleScale;
-        var canvasElement = document.getElementById("testcanvas");
-        var canvas = canvasElement.getContext("2d");
-        canvas.beginPath();
-        canvas.moveTo(0, 0);
-        canvas.lineTo(x, y);
-        canvas.stroke();
-    }
 
     setfont(f) {
         this.font = f;
@@ -600,7 +625,7 @@ export default class Interpreter {
 
         var widthScale = 700 / (wrapper.offsetWidth - 5);
         var heightScale = 560 / (wrapper.offsetHeight - 5);
-        if(widthScale > heightScale){
+        if (widthScale > heightScale) {
             newScale = Math.floor(widthScale * 1000) / 1000;
         } else {
             newScale = Math.floor(heightScale * 1000) / 1000;
@@ -610,7 +635,7 @@ export default class Interpreter {
         canvas.style.width = (wrapper.offsetWidth - 5) + "px";
         canvas.style.height = (wrapper.offsetHeight - 5) + "px";
         document.getElementById("canvasDimensionsLabel").innerHTML = `Canvas: ${Math.floor((wrapper.offsetWidth - 5) * newScale)}w x ${Math.floor((wrapper.offsetHeight - 5) * newScale)}h`
-        
+
         this.move();
     }
 
@@ -863,9 +888,9 @@ export default class Interpreter {
     }
 
     printToConsole(x) {
-        if(Array.isArray(x)){
+        if (Array.isArray(x)) {
             var stringHolder = "";
-            for(var value of x){
+            for (var value of x) {
                 stringHolder += ` ${value}`;
             }
             x = stringHolder;
@@ -884,7 +909,7 @@ export default class Interpreter {
         }
     }
 
-    cleanConsole(){
+    cleanConsole() {
         var terminal = document.getElementById("terminalData");
         terminal.innerHTML = "";
     }
@@ -1447,11 +1472,6 @@ export default class Interpreter {
         this.hold = false;
     }
 
-    ping(fcn) {
-        var cmd = [0xff];
-        this.sendReceive(cmd, 1, fcn);
-    }
-
     calibrateList(newString, valuesToCalibrate, calibrationValues) {
         if (Array.isArray(calibrationValues) && Array.isArray(valuesToCalibrate)) {
             if (calibrationValues.length == 4) {
@@ -1459,14 +1479,14 @@ export default class Interpreter {
                 var calibrationResults = [];
                 var slope = (calibrationValues[1] - calibrationValues[3]) / (calibrationValues[0] - calibrationValues[2]);
 
-                for(var value of valuesToCalibrate){
+                for (var value of valuesToCalibrate) {
                     calibrationResults.push(Math.floor((calibrationValues[1] + (value - calibrationValues[0]) * slope) * 100) / 100)
                 }
 
                 this.setValue(newString, calibrationResults);
                 return;
             }
-            
+
             //no error handling; seems like a TODO
         }
 
@@ -1648,6 +1668,8 @@ prims['y-data'] = { nargs: 1, fcn: function (a) { this.setChartListener("y", a) 
 prims['x-label'] = { nargs: 1, fcn: function (a) { this.setValue("_xLabel", a) } }
 prims['y-label'] = { nargs: 1, fcn: function (a) { this.setValue("_yLabel", a) } }
 prims['one-plot'] = { nargs: 0, fcn: function () { this.setValue("_chartType", "single") } }
+prims['top-plot'] = { nargs: 0, fcn: function () { this.setValue("_chartType", "top") } }
+prims['bottom-plot'] = { nargs: 0, fcn: function () { this.setValue("_chartType", "bottom") } }
 prims['limits-y'] = { nargs: 2, fcn: function (a, b) { this.setValue("_range", [a, b]) } }
 prims['limits-x'] = { nargs: 2, fcn: function (a, b) { this.setValue("_domain", [a, b]) } }
 prims['limits'] = {
@@ -1720,11 +1742,11 @@ prims['pick'] = { nargs: 1, fcn: function (l) { return l[this.random.pickRandom(
 
 prims['print'] = { nargs: 1, fcn: function (x) { this.printToConsole(this.printstr(x)); } }
 
-prims['typeof'] = { nargs: 1, fcn: function (x) { return(typeof x) } }
+prims['typeof'] = { nargs: 1, fcn: function (x) { return (typeof x) } }
 
 
 prims['clean'] = { nargs: 0, fcn: function (n) { this.clean(); } }
-prims['clear'] = { nargs: 0, fcn: function () {this.cleanConsole();}}
+prims['clear'] = { nargs: 0, fcn: function () { this.cleanConsole(); } }
 prims['forward'] = { nargs: 1, fcn: function (n) { this.forward(this.getnum(n)); } }
 prims['fd'] = { nargs: 1, fcn: function (n) { this.forward(this.getnum(n)); } }
 prims['back'] = { nargs: 1, fcn: function (n) { this.forward(this.getnum(-n)); } }
@@ -1773,7 +1795,6 @@ prims['ht'] = { nargs: 0, fcn: function (n) { this.hideTurtle(); } }
 prims['showturtle'] = { nargs: 0, fcn: function (n) { this.showTurtle(); } }
 prims['st'] = { nargs: 0, fcn: function (n) { this.showTurtle(); } }
 
-//prims['snapimage'] = {nargs: 1, fcn: function(n){ this.snaps[n] = canvas.toDataURL();}}
 prims['drawsnap'] = { nargs: 1, fcn: function (n) { this.hold = true; this.loadimg(this.snaps[n], function () { this.hold = false; }); } }
 
 prims['flushtime'] = { nargs: 1, fcn: function (n) { flushtime = this.getnum(n); } }
@@ -1803,7 +1824,6 @@ prims['let'] = { nargs: 2, fcn: function (a, b) { this.setValue(a, b); } }
 //This is only for backwards compatability. Let is not different from make right now.
 
 prims['local'] = { nargs: 1, fcn: function (a, b) { this.makeLocal(a); } }
-prims['openport'] = { nargs: 0, fcn: function () { this.openSerialPort(); } }
 
 prims['ob1on'] = { nargs: 0, fcn: function () { this.ledOn(); this.mwait(1); } }
 prims['ob1off'] = { nargs: 0, fcn: function () { this.ledOff(); this.mwait(1); } }
@@ -1820,18 +1840,10 @@ prims['dp6on'] = { nargs: 0, fcn: function () { this.pinOn(6); this.mwait(1); } 
 prims['dp6off'] = { nargs: 0, fcn: function () { this.pinOff(6); this.mwait(1); } }
 prims['dp7on'] = { nargs: 0, fcn: function () { this.pinOn(7); this.mwait(1); } }
 prims['dp7off'] = { nargs: 0, fcn: function () { this.pinOff(7); this.mwait(1); } }
-prims['lineto'] = { nargs: 2, fcn: function (a, b) { this.drawLine(a, b); } }
 
-prims['read0'] = { nargs: 0, fcn: function () { this.readSensor(0); return this.cfun; } }
-prims['read1'] = { nargs: 0, fcn: function () { this.readSensor(1); return this.cfun; } }
-prims['read2'] = { nargs: 0, fcn: function () { this.readSensor(2); return this.cfun; } }
-prims['read3'] = { nargs: 0, fcn: function () { this.readSensor(3); return this.cfun; } }
-prims['read4'] = { nargs: 0, fcn: function () { this.readSensor(4); return this.cfun; } }
-prims['read5'] = { nargs: 0, fcn: function () { this.readSensor(5); return this.cfun; } }
-
-prims['connected8'] = { nargs: 0, fcn: function () { this.readPin(8); return this.cfun; } }
-prims['connected9'] = { nargs: 0, fcn: function () { this.readPin(9); return this.cfun; } }
-prims['connected10'] = { nargs: 0, fcn: function () { this.readPin(10); return this.cfun; } }
-prims['connected11'] = { nargs: 0, fcn: function () { this.readPin(11); return this.cfun; } }
-prims['connected12'] = { nargs: 0, fcn: function () { this.readPin(12); return this.cfun; } }
-prims['chartpush'] = { nargs: 2, fcn: function (a, b) { this.addToChart(a, b); } }
+prims['readADC0'] = { nargs: 0, fcn: function () { this.readSensor(0); return this.cfun; } }
+prims['readADC1'] = { nargs: 0, fcn: function () { this.readSensor(1); return this.cfun; } }
+prims['readADC2'] = { nargs: 0, fcn: function () { this.readSensor(2); return this.cfun; } }
+prims['readADC3'] = { nargs: 0, fcn: function () { this.readSensor(3); return this.cfun; } }
+prims['readADC4'] = { nargs: 0, fcn: function () { this.readSensor(4); return this.cfun; } }
+prims['readADC5'] = { nargs: 0, fcn: function () { this.readSensor(5); return this.cfun; } }

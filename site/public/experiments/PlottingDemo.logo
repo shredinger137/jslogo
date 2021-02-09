@@ -16,14 +16,14 @@ to makeSinglePlot
 end
 
 to makeBottomPlot
-  make "_chartType "bottom
+  bottom-plot
   x-data "xDataOne
   y-data "yDataOne
   show-plot
 end
 
 to makeTopPlot
-  make "_chartType "top
+  top-plot
   x-data "xDataOne
   y-data "yDataOne
   x-label "Numbers
