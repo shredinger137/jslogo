@@ -11,6 +11,7 @@ function UserMenu(props){
         paddingRight: '75px',
         paddingLeft: '15px',
         fontSize: "1.2rem",
+        cursor: "pointer"
     }
 
     const textStyle = {
@@ -34,15 +35,6 @@ function UserMenu(props){
     return (
         <div style={menuStyle}>
             <h4 onClick={signOut} style={textStyle}>Sign Out</h4>
-            <h4 style={textStyle}>User Settings</h4>
-            <br />
-            <h4 style={textStyle}>Projects</h4>
-            <hr/>
-            <ul style={ulStyle}>
-                <li>Test</li>
-                <li>Test2</li>
-            </ul>
-            <span onClick={props.toggleUserMenu}>Toggle</span>
         </div>
     )
 
