@@ -2,6 +2,7 @@ stages:
     - prep
     - build
     - deploy
+    - deployapi
 
 prep: 
   stage: prep
@@ -49,6 +50,21 @@ deploy_dev:
         - echo "Deploying dev to server"
         - cp -rv build/* /var/www/lbym-app/dev
         - echo "Deployed"
+    environment:
+        name: dev
+        url: dev.lbym.org
+    only:
+        - dev
+
+
+deploy_dev_api:
+    stage: deployapi
+    before_script:
+      - cd api
+    script:
+        - echo "Deploying API server"
+        - npm install
+        - cp -R ./* /repos/lbym-app/api/
     environment:
         name: dev
         url: dev.lbym.org
