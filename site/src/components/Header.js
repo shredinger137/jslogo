@@ -5,8 +5,9 @@ import Projects from './Projects.js';
 import firebase from 'firebase/app'
 import 'firebase/auth'
 import { useAuth, useUser } from 'reactfire';
-import ProjectManager from './ProjectManager';
+import axios from 'axios';
 import UserMenu from './UserMenu';
+import {config} from '../config';
 
 var projects;
 projects = new Projects();
@@ -56,7 +57,17 @@ function Header(props) {
 
 
     const signIn = async () => {
-        await reactAuth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+        await reactAuth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).then(result => {
+            if(result.user){
+                firebase.auth().currentUser.getIdToken(false).then(idToken => {
+                    axios.post(`${config.apiUrl}/login/${result.user.uid}`, {
+                        displayName: result.user.displayName,
+                        email: result.user.email,
+                        authorization: idToken
+                    })
+                })
+            }
+        });
     };
 
 

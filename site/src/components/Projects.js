@@ -16,6 +16,10 @@ export default class Projects {
     })
   }
 
+  save(){
+    
+  }
+
 
   async writeLastCodeToLocalStorage(code) {
 

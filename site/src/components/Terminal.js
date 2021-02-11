@@ -30,7 +30,7 @@ function Terminal(props) {
 
     function handleEnter() {
 
-        var inputValue = document.getElementById("prompt").innerHTML;
+        var inputValue = document.getElementById("prompt").innerText;
         props.interpreter.runLine(inputValue);
         var newData = [...terminalEntries];
         newData.push(inputValue);

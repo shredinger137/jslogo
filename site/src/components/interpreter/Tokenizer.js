@@ -6,7 +6,9 @@ export default class Tokenizer {
         this.offset = 0;
     }
 
-    static parse(s){return new Tokenizer(s).tokenize();}
+    static parse(s) {
+        return new Tokenizer(s).tokenize();
+    }
 
     tokenize() {
         var t = this;
