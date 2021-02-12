@@ -81,9 +81,9 @@ deploy_dev_api:
         - cp -R ./* /repos/lbym-app/api/
     environment:
         name: dev
-        url: dev.lbym.org
+        url: app.lbym.org
     only:
-        - dev
+        - master
 
 deploy_production:
     stage: deploy
