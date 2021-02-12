@@ -45,8 +45,8 @@ function DataTable(props) {
     return (
         <div style={{ overflow: "scroll", height: "100%", width: "100%" }}>
             <span onClick={exportData.bind(this)}>Export Data</span>
-            <table>
-                <thead>
+            <table style={{width: "80%"}}>
+                <thead style={{textAlign: "left"}}>
                     <tr>
                         <th>Time</th>
                         <th>ADC0</th>

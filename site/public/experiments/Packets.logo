@@ -1,0 +1,9 @@
+to go
+    loop [
+        receive-packet
+        logData :_last-packet
+        wait 5
+    ]
+end
+
+;Click on the 'data' tab to see results

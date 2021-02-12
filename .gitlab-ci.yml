@@ -62,6 +62,20 @@ deploy_dev_api:
     before_script:
       - cd api
     script:
+        - echo "Deploying dev API server"
+        - npm install
+        - cp -R ./* /repos/lbym-app/api-dev/
+    environment:
+        name: dev
+        url: dev.lbym.org
+    only:
+        - dev
+
+  deploy_production_api:
+    stage: deployapi
+    before_script:
+      - cd api
+    script:
         - echo "Deploying API server"
         - npm install
         - cp -R ./* /repos/lbym-app/api/

@@ -112,7 +112,7 @@ function Header(props) {
             <span style={{ width: "10px" }}></span>
 
             {user ?
-                <div id="userMenuWrapper" class="userMenu">
+                <div id="userMenuWrapper" className="userMenu">
                     <UserMenu toggleUserMenu = {toggleUserMenu.bind(this)} />
                 </div>
                 :

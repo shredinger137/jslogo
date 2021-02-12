@@ -21,13 +21,6 @@ function UserMenu(props){
         marginBlockEnd: "1em",
     }
 
-
-    const ulStyle = {
-        listStyle: "none",
-        textAlign: "left",
-        paddingLeft: '0px',
-    }
-
     const signOut = () => {
         firebase.auth().signOut();
     }

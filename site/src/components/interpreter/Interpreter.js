@@ -619,6 +619,7 @@ export default class Interpreter {
         //will be needed to change the relative width of the code area.
 
 
+        
         var newScale;
         var canvas = document.getElementById("canvas");
         var wrapper = document.getElementById("chartAreaWrapper");
@@ -637,6 +638,38 @@ export default class Interpreter {
         document.getElementById("canvasDimensionsLabel").innerHTML = `Canvas: ${Math.floor((wrapper.offsetWidth - 5) * newScale)}w x ${Math.floor((wrapper.offsetHeight - 5) * newScale)}h`
 
         this.move();
+
+        /*
+                var newScale;
+        var canvas = document.getElementById("canvas");
+        var wrapper = document.getElementById("chartAreaWrapper");
+
+        var terminalMinimumHeight = 100;
+        var padding = 5;
+
+        var interfaceAreaHeight = document.getElementById("mainInterfaceGrid").offsetHeight;
+        var interfaceAreaWidth = document.getElementById("mainInterfaceGrid").offsetWidth;
+
+        var newCanvasHeight = interfaceAreaHeight - terminalMinimumHeight - padding;
+        var newCanvasWidth = newCanvasHeight * 1.25 - padding;
+
+        console.log(newCanvasHeight, newCanvasWidth);
+
+        wrapper.style.width = (newCanvasWidth + 3) + "px";
+        wrapper.style.height = (newCanvasHeight + 3) + "px";
+        canvas.style.width = newCanvasWidth + "px";
+        canvas.style.height = newCanvasHeight + "px";
+        document.getElementById("codeEntryDiv").style.width = (interfaceAreaWidth - newCanvasWidth - padding) + "px";
+        
+
+        document.getElementById("terminal-wrapper").style.width = (newCanvasWidth + 3) + "px";
+        document.getElementById("terminal-wrapper").style.height = terminalMinimumHeight + "px";
+
+        newScale = Math.floor((700 / newCanvasWidth) * 1000 ) / 1000
+        console.log(newScale);
+        this.turtleScale = newScale;
+
+        */
     }
 
 
@@ -1042,6 +1075,7 @@ export default class Interpreter {
 
 
     setValue(name, value) {
+        console.log(name)
         var updateChart = false;
         var t = this;
         var chartType = [];
@@ -1082,7 +1116,7 @@ export default class Interpreter {
         }
 
         //this.updateLogoVariables(t.locals[0]);
-        //TODO: Uncomment to enable local variables in user facing app.
+        //TODO: Uncomment to enable local variables in user facing app. Maybe?
     }
 
     makeLocal(name) { this.locals[0][name] = 0; }
@@ -1584,7 +1618,7 @@ export default class Interpreter {
         while (true) {
             const { value, done } = await reader.read();
             if (value) {
-
+                
                 //This is an example of how to get a string instead of a number. It can be used, for example, to do a 'read all'. 
                 //This could be something like adc0:adc1:adc2:adc3... and it gets parsed here. But we don't know what type we've received
                 //currently, we need to check something first.
@@ -1632,6 +1666,19 @@ export default class Interpreter {
             }
         }
     }
+
+    //TOOD: When running in a loop in which the value is reset, this results in the entire historical value - doesn't update. Ex:
+    /*
+    loop [
+        make "test []
+        push "test value1
+        print :test
+    ]
+
+    will print all of the historic values of test; it doesn't respect the value change on the first line of the loop. Se doesn't seem to have this problem.
+
+
+    */
 
     pushToArray(variable, value) {
         var variableValue = this.getValueInternal(variable);
