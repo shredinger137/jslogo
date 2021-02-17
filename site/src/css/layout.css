@@ -8,7 +8,7 @@ Assuming header area: 150x with a little padding
 :root {
     --interfaceHeight: calc(96vh - 100px);
     --codeEntryWidth: 44vw;
-    --chartHeight: 75vh;
+    --chartHeight: 70vh;
   }
 
 .terminal {
