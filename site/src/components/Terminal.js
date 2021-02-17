@@ -2,6 +2,7 @@
  // eslint-disable-next-line react-hooks/exhaustive-deps
 
 import React, { useState, useEffect } from 'react';
+import '../css/styles.css'
 
 //TODO: Handle ctrl + letter shortcuts from the interpreter class; consider cleaning up stuff; change print to end up here
 //styling, obviously, needs some work. Make it Ubuntu like. Plenty of tutorials tell you how.
@@ -50,6 +51,7 @@ function Terminal(props) {
         height: "calc(100% - 30px)",
         width: "100%",
         overflowY: "scroll",
+        overflowX: "none",
         fontFamily: "'Courier New', monospace",
         marginBottom: "10px",
         zIndex: 1,
