@@ -930,7 +930,7 @@ export default class Interpreter {
         }
 
         var terminal = document.getElementById("terminalData");
-        var entry = `<span style={{ paddingLeft: ".75rem" }}>${x}</span><br />`
+        var entry = `<span style={{ paddingLeft: ".75rem" }}><i>${x}</i></span>`
         terminal.innerHTML += entry;
         terminal.innerHTML += this.lastProc;
         terminal.scrollTop = document.getElementById("terminalData").scrollHeight;

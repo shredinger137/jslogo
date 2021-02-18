@@ -35,7 +35,7 @@ function Terminal(props) {
         props.interpreter.runLine(inputValue);
         var newData = [...terminalEntries];
         newData.push(inputValue);
-        document.getElementById("terminalData").innerHTML += `<span style={{ paddingLeft: ".75rem" }}>${inputValue}</span><br />`;
+        document.getElementById("terminalData").innerHTML += `<span style={{ paddingLeft: ".75rem" }}>${inputValue}</span>`;
         setTerminalData(newData)
 
         document.getElementById("prompt").innerHTML = "";
