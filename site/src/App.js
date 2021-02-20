@@ -61,15 +61,8 @@ class App extends Component {
     console.log("Serial API Check:");
     console.log(this.checkIfSerialCapable());
 
-    var canvasHeight = document.getElementById("cnvframe").clientHeight;
-    var canvasWidth = document.getElementById("cnvframe").clientWidth;
-
-    this.setState({
-      canvasHeight: canvasHeight,
-      canvasWidth: canvasWidth,
-    });
-
-    interpreter = new Interpreter(document.getElementById("cnvframe").offsetHeight,
+    interpreter = new Interpreter(
+      document.getElementById("cnvframe").offsetHeight,
       document.getElementById("cnvframe").offsetWidth,
       this.addToChart.bind(this),
       this.pushToDataTable.bind(this),
@@ -109,9 +102,8 @@ class App extends Component {
   }
 
 
-  componentDidUpdate() {
-    //interpreter.readProcs();
-
+  setDataTable(newData){
+    this.setState({tableData: newData})
   }
 
   updateChartType(newType) {
@@ -289,6 +281,7 @@ class App extends Component {
             <div id="dataFrame" className={this.state.view == "data" ? null : "hide"} style={{ height: "100%", width: "100%" }}>
               <DataTable
                 tableData={this.state.tableData}
+                setTableData={this.setDataTable.bind(this)}
               />
             </div>
           </div>

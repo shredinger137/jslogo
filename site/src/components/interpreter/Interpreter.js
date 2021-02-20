@@ -25,7 +25,7 @@ export default class Interpreter {
 
     constructor(canvasHeight, canvasWidth, addToChart, pushToTable, updateLogoVariables, pushNewChartData, updateChartOptions, updateChartType) {
 
-        this.updateLogoVariables = updateLogoVariables;
+      //  this.updateLogoVariables = updateLogoVariables;
         this.lastProc = "";
 
         //charts are given assigned variables for data; these are effectively listened for in 'make', so that 
@@ -175,6 +175,11 @@ export default class Interpreter {
         }
 
         this.handleResize();
+
+        var date = Math.floor(Date.now() / 1000)
+
+        this.printToConsole("Welcome to Logo!")
+        this.printToConsole(`The time is ${date}`)
 
     }
 

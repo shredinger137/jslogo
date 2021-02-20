@@ -5,15 +5,68 @@ import React from 'react';
 function DataTable(props) {
 
 
+    function pickFile() {
+        if (document.getElementById("loadData") !== null) {
+            document.getElementById("loadData").click();
+        }
+
+    }
+
+
+
+    function importData() {
+
+        //Parse a file made up of lines of space delineated text, create a 2d array for mapping
+
+        //So far this doesn't create values that can be referenced or used for playback
+
+        //Also doesn't necessarily cover all packet types. I'm making some assumptions about file structure here.
+
+        //Note that we may need to support different 'types' later, but that's a discussion.
+
+        var parsedFile = [];
+        var typed = false;
+
+        const input = document.getElementById("loadData");
+        const file = input.files[0];
+        var fileReader = new FileReader();
+
+        fileReader.onload = function (fileLoadedEvent, context) {
+
+            var textFromFileLoaded = fileLoadedEvent.target.result;
+            if(textFromFileLoaded.charAt(0) == "T"){
+                console.log("T");
+                typed = true;
+            }
+
+            var textInLines = textFromFileLoaded.split("\n"); //create an array of lines
+
+            for (var line of textInLines) {
+                var lineData = line.split(" ");
+                if(typed){
+                    lineData.splice(2, 2);
+                    lineData.shift();
+                    lineData.pop();
+                }
+
+                parsedFile.push(lineData);
+
+            }
+
+            props.setTableData(parsedFile);
+
+        }
+
+        fileReader.readAsText(file, "UTF-8");
+
+    }
+
     function exportData() {
         var filename = "data.csv";
         var textToSave = "Time,ADC0,ADC1,ADC2,ADC3,ADC4,ADC5\n";
         console.log(props.tableData);
         if (props.tableData) {
-            console.log("if");
             for (var dataLine of props.tableData) {
-                console.log(dataLine);
-                console.log(dataLine.length)
                 for (var i = 0; i < dataLine.length; i++) {
                     console.log("for", i);
                     if (i == 0) {
@@ -27,14 +80,14 @@ function DataTable(props) {
             }
             var newFile = new Blob([textToSave], { type: 'plain/text' });
             var a = document.createElement("a"),
-              url = URL.createObjectURL(newFile);
+                url = URL.createObjectURL(newFile);
             a.href = url;
             a.download = filename;
             document.body.appendChild(a);
             a.click();
             setTimeout(function () {
-              document.body.removeChild(a);
-              window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
             }, 0);
         }
 
@@ -44,9 +97,11 @@ function DataTable(props) {
 
     return (
         <div style={{ overflow: "scroll", height: "100%", width: "100%" }}>
-            <span onClick={exportData.bind(this)}>Export Data</span>
-            <table style={{width: "80%"}}>
-                <thead style={{textAlign: "left"}}>
+            <span onClick={exportData.bind(this)}>Export</span>
+            <input id="loadData" type="file" accept=".csv, .pac" onChange={() => importData()} style={{ display: "none" }} />
+            <span onClick={pickFile} style={{marginLeft: "20px"}}>Import</span>
+            <table style={{ width: "80%" }}>
+                <thead style={{ textAlign: "left" }}>
                     <tr>
                         <th>Time</th>
                         <th>ADC0</th>
