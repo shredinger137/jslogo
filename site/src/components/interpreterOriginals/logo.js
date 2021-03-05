@@ -156,6 +156,8 @@ setValue(name, value){
 
 makeLocal(name){this.locals[0][name]=0;}
 
+
+
 procOutput(t, x){
 	if(t.frame.length==0) {
 		if(x!=undefined) throw "output can only be used in a procedure.";
