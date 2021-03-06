@@ -966,15 +966,20 @@ export default class Interpreter {
             t.evline = [];
         }
 
-        function evalString() {
 
+        function evalString() {
+ 
             if (token.substring(0, 1) == ':') t.pushResult(t.getValue(token.substring(1)));
             else if (token.substring(0, 1) == '"') t.pushResult(token.substring(1));
             else if ((token.substring(0, 1) == "'") && (token.slice(-1) == "'")) t.pushResult(token.substring(1, token.length - 1));
             else if (constants[token]) t.pushResult(constants[token]);
 
-            //no type declaration, no value, no current function, but followed by =
-            else if (!t.cfun && t.evline[0] === `=` && t.evline[1]) {
+            //no type declaration, no value, no current function, but followed by = - implicit declaration
+
+
+             if (!t.cfun && t.evline[0] === `=` && t.evline[1] != undefined ) {
+
+                //not sure if undefined works to catch errors here
 
                 //for an implicit variable definition, make the variable and delete the relevant values from evline
 
@@ -988,9 +993,6 @@ export default class Interpreter {
 
 
             }
-
-
-
             //no type declaration or value, but current function is declaring one, go ahead and push what you have
 
             //this isn't working quite right - most of the time it doesn't flag an error, but also doesn't update
@@ -1007,8 +1009,6 @@ export default class Interpreter {
             else if (t.getValueInternal(token)) {
                 t.pushResult(t.getValue(token));
             }
-
-
 
 
             else {
@@ -1033,6 +1033,8 @@ export default class Interpreter {
                 else token = '( ';
             }
         }
+
+
 
         function funcall() {
             if (prims[t.cfun].flow) prims[t.cfun].fcn.apply(t, t.arglist);
@@ -1295,7 +1297,7 @@ export default class Interpreter {
             t.evalLine(l, loopAgain);
         }
     }
-    
+
 
     break() {
         this.breakLoop = true;
@@ -1798,7 +1800,7 @@ prims['ifelse'] = { nargs: 3, flow: true, fcn: function (a, t, f) { this.logo_if
 prims['run'] = { nargs: 1, flow: true, fcn: function (l) { this.logo_run(l); } }
 prims['show-plot'] = { nargs: 0, fcn: function (n) { this.initPlot() } }
 
-prims['break'] = {nargs: 0, fcn: function (n) { this.break() }}
+prims['break'] = { nargs: 0, fcn: function (n) { this.break() } }
 
 prims['.'] = { nargs: 0, flow: true, fcn: function () { this.procOutput(this); } }
 prims['stop'] = { nargs: 0, flow: true, fcn: function () { this.procOutput(this); } }
