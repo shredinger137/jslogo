@@ -1290,9 +1290,15 @@ export default class Interpreter {
 
         function loopAgain(t) {
             var l = t.stack.pop();
+            if (t.breakLoop) { t.flowEnd(); t.breakLoop = false; return; }
             t.stack.push(l);
             t.evalLine(l, loopAgain);
         }
+    }
+    
+
+    break() {
+        this.breakLoop = true;
     }
 
     logo_run(l) {
@@ -1791,6 +1797,8 @@ prims['if'] = { nargs: 2, flow: true, fcn: function (a, b) { this.logo_if(this.g
 prims['ifelse'] = { nargs: 3, flow: true, fcn: function (a, t, f) { this.logo_ifelse(this.getbool(a), t, f); } }
 prims['run'] = { nargs: 1, flow: true, fcn: function (l) { this.logo_run(l); } }
 prims['show-plot'] = { nargs: 0, fcn: function (n) { this.initPlot() } }
+
+prims['break'] = {nargs: 0, fcn: function (n) { this.break() }}
 
 prims['.'] = { nargs: 0, flow: true, fcn: function () { this.procOutput(this); } }
 prims['stop'] = { nargs: 0, flow: true, fcn: function () { this.procOutput(this); } }
