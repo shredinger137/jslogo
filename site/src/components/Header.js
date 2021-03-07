@@ -7,7 +7,7 @@ import 'firebase/auth'
 import { useAuth, useUser } from 'reactfire';
 import axios from 'axios';
 import UserMenu from './UserMenu';
-import {config} from '../config';
+import { config } from '../config';
 
 var projects;
 projects = new Projects();
@@ -18,10 +18,10 @@ function Header(props) {
 
     const userLogoStyle = {
         borderRadius: "50%",
-        width: "40px",
-        height: "40px",
+        width: "35px",
+        height: "35px",
         marginTop: "8px",
-        backgroundColor: "darkblue",
+        backgroundColor: "#1A74A3",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
@@ -35,7 +35,7 @@ function Header(props) {
         left: "100px",
         lineHeight: "55px",
         verticalAling: "middle"
-        
+
     }
 
 
@@ -69,7 +69,7 @@ function Header(props) {
 
     const signIn = async () => {
         await reactAuth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).then(result => {
-            if(result.user){
+            if (result.user) {
                 firebase.auth().currentUser.getIdToken(false).then(idToken => {
                     axios.post(`${config.apiUrl}/login/${result.user.uid}`, {
                         displayName: result.user.displayName,
@@ -126,6 +126,7 @@ function Header(props) {
             </div>
             <a href="https://docs.lbym.org" target="_new">
                 <div className="buttonDiv">
+                    <img src="/images/new-window.png" alt="Open docs icon"></img>
                     <span>Docs</span>
                 </div>
             </a>
@@ -141,7 +142,7 @@ function Header(props) {
 
             {user ?
                 <div id="userMenuWrapper" className="userMenu">
-                    <UserMenu toggleUserMenu = {toggleUserMenu.bind(this)} />
+                    <UserMenu toggleUserMenu={toggleUserMenu.bind(this)} />
                 </div>
                 :
                 null
