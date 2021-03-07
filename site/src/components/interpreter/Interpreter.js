@@ -969,7 +969,16 @@ export default class Interpreter {
 
         function evalString() {
  
-            if (token.substring(0, 1) == ':') t.pushResult(t.getValue(token.substring(1)));
+            //TODO: The first thing here means that we never check if the second value is =, meaning you can't use " or : for implicit declarations
+            //The ideal would be for both to work 
+
+            //Also weird: running x = 1 ,  x = :x + 1 gives x of 2, but x = x + 1 gives x1 (strings)
+            //so it's not able to evaluate... something
+
+            if (token.substring(0, 1) == ':') {
+                console.log("first")
+                t.pushResult(t.getValue(token.substring(1)));
+            }
             else if (token.substring(0, 1) == '"') t.pushResult(token.substring(1));
             else if ((token.substring(0, 1) == "'") && (token.slice(-1) == "'")) t.pushResult(token.substring(1, token.length - 1));
             else if (constants[token]) t.pushResult(constants[token]);
@@ -977,7 +986,7 @@ export default class Interpreter {
             //no type declaration, no value, no current function, but followed by = - implicit declaration
 
 
-             if (!t.cfun && t.evline[0] === `=` && t.evline[1] != undefined ) {
+             else if (!t.cfun && t.evline[0] === `=` && t.evline[1] != undefined ) {
 
                 //not sure if undefined works to catch errors here
 

@@ -1,5 +1,10 @@
 export const experimentsList = [
     {
+        name: "Blank",
+        fileLocation: "/experiments/Blank.logo"
+    },
+
+    {
         name: "LEDs",
         fileLocation: "/experiments/LEDs.logo",
     },

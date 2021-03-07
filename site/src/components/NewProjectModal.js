@@ -43,6 +43,7 @@ export default class NewProjectModal extends Component {
                             request.onreadystatechange = function () {
                                 if (request.readyState === 4 && request.status === 200) {
                                     scopedUpdateCode(request.responseText);
+                                    document.getElementById("projectTitle").innerHTML = "Untitled";
                                 }
                             }
                         } else {
