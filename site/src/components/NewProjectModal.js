@@ -75,7 +75,7 @@ export default class NewProjectModal extends Component {
                     <div>
                         {this.state.projectsAvailable.map(project => (
                             <div key={project.name + "div"}>
-                                <span onClick={() => { this.loadCodeFromProject(project.name) }} key={project.name}>{project.name}</span><br />
+                                <span style={{cursor: "pointer"}}  onClick={() => { this.loadCodeFromProject(project.name) }} key={project.name}>{project.name}</span><br />
                             </div>
                         )
                         )

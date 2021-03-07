@@ -30,6 +30,15 @@ function Header(props) {
         cursor: "pointer"
     }
 
+    const loginStyle = {
+        position: "absolute",
+        left: "20px",      
+        top: "17px", 
+        width: "35px",
+        height: "35px",
+        cursor: "pointer"
+    }
+
     const titleStyle = {
         position: "absolute",
         left: "100px",
@@ -104,7 +113,7 @@ function Header(props) {
                     <p>{user.displayName.substr(0, 1)}</p>
                 </div>
                 :
-                <div className="buttonDiv" >
+                <div style={loginStyle} >
                     <span onClick={signIn}>Login</span>
                 </div>
 
@@ -145,6 +154,7 @@ function Header(props) {
                     <UserMenu toggleUserMenu={toggleUserMenu.bind(this)} />
                 </div>
                 :
+                
                 null
             }
 

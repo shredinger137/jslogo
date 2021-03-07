@@ -101,6 +101,10 @@
     z-index: 999;
   }
 
+  .activeButton {
+    background-color: lightgray;
+  }
+
   .userMenu {
     height: 100vh;
     background-color: #1A74A3;
@@ -125,7 +129,7 @@
   .buttonDiv {
     height: 50px;
     vertical-align: middle;
-    margin-right: 18px;
+    margin-right: 28px;
     cursor: pointer;
   }
 
