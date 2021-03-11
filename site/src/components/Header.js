@@ -7,7 +7,7 @@ import 'firebase/auth'
 import { useAuth, useUser } from 'reactfire';
 import axios from 'axios';
 import UserMenu from './UserMenu';
-import {config} from '../config';
+import { config } from '../config';
 
 var projects;
 projects = new Projects();
@@ -18,13 +18,33 @@ function Header(props) {
 
     const userLogoStyle = {
         borderRadius: "50%",
-        width: "40px",
-        height: "40px",
+        width: "35px",
+        height: "35px",
         marginTop: "8px",
-        backgroundColor: "darkblue",
+        backgroundColor: "#1A74A3",
         display: "flex",
         justifyContent: "center",
-        alignItems: "center"
+        alignItems: "center",
+        position: "absolute",
+        left: "20px",
+        cursor: "pointer"
+    }
+
+    const loginStyle = {
+        position: "absolute",
+        left: "20px",      
+        top: "17px", 
+        width: "35px",
+        height: "35px",
+        cursor: "pointer"
+    }
+
+    const titleStyle = {
+        position: "absolute",
+        left: "100px",
+        lineHeight: "55px",
+        verticalAling: "middle"
+
     }
 
 
@@ -58,7 +78,7 @@ function Header(props) {
 
     const signIn = async () => {
         await reactAuth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).then(result => {
-            if(result.user){
+            if (result.user) {
                 firebase.auth().currentUser.getIdToken(false).then(idToken => {
                     axios.post(`${config.apiUrl}/login/${result.user.uid}`, {
                         displayName: result.user.displayName,
@@ -71,56 +91,72 @@ function Header(props) {
     };
 
 
+    const saveToCloud = () => {
+        firebase.auth().currentUser.getIdToken(false).then(idToken => {
+            //this doesn't do anything - we need an ID flag for each project, and we have to... generate an ID? Otherwise how do we understand that the name changed?
+
+            //I guess load project can handle updating the flags, so if an ID doesn't exist we assume there isn't one and we're creating a new project.
+
+            //Okay. So make an endpoint to create a new project and have it get hit by this. Then update App to feature a project ID.... and use the URL to store it? Not sure yet.
+
+            //Then we'll have the function check. It's either creating a new one or updating an existing one. Maybe.
+
+        })
+    }
+
+
     return (
         <header className="header">
             <span style={{ width: "20px" }}></span>
             {user ?
-                <div onClick={toggleUserMenu} className="buttonDiv" style={userLogoStyle}>
+                <div onClick={toggleUserMenu} className="" style={userLogoStyle}>
                     <p>{user.displayName.substr(0, 1)}</p>
                 </div>
                 :
-                <div className="buttonDiv">
+                <div style={loginStyle} >
                     <span onClick={signIn}>Login</span>
                 </div>
 
             }
+            <div style={titleStyle}>
+                <span id="projectTitle">Untitled</span>
+            </div>
             <div className="buttonDiv" onClick={() => toggleNewProject()}>
                 <img src="/images/newProject.png" alt="New project icon"></img>
-                <span>New Project</span>
+                <span>New</span>
             </div>
             <div className="buttonDiv" onClick={() => saveAs()}>
                 <img src="/images/download.png" alt="Download icon"></img>
-                <span>Save File</span>
+                <span>Download</span>
             </div>
             <div className="buttonDiv" onClick={() => loadFile()}>
                 <img src="/images/upload.png" alt="Upload icon"></img>
-                <span>Load File</span>
+                <span>Open</span>
             </div>
             <a href="https://docs.lbym.org" target="_new">
                 <div className="buttonDiv">
+                    <img src="/images/new-window.png" alt="Open docs icon"></img>
                     <span>Docs</span>
                 </div>
             </a>
-            <div id="connectButton" className="buttonDiv" style={{ minWidth: "100px", position: "fixed", right: "50px" }}>
+            <div id="connectButton" className="buttonDiv" >
                 <img src="/images/connect-icon.png" alt="Connect icon"></img>
                 <span>Connect</span>
             </div>
-            <div id="disconnectButton" className="buttonDiv" style={{ display: "none", position: "fixed", right: "50px" }}>
+            <div id="disconnectButton" className="buttonDiv" style={{ display: "none" }}>
                 <img src="/images/connect-icon.png" alt="Connect icon"></img>
                 <span>Disconnect</span>
             </div>
-            <span style={{ width: "10px" }}></span>
+            <span style={{ width: "20px" }}></span>
 
             {user ?
                 <div id="userMenuWrapper" className="userMenu">
-                    <UserMenu toggleUserMenu = {toggleUserMenu.bind(this)} />
+                    <UserMenu toggleUserMenu={toggleUserMenu.bind(this)} />
                 </div>
                 :
+                
                 null
             }
-
-
-            <div id="updateText" style={{ marginLeft: "200px", fontSize: ".8rem", marginTop: "20px", visibility: "hidden" }}><span>An update is available. Close and re-open the site to apply it.</span></div>
 
         </header>
     );

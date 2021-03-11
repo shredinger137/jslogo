@@ -63,7 +63,6 @@ export default class Tokenizer {
         }
 
         function skipSpace() {
-            //TODO: It would be cool if we could read multiple characters, and skip comments with // to make Logo++. Or LogoScript. Or something.
             while (true) {
                 if (eof()) return;
                 var c = peekChar();

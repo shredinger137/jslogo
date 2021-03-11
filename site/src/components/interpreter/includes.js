@@ -14,4 +14,18 @@ export const includes =
     end
 
 
+    to readLightSensor
+        readADC2
+    end
+
+    to readTempSensor0
+        readADC0
+    end
+
+    to readTempSensor1
+        readADC1
+    end
+
+
+
 `;

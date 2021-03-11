@@ -25,7 +25,7 @@ export default class Interpreter {
 
     constructor(canvasHeight, canvasWidth, addToChart, pushToTable, updateLogoVariables, pushNewChartData, updateChartOptions, updateChartType) {
 
-      //  this.updateLogoVariables = updateLogoVariables;
+        //  this.updateLogoVariables = updateLogoVariables;
         this.lastProc = "";
 
         //charts are given assigned variables for data; these are effectively listened for in 'make', so that 
@@ -624,7 +624,7 @@ export default class Interpreter {
         //will be needed to change the relative width of the code area.
 
 
-        
+
         var newScale;
         var canvas = document.getElementById("canvas");
         var wrapper = document.getElementById("chartAreaWrapper");
@@ -833,7 +833,6 @@ export default class Interpreter {
 
     }
 
-    //The only difference I saw so far was that Tokenize was called from the class before, and that's been replaced. Still not evaluating arguments passed to words.
 
     procString(str, type) {
         gatherSource();
@@ -845,9 +844,6 @@ export default class Interpreter {
             for (var i in prims) if ((prims[i].type) == 'normal') delete prims[i];
             var lines = str.split('\n');
             for (var j = 0; j < lines.length; j++) procLines(lines[j]);
-
-
-            //TODO: This isn't passing values as arguments when words are defined. Meaning 'to something :n' doesn't see :n as having a value when you call 'something 5'.
 
             function procLines(l) {
                 var sl = Tokenizer.parse(l);
@@ -914,10 +910,6 @@ export default class Interpreter {
         this.stack = [];
         this.frame = [];
 
-
-        //This locals line had previously been commented out, as it broke make, but it seems to be working now. Delete this comment if it doesn't come up again.
-        //Commented August 2020
-        //NOTE: This locals line is still very suspicious. I still don't know why it exists or what, exactly, it's for.
         this.locals = [this.last(this.locals)];
 
         this.hold = false;
@@ -974,14 +966,71 @@ export default class Interpreter {
             t.evline = [];
         }
 
+
         function evalString() {
-            if (token.substring(0, 1) == ':') t.pushResult(t.getValue(token.substring(1)));
+ 
+            //TODO: The first thing here means that we never check if the second value is =, meaning you can't use " or : for implicit declarations
+            //The ideal would be for both to work 
+
+            //Also weird: running x = 1 ,  x = :x + 1 gives x of 2, but x = x + 1 gives x1 (strings)
+            //so it's not able to evaluate... something
+
+            if (token.substring(0, 1) == ':') {
+                t.pushResult(t.getValue(token.substring(1)));
+            }
             else if (token.substring(0, 1) == '"') t.pushResult(token.substring(1));
             else if ((token.substring(0, 1) == "'") && (token.slice(-1) == "'")) t.pushResult(token.substring(1, token.length - 1));
             else if (constants[token]) t.pushResult(constants[token]);
+
+            //no type declaration, no value, no current function, but followed by = - implicit declaration
+
+
+             else if (!t.cfun && t.evline[0] === `=` && t.evline[1] != undefined ) {
+
+                //not sure if undefined works to catch errors here
+
+                //for an implicit variable definition, make the variable and delete the relevant values from evline
+
+                t.stack.push(t.cfun);
+                t.stack.push(t.arglist);
+                t.stack.push(t.priority);
+
+                t.cfun = "make";
+                t.arglist = [token];
+                t.evline.shift()
+
+
+            }
+            //no type declaration or value, but current function is declaring one, go ahead and push what you have
+
+            //this isn't working quite right - most of the time it doesn't flag an error, but also doesn't update
+
+            //the goal is to assume anything following certain words is of a certain type
+
+            //this broke se; for some reason it ran this case instead of evaluating
+
+         /*   else if (t.cfun == "make" || t.cfun == "var" || t.cfun == "let") {
+                console.log("second")
+                t.pushResult(token)
+            }
+
+*/
+
+            //if no declaration, but value exists as a variable, get that value
+            else if (t.getValueInternal(token)) {
+                t.pushResult(t.getValue(token));
+            }
+
+
             else {
+
+
                 if (token == '(') handleParend();
-                if (prims[token] == undefined) throw "error: I don't know how to " + token;
+
+                if (prims[token] == undefined) {
+                    throw "error: I don't know how to " + token;
+                }
+
                 t.stack.push(t.cfun);
                 t.stack.push(t.arglist);
                 t.stack.push(t.priority);
@@ -995,6 +1044,8 @@ export default class Interpreter {
                 else token = '( ';
             }
         }
+
+
 
         function funcall() {
             if (prims[t.cfun].flow) prims[t.cfun].fcn.apply(t, t.arglist);
@@ -1080,7 +1131,6 @@ export default class Interpreter {
 
 
     setValue(name, value) {
-        console.log(name)
         var updateChart = false;
         var t = this;
         var chartType = [];
@@ -1120,8 +1170,18 @@ export default class Interpreter {
             }
         }
 
-        //this.updateLogoVariables(t.locals[0]);
-        //TODO: Uncomment to enable local variables in user facing app. Maybe?
+    }
+
+
+    setLocalValue(name, value) {
+        var t = this;
+        if (t.locals[0][name] != undefined) {
+            t.locals[0][name] = value;
+            return;
+        }
+
+        t.locals[0][name] = value;
+        return;
     }
 
     makeLocal(name) { this.locals[0][name] = 0; }
@@ -1243,9 +1303,15 @@ export default class Interpreter {
 
         function loopAgain(t) {
             var l = t.stack.pop();
+            if (t.breakLoop) { t.flowEnd(); t.breakLoop = false; return; }
             t.stack.push(l);
             t.evalLine(l, loopAgain);
         }
+    }
+
+
+    break() {
+        this.breakLoop = true;
     }
 
     logo_run(l) {
@@ -1620,10 +1686,12 @@ export default class Interpreter {
 
 
     async startReading() {
+
+
         while (true) {
             const { value, done } = await reader.read();
             if (value) {
-                
+
                 //This is an example of how to get a string instead of a number. It can be used, for example, to do a 'read all'. 
                 //This could be something like adc0:adc1:adc2:adc3... and it gets parsed here. But we don't know what type we've received
                 //currently, we need to check something first.
@@ -1742,6 +1810,8 @@ prims['ifelse'] = { nargs: 3, flow: true, fcn: function (a, t, f) { this.logo_if
 prims['run'] = { nargs: 1, flow: true, fcn: function (l) { this.logo_run(l); } }
 prims['show-plot'] = { nargs: 0, fcn: function (n) { this.initPlot() } }
 
+prims['break'] = { nargs: 0, fcn: function (n) { this.break() } }
+
 prims['.'] = { nargs: 0, flow: true, fcn: function () { this.procOutput(this); } }
 prims['stop'] = { nargs: 0, flow: true, fcn: function () { this.procOutput(this); } }
 prims['output'] = { nargs: 1, flow: true, fcn: function (x) { return this.procOutput(this, x); } }
@@ -1769,7 +1839,7 @@ prims['oneof'] = { nargs: 2, fcn: function (a, b) { return this.oneof(a, b); } }
 prims['sum'] = { nargs: 2, fcn: function (a, b) { return a + b; } }
 prims['product'] = { nargs: 2, fcn: function (a, b) { return a * b; } }
 
-prims['se'] = { nargs: 2, fcn: function (a, b) { return [].concat(a, b); } }
+prims['se'] = { nargs: 2, fcn: function (a, b) {return [].concat(a, b); } }
 prims['word'] = { nargs: 2, fcn: function (a, b) { return this.word(a, b); } }
 prims['first'] = { nargs: 1, fcn: function (a) { return this.first(a); } }
 prims['butfirst'] = { nargs: 1, fcn: function (a) { return this.butfirst(a); } }
@@ -1783,6 +1853,7 @@ prims['fput'] = {
         return res;
     }
 }
+
 prims['lput'] = { nargs: 2, fcn: function (a, b) { var res = [].concat(this.getlist(b)); res.push(a); return res; } }
 prims['count'] = { nargs: 1, fcn: function (a) { return this.count(a); } }
 prims['item'] = { nargs: 2, fcn: function (n, l) { return this.item(n, l); } }
@@ -1872,8 +1943,7 @@ prims['false'] = { nargs: 0, fcn: function () { return false; } }
 
 prims['push'] = { nargs: 2, fcn: function (a, b) { this.pushToArray(a, b); } }
 prims['make'] = { nargs: 2, fcn: function (a, b) { this.setValue(a, b); } }
-prims['let'] = { nargs: 2, fcn: function (a, b) { this.setValue(a, b); } }
-//This is only for backwards compatability. Let is not different from make right now.
+prims['let'] = { nargs: 2, fcn: function (a, b) { this.setLocalValue(a, b); } }
 
 prims['local'] = { nargs: 1, fcn: function (a, b) { this.makeLocal(a); } }
 

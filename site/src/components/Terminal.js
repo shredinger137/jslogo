@@ -20,8 +20,6 @@ function Terminal(props) {
         //  document.getElementById("terminalData").innerHTML = `<span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br />`
     })
 
-    //TODO: This is where we want to handle the change in selection. Also, 0 is not meaningful right now, so we need to offset the result by one.
-
     useEffect(() => {
         getSelectedLine()
     },
@@ -62,7 +60,8 @@ function Terminal(props) {
         var entries = [...terminalEntries];
         entries.reverse();
 
-        if (terminalSelection - 1 > -1 && terminalSelection - 1 <= entries.length) {
+        //there is an occasional off by one error happening; it's probably here
+        if (terminalSelection > 0 && terminalSelection <= entries.length) {
             var selectedEntry = entries[terminalSelection - 1];
             if (selectedEntry) {
                 document.getElementById("prompt").innerHTML = selectedEntry;

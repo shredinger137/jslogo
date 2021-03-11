@@ -43,6 +43,7 @@ export default class NewProjectModal extends Component {
                             request.onreadystatechange = function () {
                                 if (request.readyState === 4 && request.status === 200) {
                                     scopedUpdateCode(request.responseText);
+                                    document.getElementById("projectTitle").innerHTML = "Untitled";
                                 }
                             }
                         } else {
@@ -74,7 +75,7 @@ export default class NewProjectModal extends Component {
                     <div>
                         {this.state.projectsAvailable.map(project => (
                             <div key={project.name + "div"}>
-                                <span onClick={() => { this.loadCodeFromProject(project.name) }} key={project.name}>{project.name}</span><br />
+                                <span style={{cursor: "pointer"}}  onClick={() => { this.loadCodeFromProject(project.name) }} key={project.name}>{project.name}</span><br />
                             </div>
                         )
                         )

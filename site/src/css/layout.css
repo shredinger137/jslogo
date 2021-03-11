@@ -1,12 +1,12 @@
 /*
-Header height: 56px
+Header height: 50px
 Buttons: around 77px
 
 Assuming header area: 150x with a little padding
 */
 
 :root {
-    --interfaceHeight: calc(96vh - 100px);
+    --interfaceHeight: calc(96vh - 90px);
     --codeEntryWidth: 44vw;
     --chartHeight: 65vh;
   }

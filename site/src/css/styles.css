@@ -22,7 +22,7 @@
   body {
     align-content: stretch;
     align-items: stretch;
-    background: #ececec;
+    background: #efefef;
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
@@ -34,9 +34,10 @@
   }
 
   .header {
+
     align-content: center;
     align-items: stretch;
-    background: #3f51b5;
+    background: #1b3752  ;
     box-shadow:
       0 4px 5px 0 rgba(0, 0, 0, 0.14),
       0 2px 9px 1px rgba(0, 0, 0, 0.12),
@@ -45,14 +46,15 @@
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
-    font-size: 20px;
-    height: 55px;
-    justify-content: flex-start;
+    font-size: 18.0px;
+    height: 50px;
+    justify-content: flex-end;
     position: fixed;
     transition: transform 0.233s cubic-bezier(0, 0, 0.21, 1) 0.1s;
     width: 100%;
     will-change: transform;
     z-index: 1000;
+
   }
 
   header a {
@@ -91,7 +93,7 @@
     padding-right: 20px;
     padding-left: 5px;
     position: absolute;
-    top: 56px;
+    top: 45px;
     left: 0;
     background-color: black;
     transition: all 0.2s ease-in-out;
@@ -99,12 +101,16 @@
     z-index: 999;
   }
 
+  .activeButton {
+    background-color: lightgray;
+  }
+
   .userMenu {
     height: 100vh;
-    background-color: darkblue;
+    background-color: #1A74A3;
     position: absolute;
     left: 0;
-    top: 55px;
+    top: 50px;
     transform: translateX(-500px);
   }
 
@@ -123,8 +129,12 @@
   .buttonDiv {
     height: 50px;
     vertical-align: middle;
-    margin-right: 10px;
+    margin-right: 28px;
     cursor: pointer;
+  }
+
+  .buttonDiv:hover {
+    border-bottom: 2px solid white;
   }
   
   .buttonDiv img {
