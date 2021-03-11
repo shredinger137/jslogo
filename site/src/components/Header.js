@@ -119,7 +119,7 @@ function Header(props) {
 
             }
             <div style={titleStyle}>
-                <span id="projectTitle" contentEditable>Untitled</span>
+                <span id="projectTitle">Untitled</span>
             </div>
             <div className="buttonDiv" onClick={() => toggleNewProject()}>
                 <img src="/images/newProject.png" alt="New project icon"></img>

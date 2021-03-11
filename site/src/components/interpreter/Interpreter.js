@@ -976,7 +976,6 @@ export default class Interpreter {
             //so it's not able to evaluate... something
 
             if (token.substring(0, 1) == ':') {
-                console.log("first")
                 t.pushResult(t.getValue(token.substring(1)));
             }
             else if (token.substring(0, 1) == '"') t.pushResult(token.substring(1));
@@ -1008,11 +1007,14 @@ export default class Interpreter {
 
             //the goal is to assume anything following certain words is of a certain type
 
+            //this broke se; for some reason it ran this case instead of evaluating
 
-
-            else if (t.cfun == "make" || t.cfun == "var" || t.cfun == "let") {
+         /*   else if (t.cfun == "make" || t.cfun == "var" || t.cfun == "let") {
+                console.log("second")
                 t.pushResult(token)
             }
+
+*/
 
             //if no declaration, but value exists as a variable, get that value
             else if (t.getValueInternal(token)) {
@@ -1752,7 +1754,6 @@ export default class Interpreter {
     */
 
     pushToArray(variable, value) {
-        console.log(variable)
         var variableValue = this.getValueInternal(variable);
 
         if (variableValue && Array.isArray(variableValue)) {
@@ -1838,7 +1839,7 @@ prims['oneof'] = { nargs: 2, fcn: function (a, b) { return this.oneof(a, b); } }
 prims['sum'] = { nargs: 2, fcn: function (a, b) { return a + b; } }
 prims['product'] = { nargs: 2, fcn: function (a, b) { return a * b; } }
 
-prims['se'] = { nargs: 2, fcn: function (a, b) { return [].concat(a, b); } }
+prims['se'] = { nargs: 2, fcn: function (a, b) {return [].concat(a, b); } }
 prims['word'] = { nargs: 2, fcn: function (a, b) { return this.word(a, b); } }
 prims['first'] = { nargs: 1, fcn: function (a) { return this.first(a); } }
 prims['butfirst'] = { nargs: 1, fcn: function (a) { return this.butfirst(a); } }
