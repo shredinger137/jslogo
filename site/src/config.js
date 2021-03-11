@@ -1,5 +1,5 @@
 export const config = {
-    apiUrl: 'http://localhost:3224',
+    apiUrl: 'http://api.lbym.org',
     firebase: {
         apiKey: "AIzaSyBELlFvBiDtHID6Lo7pBKzDQ6tWL4kHAfs",
         authDomain: "lbym-8be59.firebaseapp.com",
