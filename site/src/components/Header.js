@@ -1,4 +1,6 @@
-import React, { useEffect } from 'react';
+//Bit of a misnomer. Header also handles cloud saves. The user menu is connected to cloud loads. Oops.
+
+import React, { useEffect, useState } from 'react';
 import '../css/styles.css';
 import '../css/layout.css';
 import Projects from './Projects.js';
@@ -16,6 +18,7 @@ projects = new Projects();
 
 function Header(props) {
 
+
     const userLogoStyle = {
         borderRadius: "50%",
         width: "35px",
@@ -32,8 +35,8 @@ function Header(props) {
 
     const loginStyle = {
         position: "absolute",
-        left: "20px",      
-        top: "17px", 
+        left: "20px",
+        top: "17px",
         width: "35px",
         height: "35px",
         cursor: "pointer"
@@ -47,15 +50,29 @@ function Header(props) {
 
     }
 
+    const titleInputStyle = {
+        border: "none",
+        backgroundColor: "transparent",
+        color: "white",
+        fontSize: "1.2em"
 
-    useEffect(() => {
-        if (window.isUpdateAvailable) {
-            document.getElementById("updateText").style.visibility = "visible";
-        }
-    });
+    }
 
+    
     const { data: user } = useUser();
     const reactAuth = useAuth();
+
+
+    //run getUserProjects if user changes; meaning, we want to wait until the login loads
+    useEffect(() => {
+        getUserProjects();
+    },
+        [user]
+    );
+
+    const [projectList, setProjectList] = useState([]);
+    const [projectId, setProjectId] = useState(null);
+
 
     function loadFile() {
         document.getElementById("load").click();
@@ -91,18 +108,125 @@ function Header(props) {
     };
 
 
+
     const saveToCloud = () => {
-        firebase.auth().currentUser.getIdToken(false).then(idToken => {
-            //this doesn't do anything - we need an ID flag for each project, and we have to... generate an ID? Otherwise how do we understand that the name changed?
 
-            //I guess load project can handle updating the flags, so if an ID doesn't exist we assume there isn't one and we're creating a new project.
+        if (user) {
 
-            //Okay. So make an endpoint to create a new project and have it get hit by this. Then update App to feature a project ID.... and use the URL to store it? Not sure yet.
+            var codeToSave = document.getElementById("procs").value;
+            var projectTitle = document.getElementById("projectTitle").value;
 
-            //Then we'll have the function check. It's either creating a new one or updating an existing one. Maybe.
 
-        })
+            firebase.auth().currentUser.getIdToken(false).then(idToken => {
+
+                if (!projectId) {
+                    //first time saving - we expect a response containing an ID
+
+
+                    axios.post(`${config.apiUrl}/project`, {
+                        userId: user.uid,
+                        title: projectTitle,
+                        code: codeToSave,
+                        authorization: idToken
+                    }).then((response) => {
+
+                        //We're being very confident and assuming that the response is a valid ID
+                        //in the future you'll want to add error handling here, or at least validation
+
+                        setProjectId(response.data)
+                    })
+
+
+                } else {
+                    //not the first time - update an existing
+
+                    axios.patch(`${config.apiUrl}/project/${projectId}`, {
+                        userId: user.uid,
+                        title: projectTitle,
+                        code: codeToSave,
+                        projectId: projectId,
+                        authorization: idToken
+                    }).then((response) => {
+
+                        //should validate or something ?
+
+                    })
+
+
+                }
+            })
+
+            getUserProjects();
+        }
     }
+
+    const deleteProject = (pid) => {
+
+        if (user && user.uid) {
+            firebase.auth().currentUser.getIdToken(false).then(idToken => {
+
+                axios.delete(`${config.apiUrl}/project/${pid}`, {
+                    headers: {
+                        authorization: idToken
+                    }
+                })
+                    .then(response => {
+                        getUserProjects();
+                    })
+            })
+        }
+    }
+
+    const handleNameChange = () => {
+        console.log("change")
+    }
+
+    const getSingleProject = (pid) => {
+
+        toggleUserMenu();
+        if (user && user.uid) {
+            firebase.auth().currentUser.getIdToken(false).then(idToken => {
+                axios.get(`${config.apiUrl}/projects/${pid}`, {
+                    headers: {
+                        authorization: idToken
+                    }
+                }).then(response => {
+                    if (response && response.data && response.data.code && response.data.title) {
+                        props.updateCode(response.data.code);
+                        document.getElementById('projectTitle').value = response.data.title;
+                        setProjectId(response.data.projectId);
+                    } else {
+                        console.log("error")
+                    }
+                })
+
+            })
+
+        }
+    }
+
+
+    const getUserProjects = () => {
+
+        if (user) {
+            firebase.auth().currentUser.getIdToken(false).then(idToken => {
+
+                axios.get(`${config.apiUrl}/user-projects/${user.uid}`, {
+                    headers: {
+                        authorization: idToken
+                    }
+                })
+                    .then(response => {
+                        //we believe that response.data is an array of projects; this should do something different if there's an error
+                        setProjectList(response.data)
+                    })
+            })
+        }
+    }
+
+
+
+
 
 
     return (
@@ -119,7 +243,7 @@ function Header(props) {
 
             }
             <div style={titleStyle}>
-                <span id="projectTitle">Untitled</span>
+                <input type="text" id="projectTitle" defaultValue="Untitled" style={titleInputStyle} maxLength="22" onChange={handleNameChange}></input>
             </div>
             <div className="buttonDiv" onClick={() => toggleNewProject()}>
                 <img src="/images/newProject.png" alt="New project icon"></img>
@@ -133,6 +257,15 @@ function Header(props) {
                 <img src="/images/upload.png" alt="Upload icon"></img>
                 <span>Open</span>
             </div>
+            {user ?
+                <div className="buttonDiv" onClick={() => saveToCloud()}>
+                    <img src="/images/cloud-save.png" alt="Save"></img>
+                    <span>Save</span>
+                </div>
+                :
+                null
+            }
+
             <a href="https://docs.lbym.org" target="_new">
                 <div className="buttonDiv">
                     <img src="/images/new-window.png" alt="Open docs icon"></img>
@@ -151,10 +284,16 @@ function Header(props) {
 
             {user ?
                 <div id="userMenuWrapper" className="userMenu">
-                    <UserMenu toggleUserMenu={toggleUserMenu.bind(this)} />
+                    <UserMenu
+                        toggleUserMenu={toggleUserMenu.bind(this)}
+                        getSingleProject={getSingleProject.bind(this)}
+                        deleteProject={deleteProject.bind(this)}
+                        projectList={projectList}
+
+                    />
                 </div>
                 :
-                
+
                 null
             }
 

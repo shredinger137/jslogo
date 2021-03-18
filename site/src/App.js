@@ -98,7 +98,7 @@ class App extends Component {
 
     setInterval(() => {
       projects.writeLastCodeToLocalStorage(this.state.code);
-    }, 10000);
+    }, 60000);
   }
 
 
@@ -225,6 +225,7 @@ class App extends Component {
           toggleNewProjectModal={this.toggleShowNewProjectModal.bind(this)}
           interpreter={this.interpreter}
           chartToggle={this.chartToggle}
+          updateCode={this.updateCode.bind(this)}
         />
         <div style={{ height: "20px" }}></div>
         <div className="main">
