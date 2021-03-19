@@ -49,8 +49,10 @@ export const languageDef = {
     ],
     strings: [
       [/[=|][ @number]*$/, "string.escape"],
+      [/\'[a-zA-Z_\-\s]*\'/, "string.escape"],
       [/\"[a-zA-Z_-]*/, "string.escape"],
       [/\'[a-zA-Z_-]*/, "string.escape"],
+
     ],
     tags: [
       [/^%[a-zA-Z]\w*/, "tag"],

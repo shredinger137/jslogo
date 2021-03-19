@@ -27,7 +27,10 @@ class App extends Component {
     tableData: [[]],
     view: "main",
     showNewProjectModal: false,
-    code: "",
+    code: 
+`to go
+    print 'Hello World'
+end`,
     canvasHeight: 400,
     canvasWidth: 900,
     chartType: "single",
@@ -92,7 +95,15 @@ class App extends Component {
 
     projects.getRecoverEntry().then(recoveryProject => {
       if (recoveryProject && recoveryProject[0] && recoveryProject[0]['code']) {
-        this.updateCode(recoveryProject[0]['code'])
+        //this.updateCode(recoveryProject[0]['code'])
+
+        //this is being temporarily disabled due to cloud saves - it's unclear when people
+        //load and see recovered data that it isn't a saved file, and clicking save is 
+        //going to make a new one
+
+        //maybe a TODO could be adding a reference in case there is a current file open, and just opening that?
+        //or, otherwise, add text to make it obvious that there's a difference between this and saved files
+
       }
     });
 
