@@ -172,6 +172,7 @@ app.delete("/project/:pid", function (req, res) {
 
 app.get("/user-projects/:uid", function (req, res) {
 
+
     if (req.headers.authorization) {
         admin
             .auth()
@@ -199,6 +200,20 @@ app.get("/user-projects/:uid", function (req, res) {
 
 
 app.get("/projects/:pid", function (req, res) {
+
+
+    if (req.params.pid) {
+        projectFunctions.getProject(req.params.pid).then(response => {
+            res.send(response)
+        })
+    }
+
+
+    /*
+    
+    **Disabling auth on get requests - this enables link sharing without credential checking, but also makes all projects viewable by default
+    Probably good to have this be temporary; we don't want users having write access from links, so we'll need to display that properly**
+
     if (req.headers.authorization) {
         admin
             .auth()
@@ -220,6 +235,8 @@ app.get("/projects/:pid", function (req, res) {
             });
 
     }
+
+*/
 
 })
 

@@ -60,7 +60,11 @@ end`,
 
   componentDidMount() {
 
-    console.log(process.env)
+    //check for project URL
+
+    const path = window.location;
+
+    console.log(window.location.pathname.substr(1))
 
     console.log("Serial API Check:");
     console.log(this.checkIfSerialCapable());

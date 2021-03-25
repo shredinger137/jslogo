@@ -58,9 +58,38 @@ function Header(props) {
 
     }
 
-    
+
     const { data: user } = useUser();
     const reactAuth = useAuth();
+
+
+    //On mount, check to see if a project is defined in the URL.
+    //All links have the format /pr${projectId}, so we check if 'pr' is the start of it and take the rest.
+    //This way you can still use URLs like /settings or whatever in the future, you just can't start them with pr.
+
+    //Currently missing: shared links will open as though they belong to you; if they don't, you have an issue. Author should
+    //be displayed now on the frontend, and if it isn't you saving won't work. In the future we can look into collaborative files or something.
+
+    useEffect(() => {
+        if(window.location.pathname.substr(1) && window.location.pathname.substr(1,2) == "pr"){
+            var pid = window.location.pathname.substr(3);
+
+            axios.get(`${config.apiUrl}/projects/${pid}`, {
+            }).then(response => {
+                if (response && response.data && response.data.code && response.data.title) {
+                    props.updateCode(response.data.code);
+                    document.getElementById('projectTitle').value = response.data.title;
+                    setProjectId(response.data.projectId);
+                } else {
+                    console.log("error")
+                }
+            })
+        }
+    },
+        [user]
+    )
+
+
 
 
     //run getUserProjects if user changes; meaning, we want to wait until the login loads
@@ -178,7 +207,7 @@ function Header(props) {
     }
 
     const handleNameChange = () => {
-        console.log("change")
+
     }
 
     const getSingleProject = (pid) => {

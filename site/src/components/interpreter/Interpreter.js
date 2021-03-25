@@ -579,8 +579,10 @@ export default class Interpreter {
 
     move() {
 
-        var canvas = document.getElementById("canvas");
         var t = this;
+        var canvas = document.getElementById("canvas");
+        if(canvas == null) return; 
+
         if (!t.img.complete) return;
         var img = t.element.firstChild;
 
