@@ -1,5 +1,5 @@
 export const config = {
-    apiUrl: 'http://localhost:3224',
+    apiUrl: process.env.REACT_APP_API_URL,
     firebase: {
         apiKey: "AIzaSyBELlFvBiDtHID6Lo7pBKzDQ6tWL4kHAfs",
         authDomain: "lbym-8be59.firebaseapp.com",

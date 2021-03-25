@@ -60,6 +60,7 @@ end`,
 
   componentDidMount() {
 
+    console.log(process.env)
 
     console.log("Serial API Check:");
     console.log(this.checkIfSerialCapable());
