@@ -71,7 +71,7 @@ function Header(props) {
     //be displayed now on the frontend, and if it isn't you saving won't work. In the future we can look into collaborative files or something.
 
     useEffect(() => {
-        if(window.location.pathname.substr(1) && window.location.pathname.substr(1,2) == "pr"){
+        if (window.location.pathname.substr(1) && window.location.pathname.substr(1, 2) == "pr") {
             var pid = window.location.pathname.substr(3);
 
             axios.get(`${config.apiUrl}/projects/${pid}`, {
@@ -101,6 +101,7 @@ function Header(props) {
 
     const [projectList, setProjectList] = useState([]);
     const [projectId, setProjectId] = useState(null);
+    const [refreshUserMenu, setRefreshUserMenu] = useState(false);
 
 
     function loadFile() {
@@ -186,6 +187,7 @@ function Header(props) {
             })
 
             getUserProjects();
+            setRefreshUserMenu(!refreshUserMenu);
         }
     }
 
@@ -201,6 +203,7 @@ function Header(props) {
                 })
                     .then(response => {
                         getUserProjects();
+                        setProjectId(null)
                     })
             })
         }
@@ -314,6 +317,7 @@ function Header(props) {
             {user ?
                 <div id="userMenuWrapper" className="userMenu">
                     <UserMenu
+                        refreshUserMenu={refreshUserMenu}
                         toggleUserMenu={toggleUserMenu.bind(this)}
                         getSingleProject={getSingleProject.bind(this)}
                         deleteProject={deleteProject.bind(this)}
