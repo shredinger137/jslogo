@@ -62,6 +62,9 @@ function Header(props) {
     const { data: user } = useUser();
     const reactAuth = useAuth();
 
+    const [projectList, setProjectList] = useState([]);
+    const [projectId, setProjectId] = useState(null);
+    const [refreshUserMenu, setRefreshUserMenu] = useState(false);
 
     //On mount, check to see if a project is defined in the URL.
     //All links have the format /pr${projectId}, so we check if 'pr' is the start of it and take the rest.
@@ -99,9 +102,7 @@ function Header(props) {
         [user]
     );
 
-    const [projectList, setProjectList] = useState([]);
-    const [projectId, setProjectId] = useState(null);
-    const [refreshUserMenu, setRefreshUserMenu] = useState(false);
+
 
 
     function loadFile() {
@@ -120,6 +121,7 @@ function Header(props) {
     const toggleUserMenu = () => {
         var menu = document.getElementById("userMenuWrapper");
         menu.classList.toggle("userMenuShow");
+
     }
 
 

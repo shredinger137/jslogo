@@ -62,10 +62,7 @@ end`,
 
     //check for project URL
 
-    const path = window.location;
-
-    console.log(window.location.pathname.substr(1))
-
+    
     console.log("Serial API Check:");
     console.log(this.checkIfSerialCapable());
 
@@ -100,21 +97,19 @@ end`,
 
     projects.getRecoverEntry().then(recoveryProject => {
       if (recoveryProject && recoveryProject[0] && recoveryProject[0]['code']) {
-        //this.updateCode(recoveryProject[0]['code'])
+        this.updateCode(recoveryProject[0]['code'])
 
-        //this is being temporarily disabled due to cloud saves - it's unclear when people
-        //load and see recovered data that it isn't a saved file, and clicking save is 
-        //going to make a new one
+        //this is a little weird with cloud saves; we're just going to change the title to 'recovered', and hope that makes it clear
+        //the problem is if you go in and it already has the project you were working on you might not realize it's different
 
-        //maybe a TODO could be adding a reference in case there is a current file open, and just opening that?
-        //or, otherwise, add text to make it obvious that there's a difference between this and saved files
+        document.getElementById("projectTitle").value = "Recovered"
 
       }
     });
 
     setInterval(() => {
       projects.writeLastCodeToLocalStorage(this.state.code);
-    }, 60000);
+    }, 90000);
   }
 
 
