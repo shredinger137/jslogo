@@ -27,7 +27,10 @@ class App extends Component {
     tableData: [[]],
     view: "main",
     showNewProjectModal: false,
-    code: "",
+    code: 
+`to go
+    print 'Hello World'
+end`,
     canvasHeight: 400,
     canvasWidth: 900,
     chartType: "single",
@@ -57,7 +60,9 @@ class App extends Component {
 
   componentDidMount() {
 
+    //check for project URL
 
+    
     console.log("Serial API Check:");
     console.log(this.checkIfSerialCapable());
 
@@ -93,12 +98,18 @@ class App extends Component {
     projects.getRecoverEntry().then(recoveryProject => {
       if (recoveryProject && recoveryProject[0] && recoveryProject[0]['code']) {
         this.updateCode(recoveryProject[0]['code'])
+
+        //this is a little weird with cloud saves; we're just going to change the title to 'recovered', and hope that makes it clear
+        //the problem is if you go in and it already has the project you were working on you might not realize it's different
+
+        document.getElementById("projectTitle").value = "Recovered"
+
       }
     });
 
     setInterval(() => {
       projects.writeLastCodeToLocalStorage(this.state.code);
-    }, 10000);
+    }, 90000);
   }
 
 
@@ -225,6 +236,7 @@ class App extends Component {
           toggleNewProjectModal={this.toggleShowNewProjectModal.bind(this)}
           interpreter={this.interpreter}
           chartToggle={this.chartToggle}
+          updateCode={this.updateCode.bind(this)}
         />
         <div style={{ height: "20px" }}></div>
         <div className="main">

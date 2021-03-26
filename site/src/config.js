@@ -1,5 +1,5 @@
 export const config = {
-    apiUrl: 'https://app.lbym.org/api',
+    apiUrl: process.env.REACT_APP_API_URL,
     firebase: {
         apiKey: "AIzaSyBELlFvBiDtHID6Lo7pBKzDQ6tWL4kHAfs",
         authDomain: "lbym-8be59.firebaseapp.com",
@@ -9,3 +9,5 @@ export const config = {
         appId: "1:67087581587:web:ea96ee610de15eff7e2866"
       }
 }
+
+//use locahost:3224 for dev, api.lbym.org for deploy

@@ -5,6 +5,7 @@ var MongoClient = require('mongodb').MongoClient, Server = require('mongodb').Se
 app.use(express.json());
 var admin = require('firebase-admin');
 var userAccountFunctions = require('./userAccountFunctions');
+var projectFunctions = require('./projects');
 
 var serviceAccount = require("./credentials.json");
 
@@ -14,7 +15,7 @@ admin.initializeApp({
 
 app.use(function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS, PATCH');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
 
     if ('OPTIONS' === req.method) {
@@ -55,10 +56,9 @@ app.post("/login/:id", function (req, res) {
                 const uid = decodedToken.uid;
                 if (req.params.id == uid) {
                     userAccountFunctions.doesUserExist(uid).then(result => {
-                        if(result){ 
+                        if (result) {
                             res.sendStatus(200);
-                        } else
-                        {
+                        } else {
                             var userObject = {
                                 uid: uid,
                                 displayName: req.body.displayName,
@@ -70,7 +70,7 @@ app.post("/login/:id", function (req, res) {
                             );
                         }
                     })
-                 }
+                }
                 else {
                     console.log("token mismatch")
                 }
@@ -80,6 +80,167 @@ app.post("/login/:id", function (req, res) {
             });
     }
 })
+
+//TODO: We should make sure the required parameters exist
+//Also there's no error handling; should send status
+
+app.post("/project", function (req, res) {
+    admin
+        .auth()
+        .verifyIdToken(req.body.authorization)
+        .then((decodedToken) => {
+            const uid = decodedToken.uid;
+            if (req.body.userId == uid) {
+                var newProjectId = Math.random().toString(36).slice(2);
+
+                projectFunctions.newProjectEntry({
+                    projectId: newProjectId,
+                    owner: uid,
+                    title: req.body.title,
+                    code: req.body.code
+                }).then(response => {
+                    console.log(response)
+                    res.send(newProjectId)
+
+                })
+            }
+            else {
+                console.log("token mismatch")
+            }
+        })
+        .catch((error) => {
+            // Handle error
+        });
+})
+
+app.patch("/project/:pid", function (req, res) {
+    admin
+        .auth()
+        .verifyIdToken(req.body.authorization)
+        .then((decodedToken) => {
+            const uid = decodedToken.uid;
+            if (req.body.userId == uid && req.params.pid) {
+                projectFunctions.updateProjectEntry(
+                    {
+                        title: req.body.title,
+                        code: req.body.code
+                    },
+                    req.params.pid
+                ).then(response => {
+                    res.sendStatus(200);
+
+                })
+            }
+            else {
+                console.log("token mismatch")
+            }
+        })
+        .catch((error) => {
+            // Handle error
+        });
+
+})
+
+app.delete("/project/:pid", function (req, res) {
+    admin
+        .auth()
+        .verifyIdToken(req.headers.authorization)
+        .then((decodedToken) => {
+            const uid = decodedToken.uid;
+            //we need to verify owner on the other side
+
+            projectFunctions.deleteProject(req.params.pid, uid).then(response => {
+                res.sendStatus(200);
+            })
+
+        })
+        .catch((error) => {
+            // Handle error
+        });
+
+})
+
+//Okay. So this has an obvious problem with our data structure.
+
+//If the user has the projectIds listed under their account, then we have to check each one to get a title. That's obviously a lot of requests for very little payoff. So we should be 
+//writing the title as well. That might be done by the next time you read this.
+//And at a certain point we might as well be writing the code there, but having global access is going to be valuable in the future.
+
+//Plus using simple arrays and discreet documents makes for easier, less intensive operations when updating and deleting individual entries.
+
+//Still thinking about how best to structure that. I feel like the idea of projects having owners is more sensible that accounts having projects. But I can't really think of why.
+
+app.get("/user-projects/:uid", function (req, res) {
+
+
+    if (req.headers.authorization) {
+        admin
+            .auth()
+            .verifyIdToken(req.headers.authorization)
+            .then((decodedToken) => {
+                const uid = decodedToken.uid;
+                if (req.params.uid && req.params.uid == uid) {
+                    projectFunctions.getUserProjects(uid).then(response => {
+                        res.send(response)
+                    })
+
+
+                }
+
+
+            })
+            .catch((error) => {
+                // Handle error
+            });
+
+    }
+
+})
+
+
+
+app.get("/projects/:pid", function (req, res) {
+
+
+    if (req.params.pid) {
+        projectFunctions.getProject(req.params.pid).then(response => {
+            res.send(response)
+        })
+    }
+
+
+    /*
+    
+    **Disabling auth on get requests - this enables link sharing without credential checking, but also makes all projects viewable by default
+    Probably good to have this be temporary; we don't want users having write access from links, so we'll need to display that properly**
+
+    if (req.headers.authorization) {
+        admin
+            .auth()
+            .verifyIdToken(req.headers.authorization)
+            .then((decodedToken) => {
+                const uid = decodedToken.uid;
+                if (req.params.pid) {
+                    projectFunctions.getProject(req.params.pid, uid).then(response => {
+                        res.send(response)
+                    })
+
+
+                }
+
+
+            })
+            .catch((error) => {
+                // Handle error
+            });
+
+    }
+
+*/
+
+})
+
+
 
 
 
