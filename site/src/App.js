@@ -33,7 +33,7 @@ class App extends Component {
 end`,
     canvasHeight: 400,
     canvasWidth: 900,
-    chartType: "single",
+    chartType: "",
     chartOptionsSingle: {
       yLabel: "",
       xLabel: "",
@@ -250,7 +250,7 @@ end`,
             null}
           <button onClick={() => { interpreter.runLine("go") }}>Go</button>
           <button onClick={() => {this.setState({ view: "main" }); interpreter.runLine("st")  }} className={this.state.view == "main" ? "activeButton" : null}>Main View</button>
-          <button onClick={() => this.setState({ view: "graph" })} className={this.state.view == "graph" ? "activeButton" : null}>Graph</button>
+          <button onClick={() => this.setState({ view: "graph" })} className={this.state.view == "graph" ? "activeButton" : null}>Plots</button>
           <button onClick={() => this.setState({ view: "data" })} className={this.state.view == "data" ? "activeButton" : null}>Data</button>
           <input id="load" type="file" onChange={() => projects.loadFile()} style={{ display: "none" }} />
           <span style={{ float: "right" }} id="canvasDimensionsLabel"></span>

@@ -10,7 +10,7 @@ export default class Chart extends Component {
     state = {
         options: {}
     }
-    
+
     chartRef = {}
 
     render() {
@@ -30,6 +30,12 @@ export default class Chart extends Component {
 
 
                         options={{
+
+                            title: {
+                                text: this.props.chartOptionsSingle.title,
+                                display: true
+
+                            },
                             scales: {
                                 yAxes: [{
                                     scaleLabel: {
@@ -58,7 +64,7 @@ export default class Chart extends Component {
                                     radius: 4,
                                     backgroundColor: "black"
                                 }
-                            }
+                            },
                         }
                         }
                         redraw={true}
@@ -68,108 +74,120 @@ export default class Chart extends Component {
 
                     this.props.chartType == "double" ?
                         <>
-                        <div style={{ height: "50%" }}>
-                            <Scatter
-                                data={{
-                                    datasets:
-                                        [
-                                            {
-                                                data: this.props.chartDataTop
+                            <div style={{ height: "50%" }}>
+                                <Scatter
+                                    data={{
+                                        datasets:
+                                            [
+                                                {
+                                                    data: this.props.chartDataTop
+                                                }
+
+                                            ]
+                                    }}
+
+
+                                    options={{
+
+                                        title: {
+                                            text: this.props.chartOptionsTop.title,
+                                            display: true
+
+                                        },
+
+                                        scales: {
+                                            yAxes: [{
+                                                scaleLabel: {
+                                                    display: true,
+                                                    labelString: this.props.chartOptionsTop.yLabel
+                                                },
+                                                ticks: this.props.chartOptionsTop.ticks
+                                            }],
+                                            xAxes: [{
+                                                scaleLabel: {
+                                                    display: true,
+                                                    labelString: this.props.chartOptionsTop.xLabel
+                                                }
+                                            }]
+                                        },
+                                        legend: {
+                                            display: false
+                                        },
+                                        responsive: true,
+                                        maintainAspectRatio: false,
+                                        animation: {
+                                            duration: 0
+                                        },
+                                        elements: {
+                                            point: {
+                                                radius: 4,
+                                                backgroundColor: "black"
                                             }
-
-                                        ]
-                                }}
-
-
-                                options={{
-
-                                    scales: {
-                                        yAxes: [{
-                                            scaleLabel: {
-                                                display: true,
-                                                labelString: this.props.chartOptionsTop.yLabel
-                                            },
-                                            ticks: this.props.chartOptionsTop.ticks
-                                        }],
-                                        xAxes: [{
-                                            scaleLabel: {
-                                                display: true,
-                                                labelString: this.props.chartOptionsTop.xLabel
-                                            }
-                                        }]
-                                    },
-                                    legend: {
-                                        display: false
-                                    },                                    
-                                    responsive: true,
-                                    maintainAspectRatio: false,
-                                    animation: {
-                                        duration: 0
-                                    },
-                                    elements: {
-                                        point: {
-                                            radius: 4,
-                                            backgroundColor: "black"
                                         }
                                     }
-                                }
-                                }
-                                redraw={true}
-                                ref={this.chartReference}
-                            />
-                        </div>
-                        
-                         <div style={{ height: "50%" }}>
-                         <Scatter
-                                data={{
-                                    datasets:
-                                        [
-                                            {
-                                                data: this.props.chartDataBottom
+                                    }
+                                    redraw={true}
+                                    ref={this.chartReference}
+                                />
+                            </div>
+
+                            <div style={{ height: "50%" }}>
+                                <Scatter
+                                    data={{
+                                        datasets:
+                                            [
+                                                {
+                                                    data: this.props.chartDataBottom
+                                                }
+
+                                            ]
+                                    }}
+
+
+                                    options={{
+
+                                        title: {
+                                            text: this.props.chartOptionsBottom.title,
+                                            display: true
+
+                                        },
+
+                                        scales: {
+                                            yAxes: [{
+                                                scaleLabel: {
+                                                    display: true,
+                                                    labelString: this.props.chartOptionsBottom.yLabel
+                                                },
+                                                ticks: this.props.chartOptionsBottom.ticks
+                                            }],
+                                            xAxes: [{
+                                                scaleLabel: {
+                                                    display: true,
+                                                    labelString: this.props.chartOptionsBottom.xLabel
+                                                }
+                                            }]
+                                        },
+                                        legend: {
+                                            display: false
+                                        },
+                                        responsive: true,
+                                        maintainAspectRatio: false,
+                                        animation: {
+                                            duration: 0
+                                        },
+                                        elements: {
+                                            point: {
+                                                radius: 4,
+                                                backgroundColor: "black"
                                             }
-
-                                        ]
-                                }}
-
-
-                                options={{
-
-                                    scales: {
-                                        yAxes: [{
-                                            scaleLabel: {
-                                                display: true,
-                                                labelString: this.props.chartOptionsBottom.yLabel
-                                            },
-                                            ticks: this.props.chartOptionsBottom.ticks
-                                        }],
-                                        xAxes: [{
-                                            scaleLabel: {
-                                                display: true,
-                                                labelString: this.props.chartOptionsBottom.xLabel
-                                            }
-                                        }]
-                                    },
-                                    legend: {
-                                        display: false
-                                    },                                    
-                                    responsive: true,
-                                    maintainAspectRatio: false,
-                                    animation: {
-                                        duration: 0
-                                    },
-                                    elements: {
-                                        point: {
-                                            radius: 4,
-                                            backgroundColor: "black"
                                         }
                                     }
-                                }
-                                }
-                                redraw={true}
-                                ref={this.chartReference}
-                            />
-                     </div>
-                     </>
+                                    }
+                                    redraw={true}
+                                    ref={this.chartReference}
+                                />
+                            </div>
+                        </>
 
                         : null
 
@@ -178,5 +196,5 @@ export default class Chart extends Component {
             </div>
         )
 
-    }   
+    }
 }

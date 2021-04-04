@@ -404,7 +404,8 @@ export default class Interpreter {
 
 
     initPlot() {
-        var xLabel, yLabel;
+
+        var xLabel, yLabel, title;
 
         //Get plot type
         var chartType = (this.getValueInternal("_chartType"));
@@ -414,6 +415,12 @@ export default class Interpreter {
             xLabel = (this.getValueInternal("_xLabel"));
         } else {
             xLabel = "";
+        }
+
+        if (this.getValueInternal("_plotTitle")) {
+            title = this.getValueInternal("_plotTitle");
+        } else {
+            title = ""
         }
 
         if (this.getValueInternal("_yLabel")) {
@@ -446,7 +453,8 @@ export default class Interpreter {
             xLabel: xLabel,
             yLabel: yLabel,
             ticks: ticks,
-            xTicks: xTicks
+            xTicks: xTicks,
+            title: title
         }
 
         //update view based on plot type; we know that top and bottom means double view
@@ -473,35 +481,6 @@ export default class Interpreter {
         }
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -581,7 +560,7 @@ export default class Interpreter {
 
         var t = this;
         var canvas = document.getElementById("canvas");
-        if(canvas == null) return; 
+        if (canvas == null) return;
 
         if (!t.img.complete) return;
         var img = t.element.firstChild;
@@ -970,12 +949,6 @@ export default class Interpreter {
 
 
         function evalString() {
- 
-            //TODO: The first thing here means that we never check if the second value is =, meaning you can't use " or : for implicit declarations
-            //The ideal would be for both to work 
-
-            //Also weird: running x = 1 ,  x = :x + 1 gives x of 2, but x = x + 1 gives x1 (strings)
-            //so it's not able to evaluate... something
 
             if (token.substring(0, 1) == ':') {
                 t.pushResult(t.getValue(token.substring(1)));
@@ -985,13 +958,12 @@ export default class Interpreter {
             else if (constants[token]) t.pushResult(constants[token]);
 
             //no type declaration, no value, no current function, but followed by = - implicit declaration
-
-
-             else if (!t.cfun && t.evline[0] === `=` && t.evline[1] != undefined ) {
+            else if (!t.cfun && t.evline[0] === `=` && t.evline[1] != undefined) {
 
                 //not sure if undefined works to catch errors here
 
                 //for an implicit variable definition, make the variable and delete the relevant values from evline
+                //note: implicit declarations can't be used with "name or :name, so there's an inconsistency with legacy logo here
 
                 t.stack.push(t.cfun);
                 t.stack.push(t.arglist);
@@ -1003,34 +975,45 @@ export default class Interpreter {
 
 
             }
-            //no type declaration or value, but current function is declaring one, go ahead and push what you have
 
-            //this isn't working quite right - most of the time it doesn't flag an error, but also doesn't update
 
-            //the goal is to assume anything following certain words is of a certain type
-
-            //this broke se; for some reason it ran this case instead of evaluating
-
-         /*   else if (t.cfun == "make" || t.cfun == "var" || t.cfun == "let") {
-                console.log("second")
-                t.pushResult(token)
-            }
-
-*/
-
-            //if no declaration, but value exists as a variable, get that value
+            //If no declaration, but value exists as a variable, get that value. 
             else if (t.getValueInternal(token)) {
                 t.pushResult(t.getValue(token));
             }
 
 
+            //If the function is make, var, or let (declarations), assume the second thing is the name of the variable. We already know " wasn't used due to a previouse else/if block.
+
+            //the goal is to assume anything following certain words is of a certain type; the previous code doesn't do that, because in the case of declarations the value
+            //doesn't yet exist
+
+            //when this is enabled make with se stops working; we need to check that se isn't being evaluated apparently ?
+
+            //Until this is solved, 'make' and 'let' still required the " or : symbols.
+        
+
+/*
+          else if (t.cfun == "make" || t.cfun == "var" || t.cfun == "let" || token != "se") {
+                console.log("second")
+              //  t.pushResult(token)
+              
+
+            }
+*/
+
             else {
-
-
+ 
                 if (token == '(') handleParend();
 
                 if (prims[token] == undefined) {
                     throw "error: I don't know how to " + token;
+                }
+
+                //attempting to catch the case "make x se 5 6"; see above
+                if (t.cfun == "make" || t.cfun == "var" || t.cfun == "let") {
+                 //   console.log("got declaration in else")
+    
                 }
 
                 t.stack.push(t.cfun);
@@ -1042,6 +1025,7 @@ export default class Interpreter {
             }
 
             function handleParend() {
+
                 if (t.evline[0] == 'se') { t.evline.shift(); token = 'se '; }
                 else token = '( ';
             }
@@ -1785,7 +1769,7 @@ export var prims = {};
 
 /* Charts */
 prims['x-data'] = { nargs: 1, fcn: function (a) { this.setChartListener("x", a) } }
-prims['plot-title'] = { nargs: 1, fcn: function (a) { this.setValue("_chartTitle", a) } }
+prims['plot-title'] = { nargs: 1, fcn: function (a) { this.setValue("_plotTitle", a) } }
 prims['y-data'] = { nargs: 1, fcn: function (a) { this.setChartListener("y", a) } }
 prims['x-label'] = { nargs: 1, fcn: function (a) { this.setValue("_xLabel", a) } }
 prims['y-label'] = { nargs: 1, fcn: function (a) { this.setValue("_yLabel", a) } }
@@ -1841,7 +1825,7 @@ prims['oneof'] = { nargs: 2, fcn: function (a, b) { return this.oneof(a, b); } }
 prims['sum'] = { nargs: 2, fcn: function (a, b) { return a + b; } }
 prims['product'] = { nargs: 2, fcn: function (a, b) { return a * b; } }
 
-prims['se'] = { nargs: 2, fcn: function (a, b) {return [].concat(a, b); } }
+prims['se'] = { nargs: 2, fcn: function (a, b) { return [].concat(a, b); } }
 prims['word'] = { nargs: 2, fcn: function (a, b) { return this.word(a, b); } }
 prims['first'] = { nargs: 1, fcn: function (a) { return this.first(a); } }
 prims['butfirst'] = { nargs: 1, fcn: function (a) { return this.butfirst(a); } }
