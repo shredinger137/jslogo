@@ -1,3 +1,7 @@
+;This demo has three functions to define the three 
+;plot locations and a function that adds data to 
+;the data variables. Change the function called in 'go' to change plots.
+
 to go
   make "xDataOne []
   make "yDataOne []
@@ -6,10 +10,9 @@ to go
   pushData
 end
 
+;single plot using the whole canvas, using the minimum number of options
 to makeSinglePlot
   one-plot
-  x-label "Time
-  y-label "Data
   x-data "xDataOne
   y-data "yDataOne
   show-plot
@@ -17,17 +20,20 @@ end
 
 to makeBottomPlot
   bottom-plot
+  plot-title 'Plotting Demo Bottom'
   x-data "xDataOne
   y-data "yDataOne
+  x-ticks 0.5
   show-plot
 end
 
 to makeTopPlot
   top-plot
+  plot-title 'Plotting Demo Top'
   x-data "xDataOne
   y-data "yDataOne
   x-label "Numbers
-  make "_range [13 55]
+  limits-y 13 55
   show-plot
 end
 
@@ -37,7 +43,7 @@ to pushData
   make "yDataOne []
   repeat 25 [
     make "xDataOne se :xDataOne :count
-    make "yDataOne se :yDataOne :count
+    push "yDataOne :count
     make "count :count + 1
     wait 10
   ]

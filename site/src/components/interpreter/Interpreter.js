@@ -405,56 +405,83 @@ export default class Interpreter {
 
     initPlot() {
 
-        var xLabel, yLabel, title;
+        //we use Chart.js for all of this, so follow their docs for the shape of the options object
+        var chartOptions = {
+            title: {
+                display: true,
+                text: ""
+            },
+            scales: {
+                yAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: ""
+                    },
+                    ticks: {}
+                }],
 
-        //Get plot type
+                xAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: ""
+                    },
+                    ticks: {}
+                }]
+            },
+            legend: {
+                display: false
+            },
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: {
+                duration: 0
+            },
+            elements: {
+                point: {
+                    radius: 3,
+                    backgroundColor: "black"
+                }
+            }
+        };
+
+
+        //Get plot type - used to define which chart we're working with
         var chartType = (this.getValueInternal("_chartType"));
 
         //get options and create an object we can read on the other side
         if (this.getValueInternal("_xLabel")) {
-            xLabel = (this.getValueInternal("_xLabel"));
-        } else {
-            xLabel = "";
+            chartOptions.scales.xAxes[0].scaleLabel.labelString = this.getValueInternal("_xLabel");
         }
 
         if (this.getValueInternal("_plotTitle")) {
-            title = this.getValueInternal("_plotTitle");
-        } else {
-            title = ""
-        }
+            chartOptions.title.text = this.getValueInternal("_plotTitle");
+        } 
 
         if (this.getValueInternal("_yLabel")) {
-            yLabel = (this.getValueInternal("_yLabel"));
-        } else {
-            yLabel = "";
-        }
-
-        var ticks = {
-            dummy: null
-        };
-
-        var xTicks = {
-            dummy: null
-        }
+            chartOptions.scales.yAxes.scaleLabel[0].labelString = (this.getValueInternal("_yLabel"));
+        } 
 
         var rangeSetting = this.getValueInternal("_range");
+
         if (rangeSetting && Array.isArray(rangeSetting) && rangeSetting.length >= 2) {
-            ticks["min"] = rangeSetting[0];
-            ticks["max"] = rangeSetting[1];
+            chartOptions.scales.yAxes[0].ticks["min"] = rangeSetting[0];
+            chartOptions.scales.yAxes[0].ticks["max"] = rangeSetting[1];
         }
 
         var domainSetting = this.getValueInternal("_domain");
-        if (domainSetting && Array.isArray(domainSetting) && domainSetting.length >= 2) {
-            xTicks["xmin"] = domainSetting[0];
-            xTicks["xmax"] = domainSetting[1];
+        
+        if (domainSetting && Array.isArray(rangeSetting) && rangeSetting.length >= 2) {
+            chartOptions.scales.xAxes[0].ticks["min"] = rangeSetting[0];
+            chartOptions.scales.xAxes[0].ticks["max"] = rangeSetting[1];
         }
 
-        var chartOptions = {
-            xLabel: xLabel,
-            yLabel: yLabel,
-            ticks: ticks,
-            xTicks: xTicks,
-            title: title
+
+        if (this.getValueInternal("_xTickSteps")) {
+            chartOptions.scales.xAxes[0].ticks["stepSize"] = this.getValueInternal("_xTickSteps");
+        }
+
+        if (this.getValueInternal("_yTickSteps")) {
+            chartOptions.scales.yAxes[0].ticks["stepSize"] = this.getValueInternal("_xTickSteps");
         }
 
         //update view based on plot type; we know that top and bottom means double view
@@ -471,10 +498,20 @@ export default class Interpreter {
             } else {
                 this.updateChartOptions("bottom", chartOptions);
             }
+
+            
             this.setValue("_range", null)
             this.setValue("_xLabel", null)
             this.setValue("_yLabel", null)
-            //this should reset the variables maybe?
+            this.setValue("_plotTitle", null)
+            this.setValue("_xTickSteps", null)
+            this.setValue("_yTickSteps", null)
+            this.setValue("_domain", null)
+
+             
+
+
+            //this should reset the variables so they don't polute the next one
 
         } else {
 
@@ -908,16 +945,19 @@ export default class Interpreter {
         }
 
         var terminal = document.getElementById("terminalData");
-        var entry = `<span style={{ paddingLeft: ".75rem" }}><i>${x}</i></span>`
-        terminal.innerHTML += entry;
-        terminal.innerHTML += this.lastProc;
-        terminal.scrollTop = document.getElementById("terminalData").scrollHeight;
+        if (terminal !== null) {
+            var entry = `<span style={{ paddingLeft: ".75rem" }}><i>${x}</i></span>`
+            terminal.innerHTML += entry;
+            terminal.innerHTML += this.lastProc;
+            terminal.scrollTop = document.getElementById("terminalData").scrollHeight;
 
-        var cc = document.getElementById("cc");
-        if (cc !== null) {
-            cc.value = cc.value + x + "\n";
-            cc.scrollTop = cc.scrollHeight;
+            var cc = document.getElementById("cc");
+            if (cc !== null) {
+                cc.value = cc.value + x + "\n";
+                cc.scrollTop = cc.scrollHeight;
+            }
         }
+
     }
 
     cleanConsole() {
@@ -991,19 +1031,19 @@ export default class Interpreter {
             //when this is enabled make with se stops working; we need to check that se isn't being evaluated apparently ?
 
             //Until this is solved, 'make' and 'let' still required the " or : symbols.
-        
 
-/*
-          else if (t.cfun == "make" || t.cfun == "var" || t.cfun == "let" || token != "se") {
-                console.log("second")
-              //  t.pushResult(token)
-              
 
-            }
-*/
+            /*
+                      else if (t.cfun == "make" || t.cfun == "var" || t.cfun == "let" || token != "se") {
+                            console.log("second")
+                          //  t.pushResult(token)
+                          
+            
+                        }
+            */
 
             else {
- 
+
                 if (token == '(') handleParend();
 
                 if (prims[token] == undefined) {
@@ -1012,8 +1052,8 @@ export default class Interpreter {
 
                 //attempting to catch the case "make x se 5 6"; see above
                 if (t.cfun == "make" || t.cfun == "var" || t.cfun == "let") {
-                 //   console.log("got declaration in else")
-    
+                    //   console.log("got declaration in else")
+
                 }
 
                 t.stack.push(t.cfun);
@@ -1778,6 +1818,9 @@ prims['top-plot'] = { nargs: 0, fcn: function () { this.setValue("_chartType", "
 prims['bottom-plot'] = { nargs: 0, fcn: function () { this.setValue("_chartType", "bottom") } }
 prims['limits-y'] = { nargs: 2, fcn: function (a, b) { this.setValue("_range", [a, b]) } }
 prims['limits-x'] = { nargs: 2, fcn: function (a, b) { this.setValue("_domain", [a, b]) } }
+prims['y-ticks'] = { nargs: 1, fcn: function (a) { this.setValue("_yTickSteps", a) } }
+prims['x-ticks'] = { nargs: 1, fcn: function (a) { this.setValue("_xTickSteps", a) } }
+
 prims['limits'] = {
     nargs: 4, fcn: function (a, b, c, d) {
         this.setValue("_domain", [a, b]);
