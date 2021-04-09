@@ -404,6 +404,11 @@ export default class Interpreter {
 
 
     initPlot() {
+<<<<<<< Updated upstream
+=======
+
+        var xLabel, yLabel, title;
+>>>>>>> Stashed changes
 
         //we use Chart.js for all of this, so follow their docs for the shape of the options object
         var chartOptions = {
@@ -454,8 +459,21 @@ export default class Interpreter {
         }
 
         if (this.getValueInternal("_plotTitle")) {
+<<<<<<< Updated upstream
             chartOptions.title.text = this.getValueInternal("_plotTitle");
         } 
+=======
+            title = this.getValueInternal("_plotTitle");
+        } else {
+            title = ""
+        }
+
+        if (this.getValueInternal("_yLabel")) {
+            yLabel = (this.getValueInternal("_yLabel"));
+        } else {
+            yLabel = "";
+        }
+>>>>>>> Stashed changes
 
         if (this.getValueInternal("_yLabel")) {
             chartOptions.scales.yAxes.scaleLabel[0].labelString = (this.getValueInternal("_yLabel"));
@@ -475,6 +493,7 @@ export default class Interpreter {
             chartOptions.scales.xAxes[0].ticks["max"] = rangeSetting[1];
         }
 
+<<<<<<< Updated upstream
 
         if (this.getValueInternal("_xTickSteps")) {
             chartOptions.scales.xAxes[0].ticks["stepSize"] = this.getValueInternal("_xTickSteps");
@@ -482,6 +501,14 @@ export default class Interpreter {
 
         if (this.getValueInternal("_yTickSteps")) {
             chartOptions.scales.yAxes[0].ticks["stepSize"] = this.getValueInternal("_xTickSteps");
+=======
+        var chartOptions = {
+            xLabel: xLabel,
+            yLabel: yLabel,
+            ticks: ticks,
+            xTicks: xTicks,
+            title: title
+>>>>>>> Stashed changes
         }
 
         //update view based on plot type; we know that top and bottom means double view
@@ -503,6 +530,7 @@ export default class Interpreter {
             this.setValue("_range", null)
             this.setValue("_xLabel", null)
             this.setValue("_yLabel", null)
+<<<<<<< Updated upstream
             this.setValue("_plotTitle", null)
             this.setValue("_xTickSteps", null)
             this.setValue("_yTickSteps", null)
@@ -512,6 +540,9 @@ export default class Interpreter {
 
 
             //this should reset the variables so they don't polute the next one
+=======
+            //this should reset the variables maybe?
+>>>>>>> Stashed changes
 
         } else {
 
@@ -1031,6 +1062,7 @@ export default class Interpreter {
             //when this is enabled make with se stops working; we need to check that se isn't being evaluated apparently ?
 
             //Until this is solved, 'make' and 'let' still required the " or : symbols.
+<<<<<<< Updated upstream
 
 
             /*
@@ -1043,7 +1075,21 @@ export default class Interpreter {
             */
 
             else {
+=======
+        
 
+/*
+          else if (t.cfun == "make" || t.cfun == "var" || t.cfun == "let" || token != "se") {
+                console.log("second")
+              //  t.pushResult(token)
+              
+
+            }
+*/
+>>>>>>> Stashed changes
+
+            else {
+ 
                 if (token == '(') handleParend();
 
                 if (prims[token] == undefined) {
@@ -1052,8 +1098,13 @@ export default class Interpreter {
 
                 //attempting to catch the case "make x se 5 6"; see above
                 if (t.cfun == "make" || t.cfun == "var" || t.cfun == "let") {
+<<<<<<< Updated upstream
                     //   console.log("got declaration in else")
 
+=======
+                 //   console.log("got declaration in else")
+    
+>>>>>>> Stashed changes
                 }
 
                 t.stack.push(t.cfun);
