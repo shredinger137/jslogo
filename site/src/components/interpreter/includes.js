@@ -15,15 +15,15 @@ export const includes =
 
 
     to readLightSensor
-        readADC2
+        output readADC2
     end
 
     to readTempSensor0
-        readADC0
+        output readADC0
     end
 
     to readTempSensor1
-        readADC1
+        output readADC1
     end
 
 
