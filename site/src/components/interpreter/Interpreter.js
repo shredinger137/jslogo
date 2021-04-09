@@ -455,11 +455,11 @@ export default class Interpreter {
 
         if (this.getValueInternal("_plotTitle")) {
             chartOptions.title.text = this.getValueInternal("_plotTitle");
-        } 
+        }
 
         if (this.getValueInternal("_yLabel")) {
-            chartOptions.scales.yAxes.scaleLabel[0].labelString = (this.getValueInternal("_yLabel"));
-        } 
+            chartOptions.scales.yAxes[0].scaleLabel.labelString = (this.getValueInternal("_yLabel"));
+        }
 
         var rangeSetting = this.getValueInternal("_range");
 
@@ -469,7 +469,7 @@ export default class Interpreter {
         }
 
         var domainSetting = this.getValueInternal("_domain");
-        
+
         if (domainSetting && Array.isArray(rangeSetting) && rangeSetting.length >= 2) {
             chartOptions.scales.xAxes[0].ticks["min"] = rangeSetting[0];
             chartOptions.scales.xAxes[0].ticks["max"] = rangeSetting[1];
@@ -499,7 +499,7 @@ export default class Interpreter {
                 this.updateChartOptions("bottom", chartOptions);
             }
 
-            
+            //this resets the variables so they don't polute the next plot; additional options will need to be added here
             this.setValue("_range", null)
             this.setValue("_xLabel", null)
             this.setValue("_yLabel", null)
@@ -507,11 +507,12 @@ export default class Interpreter {
             this.setValue("_xTickSteps", null)
             this.setValue("_yTickSteps", null)
             this.setValue("_domain", null)
+            var chartOptions = {};
 
-             
 
 
-            //this should reset the variables so they don't polute the next one
+
+
 
         } else {
 
