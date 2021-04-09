@@ -22,15 +22,15 @@ to go
     print (se "Average: :suml / 5)
     
 	; repeat 5 [
-    ;    let[tempsensor0 readTempSensor0]
-    ;    let[sumt0 :sumt0 + :tempsensor0]
+    ;    let "tempsensor0 readTempSensor0
+    ;    let "sumt0 :sumt0 + :tempsensor0
     ; ]
-    ; print (se "|Average Temp0 Value: | :sumt0 / 5)
+    ; print 'Average Temp0 Value: ' + :sumt0 / 5
     ; repeat 5 [
-    ;     let[tempsensor1 readTempSensor1]
-    ;     let[sumt1 :sumt1 + :tempsensor1]
+    ;     let "tempsensor1 readTempSensor1
+    ;     let "sumt1 :sumt1 + :tempsensor1
     ; ]
-    ; print (se "|Average Temp1 Value: | :sumt1 / 5)
+    ; print 'Average Temp1 Value: | :sumt1 / 5)
 
 end
 
@@ -41,7 +41,7 @@ to runForever
 
     loop
         [
-            let "light read0
+            let "light readADC0
             print :light
             wait 10
         ]
