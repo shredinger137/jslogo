@@ -25,6 +25,10 @@ export const experimentsList = [
     {
         name: "Packets",
         fileLocation: "/experiments/Packets.logo"
+    },
+    {
+        name: "Evaporation",
+        fileLocation: "/experiments/Evaporation.logo"
     }
 ];
 

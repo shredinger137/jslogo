@@ -31,6 +31,7 @@ module.exports = {
 
                     dbConnection.collection("users").updateOne({uid: projectObject.owner}, {$push: {ownedProjects: projectObject.projectId }}, {upsert: true})
                     if (err) throw err;
+                    return true;
 
                 }
 

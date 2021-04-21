@@ -65,6 +65,7 @@ function Header(props) {
     const [projectList, setProjectList] = useState([]);
     const [projectId, setProjectId] = useState(null);
     const [refreshUserMenu, setRefreshUserMenu] = useState(false);
+    const [saveState, setSaveState] = useState("");
 
     //On mount, check to see if a project is defined in the URL.
     //All links have the format /pr${projectId}, so we check if 'pr' is the start of it and take the rest.
@@ -101,6 +102,7 @@ function Header(props) {
     },
         [user]
     );
+
 
 
 
@@ -180,7 +182,15 @@ function Header(props) {
                         authorization: idToken
                     }).then((response) => {
 
-                        //should validate or something ?
+                        if(response.status == 200){
+                            setSaveState("Project Saved");
+                        } else {
+                            setSaveState("Error Saving")
+                        }
+
+                        setTimeout(function(){
+                            setSaveState("");
+                       }.bind(this),3000);
 
                     })
 
@@ -278,6 +288,7 @@ function Header(props) {
             }
             <div style={titleStyle}>
                 <input type="text" id="projectTitle" defaultValue="Untitled" style={titleInputStyle} maxLength="22" onChange={handleNameChange}></input>
+                <span style={{fontSize: ".8em"}}>{saveState}</span>
             </div>
             <div className="buttonDiv" onClick={() => toggleNewProject()}>
                 <img src="/images/newProject.png" alt="New project icon"></img>

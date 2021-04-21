@@ -29,46 +29,10 @@ export default class Chart extends Component {
                         }}
 
 
-                        options={{
-
-                            title: {
-                                text: this.props.chartOptionsSingle.title,
-                                display: true
-
-                            },
-                            scales: {
-                                yAxes: [{
-                                    scaleLabel: {
-                                        display: true,
-                                        labelString: this.props.chartOptionsSingle.yLabel
-                                    },
-                                    ticks: this.props.chartOptionsSingle.ticks
-                                }],
-                                xAxes: [{
-                                    scaleLabel: {
-                                        display: true,
-                                        labelString: this.props.chartOptionsSingle.xLabel
-                                    }
-                                }]
-                            },
-                            legend: {
-                                display: false
-                            },
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            animation: {
-                                duration: 0
-                            },
-                            elements: {
-                                point: {
-                                    radius: 4,
-                                    backgroundColor: "black"
-                                }
-                            },
-                        }
-                        }
+                        options={this.props.chartOptionsSingle}                        
                         redraw={true}
-                        ref={this.chartReference}
+                        ref={this.chartReference
+                        }
                     />
                     :
 
@@ -87,49 +51,8 @@ export default class Chart extends Component {
                                     }}
 
 
-<<<<<<< Updated upstream
-                                    options={this.props.chartOptionsTop}
-=======
-                                    options={{
-
-                                        title: {
-                                            text: this.props.chartOptionsTop.title,
-                                            display: true
-
-                                        },
-
-                                        scales: {
-                                            yAxes: [{
-                                                scaleLabel: {
-                                                    display: true,
-                                                    labelString: this.props.chartOptionsTop.yLabel
-                                                },
-                                                ticks: this.props.chartOptionsTop.ticks
-                                            }],
-                                            xAxes: [{
-                                                scaleLabel: {
-                                                    display: true,
-                                                    labelString: this.props.chartOptionsTop.xLabel
-                                                }
-                                            }]
-                                        },
-                                        legend: {
-                                            display: false
-                                        },
-                                        responsive: true,
-                                        maintainAspectRatio: false,
-                                        animation: {
-                                            duration: 0
-                                        },
-                                        elements: {
-                                            point: {
-                                                radius: 4,
-                                                backgroundColor: "black"
-                                            }
-                                        }
-                                    }
-                                    }
->>>>>>> Stashed changes
+                                    options={
+                                        this.props.chartOptionsTop}
                                     redraw={true}
                                     ref={this.chartReference}
                                 />
@@ -148,49 +71,7 @@ export default class Chart extends Component {
                                     }}
 
 
-<<<<<<< Updated upstream
                                     options={this.props.chartOptionsBottom}
-=======
-                                    options={{
-
-                                        title: {
-                                            text: this.props.chartOptionsBottom.title,
-                                            display: true
-
-                                        },
-
-                                        scales: {
-                                            yAxes: [{
-                                                scaleLabel: {
-                                                    display: true,
-                                                    labelString: this.props.chartOptionsBottom.yLabel
-                                                },
-                                                ticks: this.props.chartOptionsBottom.ticks
-                                            }],
-                                            xAxes: [{
-                                                scaleLabel: {
-                                                    display: true,
-                                                    labelString: this.props.chartOptionsBottom.xLabel
-                                                }
-                                            }]
-                                        },
-                                        legend: {
-                                            display: false
-                                        },
-                                        responsive: true,
-                                        maintainAspectRatio: false,
-                                        animation: {
-                                            duration: 0
-                                        },
-                                        elements: {
-                                            point: {
-                                                radius: 4,
-                                                backgroundColor: "black"
-                                            }
-                                        }
-                                    }
-                                    }
->>>>>>> Stashed changes
                                     redraw={true}
                                     ref={this.chartReference}
                                 />
