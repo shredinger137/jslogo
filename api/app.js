@@ -133,13 +133,16 @@ app.patch("/project/:pid", function (req, res) {
             }
             else {
                 console.log("token mismatch")
+                res.sendStatus(500)
             }
         })
         .catch((error) => {
-            // Handle error
+            res.sendStatus(500);
+            console.log(error);
         });
 
 })
+
 
 app.delete("/project/:pid", function (req, res) {
     admin

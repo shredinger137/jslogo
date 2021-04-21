@@ -405,6 +405,8 @@ export default class Interpreter {
 
     initPlot() {
 
+        var xLabel, yLabel, title;
+
         //we use Chart.js for all of this, so follow their docs for the shape of the options object
         var chartOptions = {
             title: {
@@ -455,6 +457,14 @@ export default class Interpreter {
 
         if (this.getValueInternal("_plotTitle")) {
             chartOptions.title.text = this.getValueInternal("_plotTitle");
+        } else {
+            chartOptions.title.text = ""
+        }
+
+        if (this.getValueInternal("_yLabel")) {
+            yLabel = (this.getValueInternal("_yLabel"));
+        } else {
+            yLabel = "";
         }
 
         if (this.getValueInternal("_yLabel")) {
@@ -1043,8 +1053,9 @@ export default class Interpreter {
                         }
             */
 
-            else {
 
+            else {
+ 
                 if (token == '(') handleParend();
 
                 if (prims[token] == undefined) {
@@ -1152,7 +1163,6 @@ export default class Interpreter {
                 return this.locals[i][name];
             }
         }
-
         return false;
     }
 
@@ -1176,6 +1186,8 @@ export default class Interpreter {
             updateChart = true;
             chartType.push("bottom");
         }
+
+        
 
         for (var i in t.locals) {
             if (t.locals[i][name] != undefined) {

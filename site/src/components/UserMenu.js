@@ -53,7 +53,7 @@ function UserMenu(props) {
                 <h4 onClick={signOut} style={textStyle}>Sign Out</h4>
                 {
                     projectList.map((project) =>
-                        <div key={project.title}>
+                        <div key={project.title} style={{marginTop: "10px"}}>
                             <span key={`${project.title}span`} onClick={() => { props.getSingleProject(project.projectId) }} style={{ marginRight: "10px" }}>{project.title}</span><br />
                             <span key={`${project.title}del`} style={{ marginRight: "10px", fontSize: "1rem" }} onClick={() => { props.deleteProject(project.projectId) }}>[delete]</span>
                             <span key={`${project.title}copy`} style={{ fontSize: "1rem" }} onClick={() => { copyProjectLink(`${project.projectId}`) }}>[copy link]</span>

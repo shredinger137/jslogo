@@ -148,6 +148,9 @@
   }
 
   
+  .invisible {
+    opacity: 0;
+  }
 
 
   /* The Modal (background) */

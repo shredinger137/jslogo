@@ -37,19 +37,19 @@ end`,
     chartOptionsSingle: {
       yLabel: "",
       xLabel: "",
-      ticks: {}
+      ticks: {},
+      responsive: true
     },
     chartDataSingle: [],
     chartOptionsTop: {
-      yLabel: "",
-      xLabel: "",
-      ticks: {}
+
+      responsive: true,
+      maintainAspectRatio: false,
     },
     chartDataTop: [],
     chartOptionsBottom: {
-      yLabel: "",
-      xLabel: "",
-      ticks: {}
+      responsive: true,
+      maintainAspectRatio: false,
     },
     chartDataBottom: [],
     logoVariables: [],

@@ -29,9 +29,10 @@ export default class Chart extends Component {
                         }}
 
 
-                        options={this.props.chartOptionsSingle}
+                        options={this.props.chartOptionsSingle}                        
                         redraw={true}
-                        ref={this.chartReference}
+                        ref={this.chartReference
+                        }
                     />
                     :
 
@@ -50,7 +51,8 @@ export default class Chart extends Component {
                                     }}
 
 
-                                    options={this.props.chartOptionsTop}
+                                    options={
+                                        this.props.chartOptionsTop}
                                     redraw={true}
                                     ref={this.chartReference}
                                 />
