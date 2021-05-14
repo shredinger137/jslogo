@@ -11,17 +11,18 @@ export default class Projects {
   }
 
   async initializeDatabase() {
-    localDatabase.version(1).stores({
-      projects: '++id, name, code'
+    localDatabase.version(2).stores({
+      projects: '++id, name, code, projectId'
     })
   }
 
-  save(){
-    
+  save() {
+
   }
 
 
-  async writeLastCodeToLocalStorage(code) {
+  async writeLastCodeToLocalStorage(code, projectId) {
+    console.log("lastcode")
 
     //read the database and see if 'recover' exists; if so, get the id key
 
@@ -49,6 +50,41 @@ export default class Projects {
     })
 
   }
+
+
+  async writePidToStorage(pid) {
+    var context = this;
+
+    console.log("writing pid", pid)
+    //read the database and see if 'recover' exists; if so, get the id key
+
+    this.getRecoverEntry().then(async function (entries) {
+      if (entries && entries.length > 0) {
+
+        //if a recovery entry exists, update it with the new code
+        console.log("1", pid)
+        var recoveryId = entries[0]["id"];
+        await localDatabase.projects.update(recoveryId, {
+          projectId: pid
+        }).then(context.getRecoverEntry().then(result => { console.log(result) }))
+      } else {
+        await localDatabase.projects.add({
+          name: 'recover',
+          projectId: pid,
+        })
+        //if a recover entry doesn't exist, create it
+
+        //TODO
+
+      }
+
+    })
+
+
+  }
+
+
+
 
   async getRecoverEntry() {
     var returnValue = false;
@@ -78,7 +114,7 @@ export default class Projects {
 
   }
 
-  
+
 
   loadFile() {
     const input = document.getElementById('load');

@@ -31,6 +31,7 @@ export default class Interpreter {
         //charts are given assigned variables for data; these are effectively listened for in 'make', so that 
         //if the variable in question is one of the chart data ones we know to update the chart data in our app.
 
+        this.offsetHorizontal = 0;
         this.updateChartOptions = updateChartOptions;
         this.updateChartType = updateChartType;
 
@@ -405,8 +406,6 @@ export default class Interpreter {
 
     initPlot() {
 
-        var xLabel, yLabel, title;
-
         //we use Chart.js for all of this, so follow their docs for the shape of the options object
         var chartOptions = {
             title: {
@@ -461,15 +460,10 @@ export default class Interpreter {
             chartOptions.title.text = ""
         }
 
-        if (this.getValueInternal("_yLabel")) {
-            yLabel = (this.getValueInternal("_yLabel"));
-        } else {
-            yLabel = "";
-        }
 
         if (this.getValueInternal("_yLabel")) {
             chartOptions.scales.yAxes.scaleLabel[0].labelString = (this.getValueInternal("_yLabel"));
-        } 
+        }
 
         var rangeSetting = this.getValueInternal("_range");
 
@@ -479,7 +473,7 @@ export default class Interpreter {
         }
 
         var domainSetting = this.getValueInternal("_domain");
-        
+
         if (domainSetting && Array.isArray(rangeSetting) && rangeSetting.length >= 2) {
             chartOptions.scales.xAxes[0].ticks["min"] = rangeSetting[0];
             chartOptions.scales.xAxes[0].ticks["max"] = rangeSetting[1];
@@ -509,7 +503,7 @@ export default class Interpreter {
                 this.updateChartOptions("bottom", chartOptions);
             }
 
-            
+
             this.setValue("_range", null)
             this.setValue("_xLabel", null)
             this.setValue("_yLabel", null)
@@ -518,7 +512,7 @@ export default class Interpreter {
             this.setValue("_yTickSteps", null)
             this.setValue("_domain", null)
 
-             
+
 
 
             //this should reset the variables so they don't polute the next one
@@ -645,6 +639,52 @@ export default class Interpreter {
     getDocumentWidth() { return Math.max(document.body.clientWidth, document.documentElement.clientWidth); }
 
 
+    handleResizeHorizontal(offset) {
+
+        //we have to use the CSS rules and variables here as a starting point
+
+        //codeEntryDiv: width: calc(var(--codeEntryWidth) - var(--gutterWidth));
+        //chartAreaWrapper: width: calc(98vw - var(--codeEntryWidth));
+        //terminal-wrapper: calc(98vw - var(--codeEntryWidth));
+
+        /*
+
+        --interfaceHeight: calc(96vh - 90px);
+        --codeEntryWidth: 44vw;
+        --chartHeight: 65vh;
+        --gutterWidth: 3px;
+
+
+        
+.terminal {
+    position: absolute;
+    height: calc(var(--interfaceHeight) - var(--chartHeight) - 1px);
+
+        */
+
+
+        //TODO: Gutter needs to move along with the drag; canvas doesn't redraw, probably because we haven't figured out aspect ratio yet.
+        //That means that terminal needs its height to change.
+
+
+        //TODO: This is wrong, because the offset will go to negative if you drag to the left. Immediately. We need to know
+        //the current offset and change it. The obvious answer, adding and subtracting from the original offset, doesn't work because 
+        //it will keep adding as you drag across - exponentially upping your total offset. So, we may need to identify if the drag is over or not?
+
+        this.offsetHorizontal = offset;
+
+        console.log(offset, this.offsetHorizontal)
+
+        document.getElementById("codeEntryDiv").style.width = `calc(var(--codeEntryWidth) - var(--gutterWidth) + ${this.offsetHorizontal}px)`
+        document.getElementById("chartAreaWrapper").style.width = `calc(98vw - var(--codeEntryWidth) - ${this.offsetHorizontal}px)`
+        document.getElementById("terminal-wrapper").style.width = `calc(98vw - var(--codeEntryWidth) - ${this.offsetHorizontal}px)`
+        document.getElementById("gutter").style.width = `calc(var(--codeEntryWidth) - var(--gutterWidth) + ${this.offsetHorizontal}px)`;
+
+
+        this.handleResize();
+
+    }
+
     handleResize() {
         //We're going to get the total size of the document first, then calculate the necessary size of the other elements.
         //There's a default size for each component, and a required aspect ratio to the canvas. The canvas also needs to set
@@ -666,43 +706,11 @@ export default class Interpreter {
         }
         this.turtleScale = newScale;
 
-        canvas.style.width = (wrapper.offsetWidth - 5) + "px";
+        canvas.style.width = (wrapper.offsetWidth - 5 + this.offset) + "px";
         canvas.style.height = (wrapper.offsetHeight - 5) + "px";
         document.getElementById("canvasDimensionsLabel").innerHTML = `Canvas: ${Math.floor((wrapper.offsetWidth - 5) * newScale)}w x ${Math.floor((wrapper.offsetHeight - 5) * newScale)}h`
 
         this.move();
-
-        /*
-                var newScale;
-        var canvas = document.getElementById("canvas");
-        var wrapper = document.getElementById("chartAreaWrapper");
-
-        var terminalMinimumHeight = 100;
-        var padding = 5;
-
-        var interfaceAreaHeight = document.getElementById("mainInterfaceGrid").offsetHeight;
-        var interfaceAreaWidth = document.getElementById("mainInterfaceGrid").offsetWidth;
-
-        var newCanvasHeight = interfaceAreaHeight - terminalMinimumHeight - padding;
-        var newCanvasWidth = newCanvasHeight * 1.25 - padding;
-
-        console.log(newCanvasHeight, newCanvasWidth);
-
-        wrapper.style.width = (newCanvasWidth + 3) + "px";
-        wrapper.style.height = (newCanvasHeight + 3) + "px";
-        canvas.style.width = newCanvasWidth + "px";
-        canvas.style.height = newCanvasHeight + "px";
-        document.getElementById("codeEntryDiv").style.width = (interfaceAreaWidth - newCanvasWidth - padding) + "px";
-        
-
-        document.getElementById("terminal-wrapper").style.width = (newCanvasWidth + 3) + "px";
-        document.getElementById("terminal-wrapper").style.height = terminalMinimumHeight + "px";
-
-        newScale = Math.floor((700 / newCanvasWidth) * 1000 ) / 1000
-        console.log(newScale);
-        this.turtleScale = newScale;
-
-        */
     }
 
 
@@ -1054,7 +1062,7 @@ export default class Interpreter {
 
 
             else {
- 
+
                 if (token == '(') handleParend();
 
                 if (prims[token] == undefined) {
@@ -1186,7 +1194,7 @@ export default class Interpreter {
             chartType.push("bottom");
         }
 
-        
+
 
         for (var i in t.locals) {
             if (t.locals[i][name] != undefined) {
@@ -1203,8 +1211,8 @@ export default class Interpreter {
         t.locals[t.locals.length - 1][name] = value;
 
         if (updateChart) {
-            for (var type of chartType) {
-                this.updateChartData(type);
+            for (var types of chartType) {
+                this.updateChartData(types);
             }
         }
 
@@ -1731,20 +1739,24 @@ export default class Interpreter {
             if (value) {
 
                 //This is an example of how to get a string instead of a number. It can be used, for example, to do a 'read all'. 
-                //This could be something like adc0:adc1:adc2:adc3... and it gets parsed here. But we don't know what type we've received
-                //currently, we need to check something first.
+                //This could be something like adc0:adc1:adc2:adc3... and it gets parsed here.
 
                 // var string = new TextDecoder("utf-8").decode(value);
                 //   console.log(string);
 
 
-                var newValue;
+
                 this.handleReceiveData(value);
+
+                //I guess I didn't need this part? Is it for the packet example above?
+                /*
+                var newValue;
                 if (value[1] != 0) {
                     newValue = value[0] + 256 * value[1]
                 } else {
                     newValue = value[0];
                 }
+                */
 
             }
             if (done) {

@@ -13,7 +13,8 @@ import MonacoEditor from 'react-monaco-editor';
 import Chart from './components/Chart';
 import DataTable from './components/DataTable';
 import Terminal from './components/Terminal';
-
+import 'firebase/auth';
+//import firebase from 'firebase/app';
 
 var interpreter;
 var projects;
@@ -53,6 +54,8 @@ end`,
     },
     chartDataBottom: [],
     logoVariables: [],
+    uid: null,
+    uname: null
 
   };
 
@@ -60,9 +63,6 @@ end`,
 
   componentDidMount() {
 
-    //check for project URL
-
-    
     console.log("Serial API Check:");
     console.log(this.checkIfSerialCapable());
 
@@ -81,35 +81,50 @@ end`,
 
     window.onresize = interpreter.handleResize.bind(interpreter);
 
-
-
     const connectButton = document.getElementById('connectButton');
-    connectButton.addEventListener('click', interpreter.openSerialPort.bind(interpreter));
-
     const disconnectButton = document.getElementById('disconnectButton');
-    disconnectButton.addEventListener('click', interpreter.disconnectSerialPort.bind(interpreter));
+
+    if(connectButton !== null && disconnectButton !== null){
+      connectButton.addEventListener('click', interpreter.openSerialPort.bind(interpreter));
+      disconnectButton.addEventListener('click', interpreter.disconnectSerialPort.bind(interpreter));
+    }
 
     this.setState({
       includes: includes
     });
 
-    projects.initializeDatabase();
+      
+  }
 
-    projects.getRecoverEntry().then(recoveryProject => {
-      if (recoveryProject && recoveryProject[0] && recoveryProject[0]['code']) {
-        this.updateCode(recoveryProject[0]['code'])
+  dragTest(e){
 
-        //this is a little weird with cloud saves; we're just going to change the title to 'recovered', and hope that makes it clear
-        //the problem is if you go in and it already has the project you were working on you might not realize it's different
+    e.preventDefault();
 
-        document.getElementById("projectTitle").value = "Recovered"
+    var posX = e.screenX
 
-      }
-    });
+    function handleDrag(e){
+      console.log(e.screenX - posX)
+      interpreter.handleResizeHorizontal(e.screenX - posX);
 
-    setInterval(() => {
-      projects.writeLastCodeToLocalStorage(this.state.code);
-    }, 90000);
+    }
+
+
+    function handleMouseUp(e){
+      console.log('up')
+      document.removeEventListener('mousemove', handleDrag)
+      document.removeEventListener('mouseup', handleMouseUp)
+      return;
+    }
+    
+    console.log("resize click")
+
+    
+    document.addEventListener('mouseup', handleMouseUp)
+
+    document.addEventListener('mousemove', handleDrag)
+
+ 
+
   }
 
 
@@ -233,6 +248,7 @@ end`,
     return (
       <div>
         <Header
+          pid={this.state.pid}
           toggleNewProjectModal={this.toggleShowNewProjectModal.bind(this)}
           interpreter={this.interpreter}
           chartToggle={this.chartToggle}
@@ -268,12 +284,15 @@ end`,
               editorDidMount={this.editorDidMount}
               editorWillMount={this.editorWillMount}
             />
+
             <textarea id="procs" style={{ whiteSpace: "nowrap", display: "none" }} value={this.state.code} readOnly>
             </textarea>
             <textarea id="includes" spellCheck="false" style={{ display: "none", whiteSpace: "nowrap", overflow: "visible" }} />
           </div>
-
+                
+          <div id="gutter" onMouseDown={(e) => {this.dragTest(e)}}></div>
           <div className="chartArea" id="chartAreaWrapper">
+
             <div id="cnvframe" className={this.state.view == "main" ? null : "hide"} style={{ height: "100%", width: "100%" }}>
               <canvas className="cnv" id="canvas" ></canvas>
             </div>

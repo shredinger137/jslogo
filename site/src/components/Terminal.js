@@ -1,5 +1,4 @@
-/* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off", no-use-before-define: "off" */
- // eslint-disable-next-line react-hooks/exhaustive-deps
+/* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off", no-use-before-define: "off", react-hooks/exhaustive-deps: off */
 
 import React, { useState, useEffect } from 'react';
 import '../css/styles.css'

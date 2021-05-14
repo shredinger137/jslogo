@@ -59,6 +59,9 @@ function registerValidSW(swUrl, config) {
   navigator.serviceWorker
     .register(swUrl)
     .then(registration => {
+
+      registration.update();
+
       registration.onupdatefound = () => {
         const installingWorker = registration.installing;
         if (installingWorker == null) {
@@ -77,7 +80,7 @@ function registerValidSW(swUrl, config) {
                 'tabs for this page are closed. See https://bit.ly/CRA-PWA.'
               );
               
-              window.location.reload()
+              //TODO: Add notification
 
               // Execute callback
               if (config && config.onUpdate) {

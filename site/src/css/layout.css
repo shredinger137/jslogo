@@ -9,10 +9,10 @@ Assuming header area: 150x with a little padding
     --interfaceHeight: calc(96vh - 90px);
     --codeEntryWidth: 44vw;
     --chartHeight: 65vh;
+    --gutterWidth: 3px;
   }
 
 .terminal {
-    grid-area: terminal;
     z-index: 999;
 
 }
@@ -24,14 +24,7 @@ Assuming header area: 150x with a little padding
 
 }
 
-.codeEntry {
-    grid-area: codeEntry;
-
-
-}
-
 .chartArea {
-    grid-area: chartArea;
     border-top: solid; 
     border-right: solid;
     border-left: solid;
@@ -67,8 +60,22 @@ Assuming header area: 150x with a little padding
     height: var(--chartHeight);
 }
 
+#gutter {
+    position: absolute;
+    width: var(--gutterWidth);
+    height: var(--interfaceHeight);
+    top: 0;
+    left: calc(var(--codeEntryWidth) - var(--gutterWidth));
+}
+
+#gutter:hover {
+
+    cursor: col-resize;
+
+}
+
 .codeEntry {
-    width: var(--codeEntryWidth);
+    width: calc(var(--codeEntryWidth) - var(--gutterWidth));
     height: var(--interfaceHeight);
 }
 

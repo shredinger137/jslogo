@@ -1,4 +1,7 @@
+/* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off", no-use-before-define: "off", react-hooks/exhaustive-deps: off */
+
 //Bit of a misnomer. Header also handles cloud saves. The user menu is connected to cloud loads. Oops.
+
 
 import React, { useEffect, useState } from 'react';
 import '../css/styles.css';
@@ -11,12 +14,13 @@ import axios from 'axios';
 import UserMenu from './UserMenu';
 import { config } from '../config';
 
-var projects;
-projects = new Projects();
 
 
 
 function Header(props) {
+
+    var projects;
+    projects = new Projects();
 
 
     const userLogoStyle = {
@@ -63,9 +67,10 @@ function Header(props) {
     const reactAuth = useAuth();
 
     const [projectList, setProjectList] = useState([]);
-    const [projectId, setProjectId] = useState(null);
     const [refreshUserMenu, setRefreshUserMenu] = useState(false);
     const [saveState, setSaveState] = useState("");
+    const [projectId, setProjectId] = useState(null);
+
 
     //On mount, check to see if a project is defined in the URL.
     //All links have the format /pr${projectId}, so we check if 'pr' is the start of it and take the rest.
@@ -75,22 +80,23 @@ function Header(props) {
     //be displayed now on the frontend, and if it isn't you saving won't work. In the future we can look into collaborative files or something.
 
     useEffect(() => {
-        if (window.location.pathname.substr(1) && window.location.pathname.substr(1, 2) == "pr") {
-            var pid = window.location.pathname.substr(3);
+        if (window.location.pathname.substr(1) && window.location.pathname.substr(1, 2) === "pr") {
+            setProjectId(window.location.pathname.substr(3));
 
-            axios.get(`${config.apiUrl}/projects/${pid}`, {
+            axios.get(`${config.apiUrl}/projects/${window.location.pathname.substr(3)}`, {
             }).then(response => {
                 if (response && response.data && response.data.code && response.data.title) {
                     props.updateCode(response.data.code);
                     document.getElementById('projectTitle').value = response.data.title;
                     setProjectId(response.data.projectId);
+
                 } else {
                     console.log("error")
                 }
             })
         }
     },
-        [user]
+        []
     )
 
 
@@ -103,6 +109,88 @@ function Header(props) {
         [user]
     );
 
+
+    useEffect(() => {
+
+        projects.initializeDatabase();
+
+        firebase.auth().onAuthStateChanged(function (user) {
+            projects.getRecoverEntry().then(recoveryProject => console.log(recoveryProject))
+
+            /*
+
+            projects.getRecoverEntry().then(recoveryProject => {
+                if (recoveryProject && recoveryProject[0] && recoveryProject[0]['code']) {
+                    console.log("db")
+                    props.updateCode(recoveryProject[0]['code'])
+                    props.updateCode(recoveryProject[0]['code'])
+                    document.getElementById("projectTitle").value = "Recovered"
+
+         
+                    
+                    if (recoveryProject[0]['projectId'] && user) {
+                        console.log("project")
+                        //this is not a robust solution - it assumes that we're connected, that the correct user is the one on the computer,
+                        //and that we get a good response and don't need to fallback to code. Obviously all of that is wrong and we 
+                        //need to be more robust in the future.
+                        getSingleProject(recoveryProject[0]['projectId']);
+                    } else {
+                        console.log("no")
+                        console.log(recoveryProject[0])
+                        console.log(user)
+                        props.updateCode(recoveryProject[0]['code'])
+    
+                        document.getElementById("projectTitle").value = "Recovered"
+                    }
+    
+                 
+
+
+
+
+                    //this is a little weird with cloud saves; we're just going to change the title to 'recovered', and hope that makes it clear
+                    //the problem is if you go in and it already has the project you were working on you might not realize it's different
+
+
+                }
+            });
+
+
+
+            if (user && user.uid) {
+                //got user
+
+            } else {
+                // No user is signed in.
+            }
+            */
+        });
+
+    },
+        [],
+    )
+
+    //handle recovery on render
+    useEffect(() => {
+         /*
+        projects.initializeDatabase();
+
+
+        //Due to issues with setInterval, code and projectID are handled separately with saving. ProjectId is updated in the database when its state is updated; code is updated periodically.
+        //One thing to note is that the 'code' entry isn't necessarily in sync with the 'projectId' entry - the projectId should supercede the code entry, and we trust that users saved appropriately 
+        //when using cloud projects.
+
+
+        //Here we get the code
+       
+        setInterval(() => {
+
+            projects.writeLastCodeToLocalStorage(document.getElementById("procs").value);
+        }, 1000);
+        */
+
+    },
+        [])
 
 
 
@@ -122,7 +210,9 @@ function Header(props) {
 
     const toggleUserMenu = () => {
         var menu = document.getElementById("userMenuWrapper");
-        menu.classList.toggle("userMenuShow");
+        if (menu !== null) {
+            menu.classList.toggle("userMenuShow");
+        }
 
     }
 
@@ -154,6 +244,7 @@ function Header(props) {
             firebase.auth().currentUser.getIdToken(false).then(idToken => {
 
                 if (!projectId) {
+
                     //first time saving - we expect a response containing an ID
 
 
@@ -182,15 +273,15 @@ function Header(props) {
                         authorization: idToken
                     }).then((response) => {
 
-                        if(response.status == 200){
+                        if (response.status == 200) {
                             setSaveState("Project Saved");
                         } else {
                             setSaveState("Error Saving")
                         }
 
-                        setTimeout(function(){
+                        setTimeout(function () {
                             setSaveState("");
-                       }.bind(this),3000);
+                        }, 3000);
 
                     })
 
@@ -215,22 +306,22 @@ function Header(props) {
                 })
                     .then(response => {
                         getUserProjects();
-                        setProjectId(null)
+                        setProjectId(null);
                     })
             })
         }
     }
 
-    const handleNameChange = () => {
 
-    }
+    const getSingleProject = (openPid) => {
 
-    const getSingleProject = (pid) => {
+        projects.writePidToStorage(openPid);
+
 
         toggleUserMenu();
         if (user && user.uid) {
             firebase.auth().currentUser.getIdToken(false).then(idToken => {
-                axios.get(`${config.apiUrl}/projects/${pid}`, {
+                axios.get(`${config.apiUrl}/projects/${openPid}`, {
                     headers: {
                         authorization: idToken
                     }
@@ -239,6 +330,7 @@ function Header(props) {
                         props.updateCode(response.data.code);
                         document.getElementById('projectTitle').value = response.data.title;
                         setProjectId(response.data.projectId);
+
                     } else {
                         console.log("error")
                     }
@@ -287,8 +379,8 @@ function Header(props) {
 
             }
             <div style={titleStyle}>
-                <input type="text" id="projectTitle" defaultValue="Untitled" style={titleInputStyle} maxLength="22" onChange={handleNameChange}></input>
-                <span style={{fontSize: ".8em"}}>{saveState}</span>
+                <input type="text" id="projectTitle" defaultValue="Untitled" style={titleInputStyle} maxLength="22"></input>
+                <span style={{ fontSize: ".8em" }}>{saveState}</span>
             </div>
             <div className="buttonDiv" onClick={() => toggleNewProject()}>
                 <img src="/images/newProject.png" alt="New project icon"></img>
