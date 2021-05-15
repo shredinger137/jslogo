@@ -21,8 +21,7 @@ export default class Projects {
   }
 
 
-  async writeLastCodeToLocalStorage(code, projectId) {
-    console.log("lastcode")
+  async writeLastCodeToLocalStorage(code) {
 
     //read the database and see if 'recover' exists; if so, get the id key
 
@@ -55,14 +54,12 @@ export default class Projects {
   async writePidToStorage(pid) {
     var context = this;
 
-    console.log("writing pid", pid)
     //read the database and see if 'recover' exists; if so, get the id key
 
     this.getRecoverEntry().then(async function (entries) {
       if (entries && entries.length > 0) {
 
         //if a recovery entry exists, update it with the new code
-        console.log("1", pid)
         var recoveryId = entries[0]["id"];
         await localDatabase.projects.update(recoveryId, {
           projectId: pid

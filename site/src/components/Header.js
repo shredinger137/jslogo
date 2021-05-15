@@ -15,6 +15,8 @@ import UserMenu from './UserMenu';
 import { config } from '../config';
 
 
+//alright, latest issue is using 'user' in different ways. Stick to one.
+
 
 
 function Header(props) {
@@ -66,10 +68,14 @@ function Header(props) {
     const { data: user } = useUser();
     const reactAuth = useAuth();
 
+
+    //in progress: change toggleUserMenu to use this state instead
+
     const [projectList, setProjectList] = useState([]);
     const [refreshUserMenu, setRefreshUserMenu] = useState(false);
     const [saveState, setSaveState] = useState("");
     const [projectId, setProjectId] = useState(null);
+    const [userMenuShow, setUserMenuShow] = useState(false);
 
 
     //On mount, check to see if a project is defined in the URL.
@@ -114,83 +120,71 @@ function Header(props) {
 
         projects.initializeDatabase();
 
+        /*
+        This is how we should handle opening the previous project, if we choose to do that 
         firebase.auth().onAuthStateChanged(function (user) {
-            projects.getRecoverEntry().then(recoveryProject => console.log(recoveryProject))
-
-            /*
-
             projects.getRecoverEntry().then(recoveryProject => {
-                if (recoveryProject && recoveryProject[0] && recoveryProject[0]['code']) {
-                    console.log("db")
-                    props.updateCode(recoveryProject[0]['code'])
-                    props.updateCode(recoveryProject[0]['code'])
-                    document.getElementById("projectTitle").value = "Recovered"
-
-         
-                    
-                    if (recoveryProject[0]['projectId'] && user) {
-                        console.log("project")
-                        //this is not a robust solution - it assumes that we're connected, that the correct user is the one on the computer,
-                        //and that we get a good response and don't need to fallback to code. Obviously all of that is wrong and we 
-                        //need to be more robust in the future.
-                        getSingleProject(recoveryProject[0]['projectId']);
-                    } else {
-                        console.log("no")
-                        console.log(recoveryProject[0])
-                        console.log(user)
-                        props.updateCode(recoveryProject[0]['code'])
-    
-                        document.getElementById("projectTitle").value = "Recovered"
-                    }
-    
-                 
-
-
-
-
-                    //this is a little weird with cloud saves; we're just going to change the title to 'recovered', and hope that makes it clear
-                    //the problem is if you go in and it already has the project you were working on you might not realize it's different
-
-
+                console.log(recoveryProject)
+                console.log(user)
+                if (user && recoveryProject[0] && recoveryProject[0].projectId) {
+                    console.log("open" + recoveryProject[0].projectId)
+                    getSingleProject(recoveryProject[0].projectId, user);
+                } else if (recoveryProject[0].code) {
+                    //restore code
                 }
-            });
-
-
-
-            if (user && user.uid) {
-                //got user
-
-            } else {
-                // No user is signed in.
             }
-            */
+
+
+            )
         });
+
+        */
+
+        
+
+        projects.getRecoverEntry().then(recoveryProject => {
+            if (recoveryProject && recoveryProject[0] && recoveryProject[0]['code']) {
+                props.updateCode(recoveryProject[0]['code'])
+                props.updateCode(recoveryProject[0]['code'])
+                document.getElementById("projectTitle").value = "Recovered"
+
+     
+                
+                if (false) {
+                    console.log("project")
+                    //this is not a robust solution - it assumes that we're connected, that the correct user is the one on the computer,
+                    //and that we get a good response and don't need to fallback to code. Obviously all of that is wrong and we 
+                    //need to be more robust in the future.
+                    getSingleProject(recoveryProject[0]['projectId']);
+                } else {
+
+                    props.updateCode(recoveryProject[0]['code'])
+ 
+                    document.getElementById("projectTitle").value = "Recovered"
+                }
+ 
+             
+
+
+
+
+                //this is a little weird with cloud saves; we're just going to change the title to 'recovered', and hope that makes it clear
+                //the problem is if you go in and it already has the project you were working on you might not realize it's different
+
+
+            }
+        });
+
+        setInterval(() => {
+
+            projects.writeLastCodeToLocalStorage(document.getElementById("procs").value);
+        }, 1000);
+
 
     },
         [],
     )
 
-    //handle recovery on render
-    useEffect(() => {
-         /*
-        projects.initializeDatabase();
-
-
-        //Due to issues with setInterval, code and projectID are handled separately with saving. ProjectId is updated in the database when its state is updated; code is updated periodically.
-        //One thing to note is that the 'code' entry isn't necessarily in sync with the 'projectId' entry - the projectId should supercede the code entry, and we trust that users saved appropriately 
-        //when using cloud projects.
-
-
-        //Here we get the code
-       
-        setInterval(() => {
-
-            projects.writeLastCodeToLocalStorage(document.getElementById("procs").value);
-        }, 1000);
-        */
-
-    },
-        [])
 
 
 
@@ -209,10 +203,8 @@ function Header(props) {
     }
 
     const toggleUserMenu = () => {
-        var menu = document.getElementById("userMenuWrapper");
-        if (menu !== null) {
-            menu.classList.toggle("userMenuShow");
-        }
+
+        setUserMenuShow(!userMenuShow)
 
     }
 
@@ -313,13 +305,20 @@ function Header(props) {
     }
 
 
-    const getSingleProject = (openPid) => {
+    const getSingleProject = (openPid, userObject) => {
+        //during this process we're passing userObject when getting it from a recovery entry, since it's unreliable to get it through state unless state triggers the function
+        //this is an issue entirely because we're using two different methods of getting user, and it might not exist in both... so... think about that.
 
         projects.writePidToStorage(openPid);
 
-
         toggleUserMenu();
+
+        if (userObject) {
+            var user = userObject;
+        }
+
         if (user && user.uid) {
+
             firebase.auth().currentUser.getIdToken(false).then(idToken => {
                 axios.get(`${config.apiUrl}/projects/${openPid}`, {
                     headers: {
@@ -328,7 +327,10 @@ function Header(props) {
                 }).then(response => {
                     if (response && response.data && response.data.code && response.data.title) {
                         props.updateCode(response.data.code);
-                        document.getElementById('projectTitle').value = response.data.title;
+                        var titleElement = document.getElementById('projectTitle');
+                        if (titleElement !== null) {
+                            titleElement.value = response.data.title;
+                        }
                         setProjectId(response.data.projectId);
 
                     } else {
@@ -338,6 +340,8 @@ function Header(props) {
 
             })
 
+        } else {
+            console.log("conditional error")
         }
     }
 
@@ -420,13 +424,14 @@ function Header(props) {
             <span style={{ width: "20px" }}></span>
 
             {user ?
-                <div id="userMenuWrapper" className="userMenu">
+                <div id="userMenuWrapper" className={userMenuShow ? "userMenu userMenuShow" : "userMenu"}>
                     <UserMenu
                         refreshUserMenu={refreshUserMenu}
                         toggleUserMenu={toggleUserMenu.bind(this)}
                         getSingleProject={getSingleProject.bind(this)}
                         deleteProject={deleteProject.bind(this)}
                         projectList={projectList}
+                        showMenu={userMenuShow}
 
                     />
                 </div>

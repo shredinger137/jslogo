@@ -55,8 +55,8 @@ end`,
     chartDataBottom: [],
     logoVariables: [],
     uid: null,
-    uname: null
-
+    uname: null,
+    horizontalOffset: 0,
   };
 
 
@@ -65,6 +65,11 @@ end`,
 
     console.log("Serial API Check:");
     console.log(this.checkIfSerialCapable());
+
+
+    var gutter = document.getElementById("gutter");
+    this.setState({horizontalOffset: document.getElementById("gutter").getBoundingClientRect().left})
+   // console.log(document.getElementById("gutter").getBoundingClientRect())
 
     interpreter = new Interpreter(
       document.getElementById("cnvframe").offsetHeight,
@@ -98,26 +103,26 @@ end`,
 
   dragTest(e){
 
+    var context = this;
+
     e.preventDefault();
 
-    var posX = e.screenX
+    var posX = e.clientX
 
     function handleDrag(e){
-      console.log(e.screenX - posX)
-      interpreter.handleResizeHorizontal(e.screenX - posX);
+      
+
+      interpreter.handleResizeHorizontal(e.clientX - context.state.horizontalOffset);
 
     }
 
 
     function handleMouseUp(e){
-      console.log('up')
       document.removeEventListener('mousemove', handleDrag)
       document.removeEventListener('mouseup', handleMouseUp)
       return;
     }
-    
-    console.log("resize click")
-
+ 
     
     document.addEventListener('mouseup', handleMouseUp)
 

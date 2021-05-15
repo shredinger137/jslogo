@@ -118,7 +118,7 @@ function Terminal(props) {
             >
 
             <div id="terminalData" style={divStyle}> </div>
-            <span>></span><span id="prompt" contentEditable={true} style={{ outline: "none", width: "100%" }} onKeyDown={(e) => { handleKeyDown(e) }}></span>
+            <span></span><span id="prompt" contentEditable={true} style={{ outline: "none", width: "100%" }} onKeyDown={(e) => { handleKeyDown(e) }}></span>
             <p></p>
             <textarea id="cc" style={{ display: "none" }}></textarea>
         </div>

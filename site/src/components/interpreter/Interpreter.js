@@ -663,22 +663,17 @@ export default class Interpreter {
         */
 
 
-        //TODO: Gutter needs to move along with the drag; canvas doesn't redraw, probably because we haven't figured out aspect ratio yet.
-        //That means that terminal needs its height to change.
-
-
-        //TODO: This is wrong, because the offset will go to negative if you drag to the left. Immediately. We need to know
-        //the current offset and change it. The obvious answer, adding and subtracting from the original offset, doesn't work because 
-        //it will keep adding as you drag across - exponentially upping your total offset. So, we may need to identify if the drag is over or not?
+        //TODO: Currently, gutter is resized instead of moved. Oops.
+        //Canvas with turtle doesn't redraw in an expected way. HandleResize already isn't doing that correctly.
+        //Aspect ratio is not preserved, but that might be okay..
+        //Biggest issue is that this only works once. If you click to drag again it resets. Deal with that partly on the other side, App.js.
 
         this.offsetHorizontal = offset;
-
-        console.log(offset, this.offsetHorizontal)
 
         document.getElementById("codeEntryDiv").style.width = `calc(var(--codeEntryWidth) - var(--gutterWidth) + ${this.offsetHorizontal}px)`
         document.getElementById("chartAreaWrapper").style.width = `calc(98vw - var(--codeEntryWidth) - ${this.offsetHorizontal}px)`
         document.getElementById("terminal-wrapper").style.width = `calc(98vw - var(--codeEntryWidth) - ${this.offsetHorizontal}px)`
-        document.getElementById("gutter").style.width = `calc(var(--codeEntryWidth) - var(--gutterWidth) + ${this.offsetHorizontal}px)`;
+        document.getElementById("gutter").style.left = `calc(var(--codeEntryWidth) - var(--gutterWidth) + ${this.offsetHorizontal}px)`;
 
 
         this.handleResize();
@@ -1027,7 +1022,7 @@ export default class Interpreter {
                 t.stack.push(t.arglist);
                 t.stack.push(t.priority);
 
-                t.cfun = "make";
+                t.cfun = "let";
                 t.arglist = [token];
                 t.evline.shift()
 
