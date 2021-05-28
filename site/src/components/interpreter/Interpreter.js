@@ -8,6 +8,7 @@
 import Tokenizer from './Tokenizer';
 import turtleMath from './turtleMath';
 import { includes } from './includes';
+import { useFirebaseApp } from 'reactfire';
 
 
 Number.prototype.mod = function (n) { return ((this % n) + n) % n; }
@@ -68,7 +69,7 @@ export default class Interpreter {
         this.opacity = 1;
         this.pendown = true;
         this.pensize = 1;
-        this.size = 70;
+        this.size = 60;
         this.font = "sans-serif";
         this.fontsize = 30;
         this.dpi = 1;
@@ -143,11 +144,19 @@ export default class Interpreter {
      */
 
 
-    setup() {
+    setup(orderedInCommandLine) {
+
+        if(orderedInCommandLine){
+            var turtle = document.getElementById("turtle");
+            if(turtle !== null){
+                turtle.remove();
+            }
+        }
 
         var t = this;
         this.element = document.createElement('div');
         this.element.setAttribute('class', 'turtle');
+        this.element.setAttribute('id', 'turtle')
         var cnvframe = document.getElementById('cnvframe');
         cnvframe.appendChild(t.element);
         this.img = document.createElement('img');
@@ -671,8 +680,8 @@ export default class Interpreter {
         this.offsetHorizontal = offset;
 
         document.getElementById("codeEntryDiv").style.width = `calc(var(--codeEntryWidth) - var(--gutterWidth) + ${this.offsetHorizontal}px)`
-        document.getElementById("chartAreaWrapper").style.width = `calc(98vw - var(--codeEntryWidth) - ${this.offsetHorizontal}px)`
-        document.getElementById("terminal-wrapper").style.width = `calc(98vw - var(--codeEntryWidth) - ${this.offsetHorizontal}px)`
+        document.getElementById("chartAreaWrapper").style.width = `calc(var(--chartWidth) - ${this.offsetHorizontal}px)`
+        document.getElementById("terminal-wrapper").style.width = `calc(var(--chartWidth) - ${this.offsetHorizontal}px)`
         document.getElementById("gutter").style.left = `calc(var(--codeEntryWidth) - var(--gutterWidth) + ${this.offsetHorizontal}px)`;
 
 
@@ -683,22 +692,20 @@ export default class Interpreter {
     handleResize() {
         //We're going to get the total size of the document first, then calculate the necessary size of the other elements.
         //There's a default size for each component, and a required aspect ratio to the canvas. The canvas also needs to set
-        //turtleScale, which locks the coordinate system to 700x560. This is step one - later, a drag to resize handler
-        //will be needed to change the relative width of the code area.
+        //turtleScale, which locks the coordinate system to 700x560.
 
+        //Note that the canvas has an inherent problem with resize - changing it's scale doesn't change the content.
+
+        //TODO: We've changed this to a fixed 1.7 ratio. So the scale doesn't need two components now. 
 
 
         var newScale;
         var canvas = document.getElementById("canvas");
         var wrapper = document.getElementById("chartAreaWrapper");
 
-        var widthScale = 700 / (wrapper.offsetWidth - 5);
         var heightScale = 560 / (wrapper.offsetHeight - 5);
-        if (widthScale > heightScale) {
-            newScale = Math.floor(widthScale * 1000) / 1000;
-        } else {
-            newScale = Math.floor(heightScale * 1000) / 1000;
-        }
+    newScale = Math.floor(heightScale * 1000) / 1000;
+        
         this.turtleScale = newScale;
 
         canvas.style.width = (wrapper.offsetWidth - 5 + this.offset) + "px";
@@ -1961,10 +1968,11 @@ prims['shade'] = { nargs: 0, fcn: function (n) { return this.shade; } }
 prims['pensize'] = { nargs: 0, fcn: function (n) { return this.pensize; } }
 prims['opacity'] = { nargs: 0, fcn: function (n) { return 100 * this.opacity; } }
 
-prims['hideturtle'] = { nargs: 0, fcn: function (n) { this.hideTurtle(); } }
+prims['hide-turtle'] = { nargs: 0, fcn: function (n) { this.hideTurtle(); } }
 prims['ht'] = { nargs: 0, fcn: function (n) { this.hideTurtle(); } }
 prims['showturtle'] = { nargs: 0, fcn: function (n) { this.showTurtle(); } }
 prims['st'] = { nargs: 0, fcn: function (n) { this.showTurtle(); } }
+prims ['setup'] = {nargs: 0, fcn: function() {this.setup(true)}}
 
 prims['drawsnap'] = { nargs: 1, fcn: function (n) { this.hold = true; this.loadimg(this.snaps[n], function () { this.hold = false; }); } }
 
