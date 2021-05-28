@@ -3,16 +3,21 @@ Header height: 50px
 Buttons: around 77px
 
 Assuming header area: 150x with a little padding
+
+TODO: We're changing the chart area to a fixed 1.7 ratio; everything else should feed off of it.
+
+
 */
 
 :root {
     --interfaceHeight: calc(96vh - 90px);
-    --codeEntryWidth: 44vw;
+    --codeEntryWidth: calc(98vw - (65vh * 1.7) - 3px);
     --chartHeight: 65vh;
+    --chartWidth: calc(65vh * 1.7);
+    --gutterWidth: 3px;
   }
 
 .terminal {
-    grid-area: terminal;
     z-index: 999;
 
 }
@@ -24,14 +29,7 @@ Assuming header area: 150x with a little padding
 
 }
 
-.codeEntry {
-    grid-area: codeEntry;
-
-
-}
-
 .chartArea {
-    grid-area: chartArea;
     border-top: solid; 
     border-right: solid;
     border-left: solid;
@@ -63,12 +61,26 @@ Assuming header area: 150x with a little padding
     position: absolute;
     top: 0;
     right: 0;
-    width: calc(98vw - var(--codeEntryWidth));
+    width: var(--chartWidth);
     height: var(--chartHeight);
 }
 
+#gutter {
+    position: absolute;
+    width: var(--gutterWidth);
+    height: var(--interfaceHeight);
+    top: 0;
+    left: calc(var(--codeEntryWidth) - var(--gutterWidth));
+}
+
+#gutter:hover {
+
+    cursor: col-resize;
+
+}
+
 .codeEntry {
-    width: var(--codeEntryWidth);
+    width: calc(var(--codeEntryWidth) - var(--gutterWidth));
     height: var(--interfaceHeight);
 }
 
@@ -77,5 +89,5 @@ Assuming header area: 150x with a little padding
     height: calc(var(--interfaceHeight) - var(--chartHeight) - 1px);
     bottom: 0;
     right: 0;
-    width: calc(98vw - var(--codeEntryWidth));
+    width: var(--chartWidth);
 }

@@ -8,6 +8,7 @@
 import Tokenizer from './Tokenizer';
 import turtleMath from './turtleMath';
 import { includes } from './includes';
+import { useFirebaseApp } from 'reactfire';
 
 
 Number.prototype.mod = function (n) { return ((this % n) + n) % n; }
@@ -31,6 +32,7 @@ export default class Interpreter {
         //charts are given assigned variables for data; these are effectively listened for in 'make', so that 
         //if the variable in question is one of the chart data ones we know to update the chart data in our app.
 
+        this.offsetHorizontal = 0;
         this.updateChartOptions = updateChartOptions;
         this.updateChartType = updateChartType;
 
@@ -67,7 +69,7 @@ export default class Interpreter {
         this.opacity = 1;
         this.pendown = true;
         this.pensize = 1;
-        this.size = 70;
+        this.size = 60;
         this.font = "sans-serif";
         this.fontsize = 30;
         this.dpi = 1;
@@ -142,11 +144,19 @@ export default class Interpreter {
      */
 
 
-    setup() {
+    setup(orderedInCommandLine) {
+
+        if(orderedInCommandLine){
+            var turtle = document.getElementById("turtle");
+            if(turtle !== null){
+                turtle.remove();
+            }
+        }
 
         var t = this;
         this.element = document.createElement('div');
         this.element.setAttribute('class', 'turtle');
+        this.element.setAttribute('id', 'turtle')
         var cnvframe = document.getElementById('cnvframe');
         cnvframe.appendChild(t.element);
         this.img = document.createElement('img');
@@ -405,8 +415,6 @@ export default class Interpreter {
 
     initPlot() {
 
-        var xLabel, yLabel, title;
-
         //we use Chart.js for all of this, so follow their docs for the shape of the options object
         var chartOptions = {
             title: {
@@ -461,14 +469,9 @@ export default class Interpreter {
             chartOptions.title.text = ""
         }
 
-        if (this.getValueInternal("_yLabel")) {
-            yLabel = (this.getValueInternal("_yLabel"));
-        } else {
-            yLabel = "";
-        }
 
         if (this.getValueInternal("_yLabel")) {
-            chartOptions.scales.yAxes[0].scaleLabel.labelString = (this.getValueInternal("_yLabel"));
+            chartOptions.scales.yAxes.scaleLabel[0].labelString = (this.getValueInternal("_yLabel"));
         }
 
         var rangeSetting = this.getValueInternal("_range");
@@ -509,7 +512,6 @@ export default class Interpreter {
                 this.updateChartOptions("bottom", chartOptions);
             }
 
-            //this resets the variables so they don't polute the next plot; additional options will need to be added here
             this.setValue("_range", null)
             this.setValue("_xLabel", null)
             this.setValue("_yLabel", null)
@@ -646,64 +648,71 @@ export default class Interpreter {
     getDocumentWidth() { return Math.max(document.body.clientWidth, document.documentElement.clientWidth); }
 
 
+    handleResizeHorizontal(offset) {
+
+        //we have to use the CSS rules and variables here as a starting point
+
+        //codeEntryDiv: width: calc(var(--codeEntryWidth) - var(--gutterWidth));
+        //chartAreaWrapper: width: calc(98vw - var(--codeEntryWidth));
+        //terminal-wrapper: calc(98vw - var(--codeEntryWidth));
+
+        /*
+
+        --interfaceHeight: calc(96vh - 90px);
+        --codeEntryWidth: 44vw;
+        --chartHeight: 65vh;
+        --gutterWidth: 3px;
+
+
+        
+.terminal {
+    position: absolute;
+    height: calc(var(--interfaceHeight) - var(--chartHeight) - 1px);
+
+        */
+
+
+        //TODO: Currently, gutter is resized instead of moved. Oops.
+        //Canvas with turtle doesn't redraw in an expected way. HandleResize already isn't doing that correctly.
+        //Aspect ratio is not preserved, but that might be okay..
+        //Biggest issue is that this only works once. If you click to drag again it resets. Deal with that partly on the other side, App.js.
+
+        this.offsetHorizontal = offset;
+
+        document.getElementById("codeEntryDiv").style.width = `calc(var(--codeEntryWidth) - var(--gutterWidth) + ${this.offsetHorizontal}px)`
+        document.getElementById("chartAreaWrapper").style.width = `calc(var(--chartWidth) - ${this.offsetHorizontal}px)`
+        document.getElementById("terminal-wrapper").style.width = `calc(var(--chartWidth) - ${this.offsetHorizontal}px)`
+        document.getElementById("gutter").style.left = `calc(var(--codeEntryWidth) - var(--gutterWidth) + ${this.offsetHorizontal}px)`;
+
+
+        this.handleResize();
+
+    }
+
     handleResize() {
         //We're going to get the total size of the document first, then calculate the necessary size of the other elements.
         //There's a default size for each component, and a required aspect ratio to the canvas. The canvas also needs to set
-        //turtleScale, which locks the coordinate system to 700x560. This is step one - later, a drag to resize handler
-        //will be needed to change the relative width of the code area.
+        //turtleScale, which locks the coordinate system to 700x560.
 
+        //Note that the canvas has an inherent problem with resize - changing it's scale doesn't change the content.
+
+        //TODO: We've changed this to a fixed 1.7 ratio. So the scale doesn't need two components now. 
 
 
         var newScale;
         var canvas = document.getElementById("canvas");
         var wrapper = document.getElementById("chartAreaWrapper");
 
-        var widthScale = 700 / (wrapper.offsetWidth - 5);
         var heightScale = 560 / (wrapper.offsetHeight - 5);
-        if (widthScale > heightScale) {
-            newScale = Math.floor(widthScale * 1000) / 1000;
-        } else {
-            newScale = Math.floor(heightScale * 1000) / 1000;
-        }
+    newScale = Math.floor(heightScale * 1000) / 1000;
+        
         this.turtleScale = newScale;
 
-        canvas.style.width = (wrapper.offsetWidth - 5) + "px";
+        canvas.style.width = (wrapper.offsetWidth - 5 + this.offset) + "px";
         canvas.style.height = (wrapper.offsetHeight - 5) + "px";
         document.getElementById("canvasDimensionsLabel").innerHTML = `Canvas: ${Math.floor((wrapper.offsetWidth - 5) * newScale)}w x ${Math.floor((wrapper.offsetHeight - 5) * newScale)}h`
 
         this.move();
-
-        /*
-                var newScale;
-        var canvas = document.getElementById("canvas");
-        var wrapper = document.getElementById("chartAreaWrapper");
-
-        var terminalMinimumHeight = 100;
-        var padding = 5;
-
-        var interfaceAreaHeight = document.getElementById("mainInterfaceGrid").offsetHeight;
-        var interfaceAreaWidth = document.getElementById("mainInterfaceGrid").offsetWidth;
-
-        var newCanvasHeight = interfaceAreaHeight - terminalMinimumHeight - padding;
-        var newCanvasWidth = newCanvasHeight * 1.25 - padding;
-
-        console.log(newCanvasHeight, newCanvasWidth);
-
-        wrapper.style.width = (newCanvasWidth + 3) + "px";
-        wrapper.style.height = (newCanvasHeight + 3) + "px";
-        canvas.style.width = newCanvasWidth + "px";
-        canvas.style.height = newCanvasHeight + "px";
-        document.getElementById("codeEntryDiv").style.width = (interfaceAreaWidth - newCanvasWidth - padding) + "px";
-        
-
-        document.getElementById("terminal-wrapper").style.width = (newCanvasWidth + 3) + "px";
-        document.getElementById("terminal-wrapper").style.height = terminalMinimumHeight + "px";
-
-        newScale = Math.floor((700 / newCanvasWidth) * 1000 ) / 1000
-        console.log(newScale);
-        this.turtleScale = newScale;
-
-        */
     }
 
 
@@ -1020,7 +1029,7 @@ export default class Interpreter {
                 t.stack.push(t.arglist);
                 t.stack.push(t.priority);
 
-                t.cfun = "make";
+                t.cfun = "let";
                 t.arglist = [token];
                 t.evline.shift()
 
@@ -1055,7 +1064,7 @@ export default class Interpreter {
 
 
             else {
- 
+
                 if (token == '(') handleParend();
 
                 if (prims[token] == undefined) {
@@ -1187,7 +1196,7 @@ export default class Interpreter {
             chartType.push("bottom");
         }
 
-        
+
 
         for (var i in t.locals) {
             if (t.locals[i][name] != undefined) {
@@ -1204,8 +1213,8 @@ export default class Interpreter {
         t.locals[t.locals.length - 1][name] = value;
 
         if (updateChart) {
-            for (var type of chartType) {
-                this.updateChartData(type);
+            for (var types of chartType) {
+                this.updateChartData(types);
             }
         }
 
@@ -1732,20 +1741,24 @@ export default class Interpreter {
             if (value) {
 
                 //This is an example of how to get a string instead of a number. It can be used, for example, to do a 'read all'. 
-                //This could be something like adc0:adc1:adc2:adc3... and it gets parsed here. But we don't know what type we've received
-                //currently, we need to check something first.
+                //This could be something like adc0:adc1:adc2:adc3... and it gets parsed here.
 
                 // var string = new TextDecoder("utf-8").decode(value);
                 //   console.log(string);
 
 
-                var newValue;
+
                 this.handleReceiveData(value);
+
+                //I guess I didn't need this part? Is it for the packet example above?
+                /*
+                var newValue;
                 if (value[1] != 0) {
                     newValue = value[0] + 256 * value[1]
                 } else {
                     newValue = value[0];
                 }
+                */
 
             }
             if (done) {
@@ -1955,10 +1968,11 @@ prims['shade'] = { nargs: 0, fcn: function (n) { return this.shade; } }
 prims['pensize'] = { nargs: 0, fcn: function (n) { return this.pensize; } }
 prims['opacity'] = { nargs: 0, fcn: function (n) { return 100 * this.opacity; } }
 
-prims['hideturtle'] = { nargs: 0, fcn: function (n) { this.hideTurtle(); } }
+prims['hide-turtle'] = { nargs: 0, fcn: function (n) { this.hideTurtle(); } }
 prims['ht'] = { nargs: 0, fcn: function (n) { this.hideTurtle(); } }
 prims['showturtle'] = { nargs: 0, fcn: function (n) { this.showTurtle(); } }
 prims['st'] = { nargs: 0, fcn: function (n) { this.showTurtle(); } }
+prims ['setup'] = {nargs: 0, fcn: function() {this.setup(true)}}
 
 prims['drawsnap'] = { nargs: 1, fcn: function (n) { this.hold = true; this.loadimg(this.snaps[n], function () { this.hold = false; }); } }
 

@@ -1,4 +1,7 @@
+/* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off", no-use-before-define: "off", react-hooks/exhaustive-deps: off */
+
 //Bit of a misnomer. Header also handles cloud saves. The user menu is connected to cloud loads. Oops.
+
 
 import React, { useEffect, useState } from 'react';
 import '../css/styles.css';
@@ -11,12 +14,15 @@ import axios from 'axios';
 import UserMenu from './UserMenu';
 import { config } from '../config';
 
-var projects;
-projects = new Projects();
+
+//alright, latest issue is using 'user' in different ways. Stick to one.
 
 
 
 function Header(props) {
+
+    var projects;
+    projects = new Projects();
 
 
     const userLogoStyle = {
@@ -62,10 +68,15 @@ function Header(props) {
     const { data: user } = useUser();
     const reactAuth = useAuth();
 
+
+    //in progress: change toggleUserMenu to use this state instead
+
     const [projectList, setProjectList] = useState([]);
-    const [projectId, setProjectId] = useState(null);
     const [refreshUserMenu, setRefreshUserMenu] = useState(false);
     const [saveState, setSaveState] = useState("");
+    const [projectId, setProjectId] = useState(null);
+    const [userMenuShow, setUserMenuShow] = useState(false);
+
 
     //On mount, check to see if a project is defined in the URL.
     //All links have the format /pr${projectId}, so we check if 'pr' is the start of it and take the rest.
@@ -75,22 +86,23 @@ function Header(props) {
     //be displayed now on the frontend, and if it isn't you saving won't work. In the future we can look into collaborative files or something.
 
     useEffect(() => {
-        if (window.location.pathname.substr(1) && window.location.pathname.substr(1, 2) == "pr") {
-            var pid = window.location.pathname.substr(3);
+        if (window.location.pathname.substr(1) && window.location.pathname.substr(1, 2) === "pr") {
+            setProjectId(window.location.pathname.substr(3));
 
-            axios.get(`${config.apiUrl}/projects/${pid}`, {
+            axios.get(`${config.apiUrl}/projects/${window.location.pathname.substr(3)}`, {
             }).then(response => {
                 if (response && response.data && response.data.code && response.data.title) {
                     props.updateCode(response.data.code);
                     document.getElementById('projectTitle').value = response.data.title;
                     setProjectId(response.data.projectId);
+
                 } else {
                     console.log("error")
                 }
             })
         }
     },
-        [user]
+        []
     )
 
 
@@ -102,6 +114,76 @@ function Header(props) {
     },
         [user]
     );
+
+
+    useEffect(() => {
+
+        projects.initializeDatabase();
+
+        /*
+        This is how we should handle opening the previous project, if we choose to do that 
+        firebase.auth().onAuthStateChanged(function (user) {
+            projects.getRecoverEntry().then(recoveryProject => {
+                console.log(recoveryProject)
+                console.log(user)
+                if (user && recoveryProject[0] && recoveryProject[0].projectId) {
+                    console.log("open" + recoveryProject[0].projectId)
+                    getSingleProject(recoveryProject[0].projectId, user);
+                } else if (recoveryProject[0].code) {
+                    //restore code
+                }
+            }
+
+
+            )
+        });
+
+        */
+
+        
+
+        projects.getRecoverEntry().then(recoveryProject => {
+            if (recoveryProject && recoveryProject[0] && recoveryProject[0]['code']) {
+                props.updateCode(recoveryProject[0]['code'])
+                props.updateCode(recoveryProject[0]['code'])
+                document.getElementById("projectTitle").value = "Recovered"
+
+     
+                
+                if (false) {
+                    console.log("project")
+                    //this is not a robust solution - it assumes that we're connected, that the correct user is the one on the computer,
+                    //and that we get a good response and don't need to fallback to code. Obviously all of that is wrong and we 
+                    //need to be more robust in the future.
+                    getSingleProject(recoveryProject[0]['projectId']);
+                } else {
+
+                    props.updateCode(recoveryProject[0]['code'])
+ 
+                    document.getElementById("projectTitle").value = "Recovered"
+                }
+ 
+             
+
+
+
+
+                //this is a little weird with cloud saves; we're just going to change the title to 'recovered', and hope that makes it clear
+                //the problem is if you go in and it already has the project you were working on you might not realize it's different
+
+
+            }
+        });
+
+        setInterval(() => {
+
+            projects.writeLastCodeToLocalStorage(document.getElementById("procs").value);
+        }, 1000);
+
+
+    },
+        [],
+    )
 
 
 
@@ -121,8 +203,8 @@ function Header(props) {
     }
 
     const toggleUserMenu = () => {
-        var menu = document.getElementById("userMenuWrapper");
-        menu.classList.toggle("userMenuShow");
+
+        setUserMenuShow(!userMenuShow)
 
     }
 
@@ -154,6 +236,7 @@ function Header(props) {
             firebase.auth().currentUser.getIdToken(false).then(idToken => {
 
                 if (!projectId) {
+
                     //first time saving - we expect a response containing an ID
 
 
@@ -182,15 +265,15 @@ function Header(props) {
                         authorization: idToken
                     }).then((response) => {
 
-                        if(response.status == 200){
+                        if (response.status == 200) {
                             setSaveState("Project Saved");
                         } else {
                             setSaveState("Error Saving")
                         }
 
-                        setTimeout(function(){
+                        setTimeout(function () {
                             setSaveState("");
-                       }.bind(this),3000);
+                        }, 3000);
 
                     })
 
@@ -215,30 +298,45 @@ function Header(props) {
                 })
                     .then(response => {
                         getUserProjects();
-                        setProjectId(null)
+                        setProjectId(null);
                     })
             })
         }
     }
 
-    const handleNameChange = () => {
 
-    }
+    const getSingleProject = (openPid, userObject) => {
 
-    const getSingleProject = (pid) => {
+        console.log("getSingle")
+        //during this process we're passing userObject when getting it from a recovery entry, since it's unreliable to get it through state unless state triggers the function
+        //this is an issue entirely because we're using two different methods of getting user, and it might not exist in both... so... think about that.
+
+        projects.writePidToStorage(openPid);
 
         toggleUserMenu();
-        if (user && user.uid) {
+
+        if (userObject) {
+            var user = userObject;
+        }
+
+        if ( true
+            //user && user.uid - check temporarily disabled during troubleshooting
+            ) {
+
             firebase.auth().currentUser.getIdToken(false).then(idToken => {
-                axios.get(`${config.apiUrl}/projects/${pid}`, {
+                axios.get(`${config.apiUrl}/projects/${openPid}`, {
                     headers: {
                         authorization: idToken
                     }
                 }).then(response => {
                     if (response && response.data && response.data.code && response.data.title) {
                         props.updateCode(response.data.code);
-                        document.getElementById('projectTitle').value = response.data.title;
+                        var titleElement = document.getElementById('projectTitle');
+                        if (titleElement !== null) {
+                            titleElement.value = response.data.title;
+                        }
                         setProjectId(response.data.projectId);
+
                     } else {
                         console.log("error")
                     }
@@ -246,6 +344,8 @@ function Header(props) {
 
             })
 
+        } else {
+            console.log("conditional error")
         }
     }
 
@@ -287,8 +387,8 @@ function Header(props) {
 
             }
             <div style={titleStyle}>
-                <input type="text" id="projectTitle" defaultValue="Untitled" style={titleInputStyle} maxLength="22" onChange={handleNameChange}></input>
-                <span style={{fontSize: ".8em"}}>{saveState}</span>
+                <input type="text" id="projectTitle" defaultValue="Untitled" style={titleInputStyle} maxLength="22"></input>
+                <span style={{ fontSize: ".8em" }}>{saveState}</span>
             </div>
             <div className="buttonDiv" onClick={() => toggleNewProject()}>
                 <img src="/images/newProject.png" alt="New project icon"></img>
@@ -328,13 +428,14 @@ function Header(props) {
             <span style={{ width: "20px" }}></span>
 
             {user ?
-                <div id="userMenuWrapper" className="userMenu">
+                <div id="userMenuWrapper" className={userMenuShow ? "userMenu userMenuShow" : "userMenu"}>
                     <UserMenu
                         refreshUserMenu={refreshUserMenu}
                         toggleUserMenu={toggleUserMenu.bind(this)}
                         getSingleProject={getSingleProject.bind(this)}
                         deleteProject={deleteProject.bind(this)}
                         projectList={projectList}
+                        showMenu={userMenuShow}
 
                     />
                 </div>

@@ -21,4 +21,4 @@ ReactDOM.render(
 
 //This is the part that makes it a PWA. Temporarily disabled due to the speed of new releases. Change to 'register' when out of alpha.
 
-serviceWorker.unregister();
+serviceWorker.register();

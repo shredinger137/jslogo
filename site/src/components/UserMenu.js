@@ -1,14 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import firebase from 'firebase/app'
 import 'firebase/auth'
-import axios from 'axios';
-import { config } from '../config'
-import { useUser } from 'reactfire'
-
 
 function UserMenu(props) {
-
-    const { data: user } = useUser();
 
     const [projectList, setProjectList] = useState(props.projectList);
 
@@ -17,6 +11,10 @@ function UserMenu(props) {
         setProjectList(props.projectList);
     }, [props.projectList]);
 
+    useEffect(() => {
+
+    },
+    [])
 
     const menuStyle = {
         minWidth: '200px',
@@ -47,6 +45,11 @@ function UserMenu(props) {
             console.error("Unable to write to clipboard");
         });
     }
+
+
+
+
+
 
     return (
         <div style={menuStyle}>

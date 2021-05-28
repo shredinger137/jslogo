@@ -1,5 +1,4 @@
-/* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off", no-use-before-define: "off" */
- // eslint-disable-next-line react-hooks/exhaustive-deps
+/* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off", no-use-before-define: "off", react-hooks/exhaustive-deps: off */
 
 import React, { useState, useEffect } from 'react';
 import '../css/styles.css'
@@ -119,7 +118,7 @@ function Terminal(props) {
             >
 
             <div id="terminalData" style={divStyle}> </div>
-            <span>></span><span id="prompt" contentEditable={true} style={{ outline: "none", width: "100%" }} onKeyDown={(e) => { handleKeyDown(e) }}></span>
+            <span></span><span id="prompt" contentEditable={true} style={{ outline: "none", width: "100%" }} onKeyDown={(e) => { handleKeyDown(e) }}></span>
             <p></p>
             <textarea id="cc" style={{ display: "none" }}></textarea>
         </div>
