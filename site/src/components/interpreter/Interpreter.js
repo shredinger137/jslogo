@@ -146,9 +146,9 @@ export default class Interpreter {
 
     setup(orderedInCommandLine) {
 
-        if(orderedInCommandLine){
+        if (orderedInCommandLine) {
             var turtle = document.getElementById("turtle");
-            if(turtle !== null){
+            if (turtle !== null) {
                 turtle.remove();
             }
         }
@@ -704,8 +704,8 @@ export default class Interpreter {
         var wrapper = document.getElementById("chartAreaWrapper");
 
         var heightScale = 560 / (wrapper.offsetHeight - 5);
-    newScale = Math.floor(heightScale * 1000) / 1000;
-        
+        newScale = Math.floor(heightScale * 1000) / 1000;
+
         this.turtleScale = newScale;
 
         canvas.style.width = (wrapper.offsetWidth - 5 + this.offset) + "px";
@@ -756,6 +756,20 @@ export default class Interpreter {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
+    //load a background
+
+    loadBackgroundImage(url) {
+
+        var c = document.getElementById("canvas");
+        var ctx = c.getContext("2d");
+        var img = new Image();
+        img.onload = function() {
+            ctx.drawImage(img, 0, 0);
+        };
+        img.src = url;
+
+    }
+
 
     /////////////////////////
     //
@@ -779,6 +793,8 @@ export default class Interpreter {
             if (fcn) fcn();
         }
     }
+
+
 
     loadpng(dataurl, fcn) {
         var t = this;
@@ -1972,7 +1988,7 @@ prims['hide-turtle'] = { nargs: 0, fcn: function (n) { this.hideTurtle(); } }
 prims['ht'] = { nargs: 0, fcn: function (n) { this.hideTurtle(); } }
 prims['showturtle'] = { nargs: 0, fcn: function (n) { this.showTurtle(); } }
 prims['st'] = { nargs: 0, fcn: function (n) { this.showTurtle(); } }
-prims ['setup'] = {nargs: 0, fcn: function() {this.setup(true)}}
+prims['setup'] = { nargs: 0, fcn: function () { this.setup(true) } }
 
 prims['drawsnap'] = { nargs: 1, fcn: function (n) { this.hold = true; this.loadimg(this.snaps[n], function () { this.hold = false; }); } }
 
@@ -2000,6 +2016,7 @@ prims['false'] = { nargs: 0, fcn: function () { return false; } }
 prims['push'] = { nargs: 2, fcn: function (a, b) { this.pushToArray(a, b); } }
 prims['make'] = { nargs: 2, fcn: function (a, b) { this.setValue(a, b); } }
 prims['let'] = { nargs: 2, fcn: function (a, b) { this.setLocalValue(a, b); } }
+prims['background'] = { nargs: 1, fcn: function (a) { this.loadBackgroundImage(a) } }
 
 prims['local'] = { nargs: 1, fcn: function (a, b) { this.makeLocal(a); } }
 

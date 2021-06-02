@@ -316,8 +316,10 @@ function Header(props) {
         if (userObject) {
             var user = userObject;
         }
-
-        if (user && user.uid) {
+        
+        if ( true
+            //user && user.uid - check temporarily disabled during troubleshooting
+            ) {
 
             firebase.auth().currentUser.getIdToken(false).then(idToken => {
                 axios.get(`${config.apiUrl}/projects/${openPid}`, {
