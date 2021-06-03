@@ -114,7 +114,7 @@ function Terminal(props) {
             id="terminal-wrapper" 
             onClick={() => { document.getElementById('prompt').focus() }} 
             className="terminal" 
-            style={{ border: "solid", outline: "none", maxHeight: "25vh", zIndex: "1", backgroundColor: "white" }} 
+            style={{ border: "solid", outline: "none", zIndex: "1", backgroundColor: "white" }} 
             >
 
             <div id="terminalData" style={divStyle}> </div>

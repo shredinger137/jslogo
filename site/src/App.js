@@ -295,7 +295,7 @@ end`,
             <textarea id="includes" spellCheck="false" style={{ display: "none", whiteSpace: "nowrap", overflow: "visible" }} />
           </div>
                 
-          <div id="gutter" onMouseDown={(e) => {this.dragTest(e)}} style={{display: "none"}}></div>
+          <div id="gutter" onMouseDown={(e) => {this.dragTest(e)}} ></div>
           <div className="chartArea" id="chartAreaWrapper">
 
             <div id="cnvframe" className={this.state.view == "main" ? null : "hide"} style={{ height: "100%", width: "100%" }}>
