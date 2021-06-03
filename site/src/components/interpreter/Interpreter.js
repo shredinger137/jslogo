@@ -703,7 +703,7 @@ export default class Interpreter {
         var canvas = document.getElementById("canvas");
         var wrapper = document.getElementById("chartAreaWrapper");
 
-        var heightScale = 560 / (wrapper.offsetHeight - 5);
+        var heightScale = 600 / (wrapper.offsetHeight - 5);
         newScale = Math.floor(heightScale * 1000) / 1000;
 
         this.turtleScale = newScale;
