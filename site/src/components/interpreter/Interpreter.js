@@ -146,9 +146,9 @@ export default class Interpreter {
 
     setup(orderedInCommandLine) {
 
-        if(orderedInCommandLine){
+        if (orderedInCommandLine) {
             var turtle = document.getElementById("turtle");
-            if(turtle !== null){
+            if (turtle !== null) {
                 turtle.remove();
             }
         }
@@ -650,38 +650,14 @@ export default class Interpreter {
 
     handleResizeHorizontal(offset) {
 
-        //we have to use the CSS rules and variables here as a starting point
-
-        //codeEntryDiv: width: calc(var(--codeEntryWidth) - var(--gutterWidth));
-        //chartAreaWrapper: width: calc(98vw - var(--codeEntryWidth));
-        //terminal-wrapper: calc(98vw - var(--codeEntryWidth));
-
-        /*
-
-        --interfaceHeight: calc(96vh - 90px);
-        --codeEntryWidth: 44vw;
-        --chartHeight: 65vh;
-        --gutterWidth: 3px;
-
-
-        
-.terminal {
-    position: absolute;
-    height: calc(var(--interfaceHeight) - var(--chartHeight) - 1px);
-
-        */
-
-
-        //TODO: Currently, gutter is resized instead of moved. Oops.
-        //Canvas with turtle doesn't redraw in an expected way. HandleResize already isn't doing that correctly.
-        //Aspect ratio is not preserved, but that might be okay..
-        //Biggest issue is that this only works once. If you click to drag again it resets. Deal with that partly on the other side, App.js.
 
         this.offsetHorizontal = offset;
 
         document.getElementById("codeEntryDiv").style.width = `calc(var(--codeEntryWidth) - var(--gutterWidth) + ${this.offsetHorizontal}px)`
         document.getElementById("chartAreaWrapper").style.width = `calc(var(--chartWidth) - ${this.offsetHorizontal}px)`
+        document.getElementById("chartAreaWrapper").style.height = `calc(var(--chartHeight) - ${this.offsetHorizontal * (3/5)}px)`
         document.getElementById("terminal-wrapper").style.width = `calc(var(--chartWidth) - ${this.offsetHorizontal}px)`
+        document.getElementById("terminal-wrapper").style.height = `calc(var(--interfaceHeight) - var(--chartHeight) + ${this.offsetHorizontal * (3/5)}px)`
         document.getElementById("gutter").style.left = `calc(var(--codeEntryWidth) - var(--gutterWidth) + ${this.offsetHorizontal}px)`;
 
 
@@ -690,25 +666,18 @@ export default class Interpreter {
     }
 
     handleResize() {
-        //We're going to get the total size of the document first, then calculate the necessary size of the other elements.
-        //There's a default size for each component, and a required aspect ratio to the canvas. The canvas also needs to set
-        //turtleScale, which locks the coordinate system to 700x560.
-
-        //Note that the canvas has an inherent problem with resize - changing it's scale doesn't change the content.
-
-        //TODO: We've changed this to a fixed 1.7 ratio. So the scale doesn't need two components now. 
 
 
         var newScale;
         var canvas = document.getElementById("canvas");
         var wrapper = document.getElementById("chartAreaWrapper");
 
-        var heightScale = 560 / (wrapper.offsetHeight - 5);
-    newScale = Math.floor(heightScale * 1000) / 1000;
-        
+        var heightScale = 600 / (wrapper.offsetHeight - 5);
+        newScale = Math.floor(heightScale * 1000) / 1000;
+
         this.turtleScale = newScale;
 
-        canvas.style.width = (wrapper.offsetWidth - 5 + this.offset) + "px";
+        canvas.style.width = (wrapper.offsetWidth - 5) + "px";
         canvas.style.height = (wrapper.offsetHeight - 5) + "px";
         document.getElementById("canvasDimensionsLabel").innerHTML = `Canvas: ${Math.floor((wrapper.offsetWidth - 5) * newScale)}w x ${Math.floor((wrapper.offsetHeight - 5) * newScale)}h`
 
@@ -756,6 +725,20 @@ export default class Interpreter {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
+    //load a background
+
+    loadBackgroundImage(url) {
+
+        var c = document.getElementById("canvas");
+        var ctx = c.getContext("2d");
+        var img = new Image();
+        img.onload = function() {
+            ctx.drawImage(img, 0, 0);
+        };
+        img.src = url;
+
+    }
+
 
     /////////////////////////
     //
@@ -779,6 +762,8 @@ export default class Interpreter {
             if (fcn) fcn();
         }
     }
+
+
 
     loadpng(dataurl, fcn) {
         var t = this;
@@ -1972,7 +1957,7 @@ prims['hide-turtle'] = { nargs: 0, fcn: function (n) { this.hideTurtle(); } }
 prims['ht'] = { nargs: 0, fcn: function (n) { this.hideTurtle(); } }
 prims['showturtle'] = { nargs: 0, fcn: function (n) { this.showTurtle(); } }
 prims['st'] = { nargs: 0, fcn: function (n) { this.showTurtle(); } }
-prims ['setup'] = {nargs: 0, fcn: function() {this.setup(true)}}
+prims['setup'] = { nargs: 0, fcn: function () { this.setup(true) } }
 
 prims['drawsnap'] = { nargs: 1, fcn: function (n) { this.hold = true; this.loadimg(this.snaps[n], function () { this.hold = false; }); } }
 
@@ -2000,6 +1985,7 @@ prims['false'] = { nargs: 0, fcn: function () { return false; } }
 prims['push'] = { nargs: 2, fcn: function (a, b) { this.pushToArray(a, b); } }
 prims['make'] = { nargs: 2, fcn: function (a, b) { this.setValue(a, b); } }
 prims['let'] = { nargs: 2, fcn: function (a, b) { this.setLocalValue(a, b); } }
+prims['background'] = { nargs: 1, fcn: function (a) { this.loadBackgroundImage(a) } }
 
 prims['local'] = { nargs: 1, fcn: function (a, b) { this.makeLocal(a); } }
 

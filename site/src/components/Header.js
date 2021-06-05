@@ -140,7 +140,7 @@ function Header(props) {
 
         */
 
-        
+
 
         projects.getRecoverEntry().then(recoveryProject => {
             if (recoveryProject && recoveryProject[0] && recoveryProject[0]['code']) {
@@ -148,8 +148,8 @@ function Header(props) {
                 props.updateCode(recoveryProject[0]['code'])
                 document.getElementById("projectTitle").value = "Recovered"
 
-     
-                
+
+
                 if (false) {
                     console.log("project")
                     //this is not a robust solution - it assumes that we're connected, that the correct user is the one on the computer,
@@ -159,11 +159,11 @@ function Header(props) {
                 } else {
 
                     props.updateCode(recoveryProject[0]['code'])
- 
+
                     document.getElementById("projectTitle").value = "Recovered"
                 }
- 
-             
+
+
 
 
 
@@ -319,32 +319,7 @@ function Header(props) {
             var user = userObject;
         }
 
-        if ( true
-            //user && user.uid - check temporarily disabled during troubleshooting
-            ) {
-
-            firebase.auth().currentUser.getIdToken(false).then(idToken => {
-                axios.get(`${config.apiUrl}/projects/${openPid}`, {
-                    headers: {
-                        authorization: idToken
-                    }
-                }).then(response => {
-                    if (response && response.data && response.data.code && response.data.title) {
-                        props.updateCode(response.data.code);
-                        var titleElement = document.getElementById('projectTitle');
-                        if (titleElement !== null) {
-                            titleElement.value = response.data.title;
-                        }
-                        setProjectId(response.data.projectId);
-
-                    } else {
-                        console.log("error")
-                    }
-                })
-
-            })
-
-        } else {
+        else {
             console.log("conditional error")
         }
     }
