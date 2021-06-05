@@ -306,8 +306,6 @@ function Header(props) {
 
 
     const getSingleProject = (openPid, userObject) => {
-
-        console.log("getSingle")
         //during this process we're passing userObject when getting it from a recovery entry, since it's unreliable to get it through state unless state triggers the function
         //this is an issue entirely because we're using two different methods of getting user, and it might not exist in both... so... think about that.
 
@@ -318,8 +316,33 @@ function Header(props) {
         if (userObject) {
             var user = userObject;
         }
+        
+        if ( true
+            //user && user.uid - check temporarily disabled during troubleshooting
+            ) {
 
-        else {
+            firebase.auth().currentUser.getIdToken(false).then(idToken => {
+                axios.get(`${config.apiUrl}/projects/${openPid}`, {
+                    headers: {
+                        authorization: idToken
+                    }
+                }).then(response => {
+                    if (response && response.data && response.data.code && response.data.title) {
+                        props.updateCode(response.data.code);
+                        var titleElement = document.getElementById('projectTitle');
+                        if (titleElement !== null) {
+                            titleElement.value = response.data.title;
+                        }
+                        setProjectId(response.data.projectId);
+
+                    } else {
+                        console.log("error")
+                    }
+                })
+
+            })
+
+        } else {
             console.log("conditional error")
         }
     }
