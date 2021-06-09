@@ -732,10 +732,13 @@ export default class Interpreter {
         var c = document.getElementById("canvas");
         var ctx = c.getContext("2d");
         var img = new Image();
-        img.onload = function() {
-            ctx.drawImage(img, 0, 0);
-        };
+        console.log(img)
         img.src = url;
+        var widthTarget = document.getElementById('chartAreaWrapper').offsetWidth;
+        img.onload = function() {
+            ctx.drawImage(img, 0, 0, widthTarget, widthTarget * img.height / img.width);
+        };
+
 
     }
 
@@ -1985,7 +1988,7 @@ prims['false'] = { nargs: 0, fcn: function () { return false; } }
 prims['push'] = { nargs: 2, fcn: function (a, b) { this.pushToArray(a, b); } }
 prims['make'] = { nargs: 2, fcn: function (a, b) { this.setValue(a, b); } }
 prims['let'] = { nargs: 2, fcn: function (a, b) { this.setLocalValue(a, b); } }
-prims['background'] = { nargs: 1, fcn: function (a) { this.loadBackgroundImage(a) } }
+prims['loadpic'] = { nargs: 1, fcn: function (a) { this.loadBackgroundImage(a) } }
 
 prims['local'] = { nargs: 1, fcn: function (a, b) { this.makeLocal(a); } }
 
