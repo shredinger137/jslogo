@@ -2020,6 +2020,13 @@ prims['dp6on'] = { nargs: 0, fcn: function () { this.pinOn(6); this.mwait(1); } 
 prims['dp6off'] = { nargs: 0, fcn: function () { this.pinOff(6); this.mwait(1); } }
 prims['dp7on'] = { nargs: 0, fcn: function () { this.pinOn(7); this.mwait(1); } }
 prims['dp7off'] = { nargs: 0, fcn: function () { this.pinOff(7); this.mwait(1); } }
+prims['dp8on'] = { nargs: 0, fcn: function () { this.pinOn(8); this.mwait(1); } }
+prims['dp8off'] = { nargs: 0, fcn: function () { this.pinOff(8); this.mwait(1); } }
+prims['dp9on'] = { nargs: 0, fcn: function () { this.pinOn(9); this.mwait(1); } }
+prims['dp9off'] = { nargs: 0, fcn: function () { this.pinOff(9); this.mwait(1); } }
+prims['dp10on'] = { nargs: 0, fcn: function () { this.pinOn(10); this.mwait(1); } }
+prims['dp10off'] = { nargs: 0, fcn: function () { this.pinOff(10); this.mwait(1); } }
+
 
 prims['readADC0'] = { nargs: 0, fcn: function () { this.readSensor(0); return this.cfun; } }
 prims['readADC1'] = { nargs: 0, fcn: function () { this.readSensor(1); return this.cfun; } }
