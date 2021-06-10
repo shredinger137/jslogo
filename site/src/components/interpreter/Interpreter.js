@@ -1595,6 +1595,19 @@ export default class Interpreter {
         //   this.readADC(n, this.gotsensor);  readADC didn't seem necessary here
     }
 
+    //specific to SI1145 sensor
+
+    readIR(){
+        this.hold = true;
+        this.sendReceive([0xf8], 2, this.gotsensor)
+    }
+
+    readVisible(){
+        this.hold = true;
+        this.sendReceive([0xf9], 2, this.gotsensor)
+    }
+
+
     gotsensor(x) {
         var val = x[0] + 256 * x[1];
         this.arglist.pop();
@@ -2014,3 +2027,5 @@ prims['readADC2'] = { nargs: 0, fcn: function () { this.readSensor(2); return th
 prims['readADC3'] = { nargs: 0, fcn: function () { this.readSensor(3); return this.cfun; } }
 prims['readADC4'] = { nargs: 0, fcn: function () { this.readSensor(4); return this.cfun; } }
 prims['readADC5'] = { nargs: 0, fcn: function () { this.readSensor(5); return this.cfun; } }
+prims['read-ir'] = { nargs: 0, fcn: function () { this.readIR(); return this.cfun; } }
+prims['read-visible'] = { nargs: 0, fcn: function () { this.readVisible(); return this.cfun; } }
