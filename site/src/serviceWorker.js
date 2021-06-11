@@ -21,7 +21,10 @@ const isLocalhost = Boolean(
 );
 
 export function register(config) {
+
   console.log("Service worker registered");
+
+  
   if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
     // The URL constructor is available in all browsers that support SW.
     const publicUrl = new URL(process.env.PUBLIC_URL, window.location.href);
@@ -56,6 +59,10 @@ export function register(config) {
 }
 
 function registerValidSW(swUrl, config) {
+
+
+
+
   navigator.serviceWorker
     .register(swUrl)
     .then(registration => {
@@ -81,6 +88,13 @@ function registerValidSW(swUrl, config) {
               );
               
               //TODO: Add notification
+
+              const newDiv = document.createElement("div");
+              const newContent = document.createTextNode("A new update is available. Restart your browser to apply the update.");
+              newDiv.appendChild(newContent);
+              newDiv.id = "updateNotification"
+              document.body.appendChild(newDiv);
+          
 
               // Execute callback
               if (config && config.onUpdate) {

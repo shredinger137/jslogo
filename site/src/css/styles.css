@@ -147,6 +147,9 @@
     vertical-align: middle;
   }
 
+  #updateNotification {
+    margin-left: 1vw;
+  }
   
   .invisible {
     opacity: 0;
