@@ -17,6 +17,8 @@ export const languageDef = {
   defaultToken: "",
   number: /\d+(\.\d+)?/,
   keywords: [
+    'receive',
+    'packet',
     "read",
     "ir",
     "visible",
