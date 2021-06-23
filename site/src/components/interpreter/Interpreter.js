@@ -2036,3 +2036,4 @@ prims['readADC4'] = { nargs: 0, fcn: function () { this.readSensor(4); return th
 prims['readADC5'] = { nargs: 0, fcn: function () { this.readSensor(5); return this.cfun; } }
 prims['read-ir'] = { nargs: 0, fcn: function () { this.readIR(); return this.cfun; } }
 prims['read-visible'] = { nargs: 0, fcn: function () { this.readVisible(); return this.cfun; } }
+prims['init-ir'] = {nargs: 0, fcn: function() {this.sendl([0xf1]);}}
