@@ -3,6 +3,7 @@ stages:
 
 
 deploy_dev_api:
+    image: node:10
     stage: deployapi
     before_script:
       - cd api
@@ -17,15 +18,16 @@ deploy_dev_api:
         - dev
 
 deploy_production_api:
-  stage: deployapi
-  before_script:
-    - cd api
-  script:
-      - echo "Deploying API server"
-      - npm install
-      - cp -R ./* /repos/lbym-app/api/
+    image: node:10
+    stage: deployapi
+    before_script:
+        - cd api
+    script:
+        - echo "Deploying API server"
+        - npm install
+        - cp -R ./* /repos/lbym-app/api/
   environment:
-      name: dev
-      url: app.lbym.org
+        name: dev
+        url: app.lbym.org
   only:
-      - master
+        - master
