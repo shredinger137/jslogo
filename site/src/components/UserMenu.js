@@ -12,9 +12,9 @@ function UserMenu(props) {
     }, [props.projectList]);
 
     useEffect(() => {
-
+        console.log(props.refreshUserMenu)
     },
-    [])
+    [props.refreshUserMenu])
 
     const menuStyle = {
         minWidth: '200px',
@@ -51,8 +51,11 @@ function UserMenu(props) {
 
 
 
+
+
     return (
         <div style={menuStyle}>
+
                 <h4 onClick={signOut} style={textStyle}>Sign Out</h4>
                 {
                     projectList.map((project) =>

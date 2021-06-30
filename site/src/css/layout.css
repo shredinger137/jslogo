@@ -73,6 +73,16 @@ TODO: We're changing the chart area to a fixed 1.7 ratio; everything else should
     left: calc(var(--codeEntryWidth) - var(--gutterWidth));
 }
 
+.fullPage {
+    z-index: 0;
+    background-color: black;
+    opacity: .5;
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+
+}
+
 #gutter:hover {
 
     cursor: col-resize;

@@ -28,8 +28,6 @@ export default class NewProjectModal extends Component {
     }
 
     loadCodeFromProject(projectName) {
-        //TODO: We're not using the 'unsaved changes' value correctly. We should not prompt if it's not unsaved.
-        //TODO: Eventually all files will have a 'fileLocation' field, in which case this conditional can be removed.
         var scopedUpdateCode = this.props.updateCode;
  
 
@@ -43,6 +41,7 @@ export default class NewProjectModal extends Component {
                                 if (request.readyState === 4 && request.status === 200) {
                                     scopedUpdateCode(request.responseText);
                                     document.getElementById("projectTitle").value = "Untitled"
+                                    document.getElementById("dummyClickToClearPid").click();
                                 }
                             }
                         } else {
@@ -51,18 +50,6 @@ export default class NewProjectModal extends Component {
                     }
                     this.props.toggleModal();
                 }
-
-
-
-           /* Due to an error, confirm isn't working. We'll have to make our own modal later.
-                       if (window.confirm("Any unsaved changes will be lost. Continue?")) {
-                       } else {
-                this.props.toggleModal();
-            }
-            */
-
-
-
     }
 
 

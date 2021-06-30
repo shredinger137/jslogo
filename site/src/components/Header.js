@@ -26,6 +26,7 @@ function Header(props) {
 
 
     const userLogoStyle = {
+        zIndex: 2,
         borderRadius: "50%",
         width: "35px",
         height: "35px",
@@ -282,6 +283,7 @@ function Header(props) {
             })
 
             getUserProjects();
+            console.log("refresh")
             setRefreshUserMenu(!refreshUserMenu);
         }
     }
@@ -316,10 +318,10 @@ function Header(props) {
         if (userObject) {
             var user = userObject;
         }
-        
-        if ( true
+
+        if (true
             //user && user.uid - check temporarily disabled during troubleshooting
-            ) {
+        ) {
 
             firebase.auth().currentUser.getIdToken(false).then(idToken => {
                 axios.get(`${config.apiUrl}/projects/${openPid}`, {
@@ -384,6 +386,7 @@ function Header(props) {
                 </div>
 
             }
+            <span id="dummyClickToClearPid" style={{display: 'none'}} onClick={() => {setProjectId(null)}}></span>
             <div style={titleStyle}>
                 <input type="text" id="projectTitle" defaultValue="Untitled" style={titleInputStyle} maxLength="22"></input>
                 <span style={{ fontSize: ".8em" }}>{saveState}</span>
@@ -426,17 +429,21 @@ function Header(props) {
             <span style={{ width: "20px" }}></span>
 
             {user ?
-                <div id="userMenuWrapper" className={userMenuShow ? "userMenu userMenuShow" : "userMenu"}>
-                    <UserMenu
-                        refreshUserMenu={refreshUserMenu}
-                        toggleUserMenu={toggleUserMenu.bind(this)}
-                        getSingleProject={getSingleProject.bind(this)}
-                        deleteProject={deleteProject.bind(this)}
-                        projectList={projectList}
-                        showMenu={userMenuShow}
+                <>
+                    <div id="fullPage" className={userMenuShow ? "fullPage" : null} onClick={(e) => {setUserMenuShow(false)}}></div>
+                    <div id="userMenuWrapper" className={userMenuShow ? "userMenu userMenuShow" : "userMenu"} onClick={(e) => {e.stopPropagation()}}>
 
-                    />
-                </div>
+                        <UserMenu
+                            refreshUserMenu={refreshUserMenu}
+                            toggleUserMenu={toggleUserMenu.bind(this)}
+                            getSingleProject={getSingleProject.bind(this)}
+                            deleteProject={deleteProject.bind(this)}
+                            projectList={projectList}
+                            showMenu={userMenuShow}
+
+                        />
+                    </div>
+                </>
                 :
 
                 null
