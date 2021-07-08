@@ -732,9 +732,9 @@ export default class Interpreter {
         var c = document.getElementById("canvas");
         var ctx = c.getContext("2d");
         var img = new Image();
-        console.log(img)
         img.src = url;
         var widthTarget = document.getElementById('chartAreaWrapper').offsetWidth;
+        console.log(widthTarget);
         img.onload = function() {
             ctx.drawImage(img, 0, 0, widthTarget, widthTarget * img.height / img.width);
         };
