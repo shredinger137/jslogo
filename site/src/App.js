@@ -191,7 +191,7 @@ end`,
   }
 
   pushToDataTable(newDataLine) {
-    var newData = this.state.tableData;
+    let newData = this.state.tableData;
     newData.push(newDataLine);
     this.setState({
       tableData: newData
