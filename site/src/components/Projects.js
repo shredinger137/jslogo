@@ -7,7 +7,7 @@ export default class Projects {
 
 
   constructor(updateCode) {
-    globalUpdateCode = updateCode;
+    this.globalUpdateCode = updateCode;
   }
 
   async initializeDatabase() {
@@ -114,16 +114,22 @@ export default class Projects {
 
 
   loadFile() {
+    let scopedUpdate = this.globalUpdateCode
+
     const input = document.getElementById('load');
     const file = input.files[0];
     var fileReader = new FileReader()
 
     fileReader.onload = function (fileLoadedEvent, context) {
       var textFromFileLoaded = fileLoadedEvent.target.result;
-      globalUpdateCode(textFromFileLoaded);
+      scopedUpdate(textFromFileLoaded)
+      return textFromFileLoaded;
+
+   //   globalUpdateCode(textFromFileLoaded);
       //document.getElementById("procs").value = textFromFileLoaded;
     };
     fileReader.readAsText(file, "UTF-8");
+
 
   }
 
