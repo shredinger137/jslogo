@@ -8,6 +8,16 @@
 ; defined.
 
 
+to go
+    clean
+    setpensize 30
+    loadpic "/beach.png
+    wait 10
+    box
+    rt 180
+    fd 255
+end
+
 to box 	;sample line comment
 	repeat 4 [fd 100 rt 90]
 end
