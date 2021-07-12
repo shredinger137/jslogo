@@ -1828,7 +1828,12 @@ export default class Interpreter {
  * Defines all JSLogo functions that the user can perform
  ************************************************************/
 
-export var prims = {};
+export var prims = {
+
+
+
+
+};
 
 /* Charts */
 prims['x-data'] = { nargs: 1, fcn: function (a) { this.setChartListener("x", a) } }

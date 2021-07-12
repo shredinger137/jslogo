@@ -35,13 +35,6 @@ to box-car
 	left-box
 end
 
-to go
-	clean
-	setcolor 50
-	setpensize 30
-	box
-end
-
 to maze
     fd 50
     rt 90
