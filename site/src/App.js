@@ -16,9 +16,7 @@ import Terminal from './components/Terminal';
 import 'firebase/auth';
 //import firebase from 'firebase/app';
 
-var interpreter;
-var projects;
-
+let interpreter, projects;
 
 class App extends Component {
 
@@ -47,6 +45,7 @@ end`,
       responsive: true,
       maintainAspectRatio: false,
     },
+
     chartDataTop: [],
     chartOptionsBottom: {
       responsive: true,
@@ -66,10 +65,7 @@ end`,
     console.log("Serial API Check:");
     console.log(this.checkIfSerialCapable());
 
-
-    var gutter = document.getElementById("gutter");
     this.setState({horizontalOffset: document.getElementById("gutter").getBoundingClientRect().left})
-   // console.log(document.getElementById("gutter").getBoundingClientRect())
 
     interpreter = new Interpreter(
       document.getElementById("cnvframe").offsetHeight,
@@ -103,19 +99,12 @@ end`,
 
   dragTest(e){
 
-    var context = this;
-
+    let context = this;
     e.preventDefault();
 
-    var posX = e.clientX
-
     function handleDrag(e){
-      
-
       interpreter.handleResizeHorizontal(e.clientX - context.state.horizontalOffset);
-
     }
-
 
     function handleMouseUp(e){
       document.removeEventListener('mousemove', handleDrag)
@@ -123,13 +112,8 @@ end`,
       return;
     }
  
-    
     document.addEventListener('mouseup', handleMouseUp)
-
     document.addEventListener('mousemove', handleDrag)
-
- 
-
   }
 
 

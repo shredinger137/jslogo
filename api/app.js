@@ -7,11 +7,14 @@ var admin = require('firebase-admin');
 var userAccountFunctions = require('./userAccountFunctions');
 var projectFunctions = require('./projects');
 
+/* disabled because I don't have the credentials file with me
 var serviceAccount = require("./credentials.json");
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
 });
+
+*/
 
 app.use(function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');

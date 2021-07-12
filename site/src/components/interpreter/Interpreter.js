@@ -8,19 +8,15 @@
 import Tokenizer from './Tokenizer';
 import turtleMath from './turtleMath';
 import { includes } from './includes';
-import { useFirebaseApp } from 'reactfire';
-
 
 Number.prototype.mod = function (n) { return ((this % n) + n) % n; }
 
-var constants = {
+const constants = {
     black: '-9999&0', white: '-9999&100', red: '0&50', green: '30&50', blue: '70&50',
     cyan: '50&50', magenta: '90&50', yellow: '20&50', orange: '14&50'
 }
-var port;
-var reader;
-var flushtime = 200;
-var outputStream;
+let port, reader, outputStream;
+let flushtime = 200;
 
 export default class Interpreter {
 
@@ -1875,6 +1871,7 @@ prims['wait'] = { nargs: 1, fcn: function (x) { this.mwait(100 * this.getnum(x))
 prims['mwait'] = { nargs: 1, fcn: function (x) { this.mwait(this.getnum(x)); } }
 
 prims['+'] = { nargs: 2, priority: -1, fcn: function (a, b) { return a + b; } }
+prims['%'] = { nargs: 2, priority: -1, fcn: function(a, b){return a % b}}
 prims['-'] = { nargs: 2, priority: -1, fcn: function (a, b) { return a - b; } }
 prims['*'] = { nargs: 2, priority: -2, fcn: function (a, b) { return a * b; } }
 prims['/'] = { nargs: 2, priority: -2, fcn: function (a, b) { return a / b; } }
