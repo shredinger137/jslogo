@@ -144,6 +144,7 @@ function Header(props) {
 
 
         projects.getRecoverEntry().then(recoveryProject => {
+            if (!window.location.pathname.substr(1) || window.location.pathname.substr(1, 2) !== "pr"){
             if (recoveryProject && recoveryProject[0] && recoveryProject[0]['code']) {
                 props.updateCode(recoveryProject[0]['code'])
                 props.updateCode(recoveryProject[0]['code'])
@@ -162,7 +163,7 @@ function Header(props) {
                     props.updateCode(recoveryProject[0]['code'])
 
                     document.getElementById("projectTitle").value = "Recovered"
-                }
+                }}
 
 
 

@@ -1,9 +1,4 @@
 /* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off", no-use-before-define: "off" */
-//NOTE: getValue does not return false if something doesn't exist - it returns an error
-//maybe false or undefined would be better, and more in line with expectations?
-//Also this means the conditionals used for graphing aren't right.
-
-//TODO: push to array would be a nice function to have, and much more sensible than "se" everytime
 
 import Tokenizer from './Tokenizer';
 import turtleMath from './turtleMath';
@@ -15,6 +10,7 @@ const constants = {
     black: '-9999&0', white: '-9999&100', red: '0&50', green: '30&50', blue: '70&50',
     cyan: '50&50', magenta: '90&50', yellow: '20&50', orange: '14&50'
 }
+
 let port, reader, outputStream;
 let flushtime = 200;
 
@@ -22,7 +18,6 @@ export default class Interpreter {
 
     constructor(canvasHeight, canvasWidth, addToChart, pushToTable, updateLogoVariables, pushNewChartData, updateChartOptions, updateChartType) {
 
-        //  this.updateLogoVariables = updateLogoVariables;
         this.lastProc = "";
 
         //charts are given assigned variables for data; these are effectively listened for in 'make', so that 
@@ -49,16 +44,13 @@ export default class Interpreter {
 
         this.addToChart = addToChart;
         this.pushToTable = pushToTable;
-        //turtle
-
+        
         this.cnvWidth = canvasWidth;
         this.cnvHeight = canvasHeight;
         this.scale = 1;
-        // this.img;
         this.ctx = document.getElementById('canvas');
         this.xcor = 0;
         this.ycor = 0;
-        //this.element;
         this.heading = 0;
         this.color = 0;
         this.shade = 50;
@@ -140,37 +132,24 @@ export default class Interpreter {
      */
 
 
-    setup(orderedInCommandLine) {
+    setup() {
 
-        if (orderedInCommandLine) {
-            var turtle = document.getElementById("turtle");
-            if (turtle !== null) {
-                turtle.remove();
-            }
-        }
-
-        var t = this;
+        let t = this;
         this.element = document.createElement('div');
         this.element.setAttribute('class', 'turtle');
         this.element.setAttribute('id', 'turtle')
-        var cnvframe = document.getElementById('cnvframe');
-        cnvframe.appendChild(t.element);
+        document.getElementById('cnvframe').appendChild(t.element);
         this.img = document.createElement('img');
         this.img.src = 'turtle.svg';
         this.element.appendChild(t.img);
         this.img.onload = imgLoaded;
         var canvas = document.getElementById('canvas');
         this.ctx = canvas.getContext('2d');
-        // canvas.width = t.cnvWidth * t.dpi;
-        //  canvas.height = t.cnvHeight * t.dpi;
         canvas.width = document.getElementById("cnvframe").clientWidth;
         canvas.height = document.getElementById("cnvframe").clientHeight;
-        // t.ctx.scale(t.dpi, t.dpi);
         t.ctx.textBaseline = "middle";
         t.clean();
         window.requestAnimationFrame(this.ticker);
-
-
 
         function imgLoaded() {
             t.img.width = t.size;
@@ -181,19 +160,16 @@ export default class Interpreter {
         }
 
         this.handleResize();
-
-        var date = Math.floor(Date.now() / 1000)
-
         this.printToConsole("Welcome to Logo!")
-        this.printToConsole(`The time is ${date}`)
+        this.printToConsole(`The time is ${Math.floor(Date.now() / 1000)}`)
 
     }
-
+    
     forward(n) {
 
         n = n / this.turtleScale;
 
-        var t = this;
+        const t = this;
         if (t.pendown) {
             t.ctx.beginPath();
             t.ctx.moveTo(t.xcor + t.cnvWidth / 2, t.cnvHeight / 2 - t.ycor);
@@ -201,7 +177,7 @@ export default class Interpreter {
         t.xcor += n * turtleMath.sindeg(t.heading);
         t.ycor += n * turtleMath.cosdeg(t.heading);
         if (t.pendown) {
-            var sx = t.xcor + t.cnvWidth / 2, sy = t.cnvHeight / 2 - t.ycor;
+            const sx = t.xcor + t.cnvWidth / 2, sy = t.cnvHeight / 2 - t.ycor;
             if (n >= .1) t.ctx.lineTo(sx, sy);
             else t.ctx.lineTo(sx, sy + .1);
             if (t.pensize != 0) t.ctx.stroke();
@@ -210,7 +186,7 @@ export default class Interpreter {
     }
 
     lineto(x, y) {
-        var t = this;
+        const t = this;
         if (t.pendown) {
             t.ctx.beginPath();
             t.ctx.moveTo(t.xcor + t.cnvWidth / 2, t.cnvHeight / 2 - t.ycor);
@@ -673,8 +649,10 @@ export default class Interpreter {
 
         this.turtleScale = newScale;
 
-        canvas.style.width = (wrapper.offsetWidth - 5) + "px";
+       canvas.style.width = (wrapper.offsetWidth - 5) + "px";
         canvas.style.height = (wrapper.offsetHeight - 5) + "px";
+        //this.cnvWidth = wrapper.offsetWidth - 5;
+        //this.cnvHeight = wrapper.offsetHeight - 5;
         document.getElementById("canvasDimensionsLabel").innerHTML = `Canvas: ${Math.floor((wrapper.offsetWidth - 5) * newScale)}w x ${Math.floor((wrapper.offsetHeight - 5) * newScale)}h`
 
         this.move();
@@ -721,10 +699,14 @@ export default class Interpreter {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
+    
+
     //load a background
 
     loadBackgroundImage(url) {
 
+        const context = this;
+        context.hold = true;
         var c = document.getElementById("canvas");
         var ctx = c.getContext("2d");
         var img = new Image();
@@ -733,7 +715,13 @@ export default class Interpreter {
         console.log(widthTarget);
         img.onload = function() {
             ctx.drawImage(img, 0, 0, widthTarget, widthTarget * img.height / img.width);
+            context.hold = false;
         };
+
+        img.onerror = function() {
+            context.printToConsole("Error loading image");
+            context.hold = false;
+        }
 
 
     }
@@ -763,49 +751,11 @@ export default class Interpreter {
     }
 
 
-
-    loadpng(dataurl, fcn) {
-        var t = this;
-        var ctx = this.ctx;
-        var img = new Image();
-        img.onload = drawImageToFit;
-        img.src = dataurl;
-
-        function drawImageToFit() {
-            var code = readHiddenData();
-            if (!procs) { var procs = { value: "null" }; }
-            procs.value = (code == 'bad sig') ? '' : code;
-            var s = t.cnvWidth / img.naturalWidth;
-            ctx.save();
-            ctx.scale(s, s);
-            ctx.drawImage(img, 0, 0);
-            ctx.restore();
-            this.readProcs();
-            if (fcn) fcn();
-        }
-
-        function readHiddenData() {
-            var cnv = document.createElement("canvas");
-            cnv.width = img.naturalWidth;
-            cnv.height = img.naturalHeight;
-            var ctx = cnv.getContext('2d');
-            ctx.imageSmoothingEnabled = false;
-            ctx.drawImage(img, 0, 0);
-            return ImageData.getImageData(ctx);
-        }
-    }
-
-
     /////////////////////////
     //
     // Low Level
     //
     /////////////////////////
-
-    resize() {
-
-    }
-
 
     setCtxColorShade(color, shade) {
         var t = this;
@@ -948,14 +898,14 @@ export default class Interpreter {
             x = stringHolder;
         }
 
-        var terminal = document.getElementById("terminalData");
+        const terminal = document.getElementById("terminalData");
         if (terminal !== null) {
-            var entry = `<span style={{ paddingLeft: ".75rem" }}><i>${x}</i></span>`
+            let entry = `<span style={{ paddingLeft: ".75rem" }}><i>${x}</i></span>`
             terminal.innerHTML += entry;
             terminal.innerHTML += this.lastProc;
             terminal.scrollTop = document.getElementById("terminalData").scrollHeight;
 
-            var cc = document.getElementById("cc");
+            const cc = document.getElementById("cc");
             if (cc !== null) {
                 cc.value = cc.value + x + "\n";
                 cc.scrollTop = cc.scrollHeight;
@@ -965,12 +915,11 @@ export default class Interpreter {
     }
 
     cleanConsole() {
-        var terminal = document.getElementById("terminalData");
-        terminal.innerHTML = "";
+        document.getElementById("terminalData").innerHTML = "";
     }
 
     evalNext() {
-        var t = this;
+        const t = this;
         try {
             if (t.cfun) {
                 if (t.arglist.length == prims[t.cfun].nargs) { funcall(); return; }
@@ -1892,7 +1841,7 @@ prims['sin'] = { nargs: 1, fcn: function (a) { return turtleMath.sindeg(this.get
 prims['cos'] = { nargs: 1, fcn: function (a) { return turtleMath.cosdeg(this.getnum(a)); } }
 prims['sqrt'] = { nargs: 1, fcn: function (a) { return Math.sqrt(this.getnum(a)); } }
 prims['random2'] = { nargs: 2, fcn: function (a, b) { return this.pickRandom(this.getnum(a), this.getnum(b)); } }
-prims['oneof'] = { nargs: 2, fcn: function (a, b) { return this.oneof(a, b); } }
+prims['oneof'] = { nargs: 2, fcn: function (a, b) {  return this.nextRandomDouble() < .5 ? a : b; } }
 
 prims['sum'] = { nargs: 2, fcn: function (a, b) { return a + b; } }
 prims['product'] = { nargs: 2, fcn: function (a, b) { return a * b; } }
@@ -2004,7 +1953,6 @@ prims['push'] = { nargs: 2, fcn: function (a, b) { this.pushToArray(a, b); } }
 prims['make'] = { nargs: 2, fcn: function (a, b) { this.setValue(a, b); } }
 prims['let'] = { nargs: 2, fcn: function (a, b) { this.setLocalValue(a, b); } }
 prims['loadpic'] = { nargs: 1, fcn: function (a) { this.loadBackgroundImage(a) } }
-
 prims['local'] = { nargs: 1, fcn: function (a, b) { this.makeLocal(a); } }
 
 prims['ob1on'] = { nargs: 0, fcn: function () { this.ledOn(); this.mwait(1); } }
