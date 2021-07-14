@@ -330,6 +330,7 @@ function Header(props) {
                         authorization: idToken
                     }
                 }).then(response => {
+                    console.log(response)
                     if (response && response.data && response.data.code && response.data.title) {
                         props.updateCode(response.data.code);
                         var titleElement = document.getElementById('projectTitle');
@@ -390,8 +391,15 @@ function Header(props) {
             <span id="dummyClickToClearPid" style={{display: 'none'}} onClick={() => {setProjectId(null)}}></span>
             <div style={titleStyle}>
                 <input type="text" id="projectTitle" defaultValue="Untitled" style={titleInputStyle} maxLength="22"></input>
+                <span style={{
+                    position: "absolute",
+                    left: "4px",
+                    top: "1.5em",
+                    fontSize: ".6em"
+                }}>By Author (TBD)</span>
                 <span style={{ fontSize: ".8em" }}>{saveState}</span>
             </div>
+     
             <div className="buttonDiv" onClick={() => toggleNewProject()}>
                 <img src="/images/newProject.png" alt="New project icon"></img>
                 <span>New</span>
