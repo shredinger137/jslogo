@@ -94,8 +94,8 @@ export default class Projects {
 
 
 
-  saveAs() {
-    var filename = "filename.txt";
+  saveAs(title) {
+    var filename = `${title}.txt`;
     var textToSave = document.getElementById('procs').value;
     var newFile = new Blob([textToSave], { type: 'plain/text' });
     var a = document.createElement("a"),

@@ -197,7 +197,7 @@ function Header(props) {
     }
 
     function saveAs() {
-        projects.saveAs();
+        projects.saveAs(document.getElementById("projectTitle").value);
     }
 
     function toggleNewProject() {
