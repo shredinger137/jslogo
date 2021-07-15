@@ -100,6 +100,20 @@ module.exports = {
             }
 
             finally {
+
+                try {                    
+                    var projectUser = await dbConnection.collection("users").findOne({uid: projectData.owner});
+                }
+
+                catch {
+                    console.log(err);
+                    return false;
+                }
+                
+                finally {
+                    if(projectUser){ projectData['ownerDisplayName'] = projectUser.displayName}
+                }
+
                 return projectData;
             }
 

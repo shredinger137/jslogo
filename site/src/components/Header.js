@@ -77,6 +77,7 @@ function Header(props) {
     const [saveState, setSaveState] = useState("");
     const [projectId, setProjectId] = useState(null);
     const [userMenuShow, setUserMenuShow] = useState(false);
+    const [projectAuthor, setProjectAuthor] = useState(null);
 
 
     //On mount, check to see if a project is defined in the URL.
@@ -96,6 +97,7 @@ function Header(props) {
                     props.updateCode(response.data.code);
                     document.getElementById('projectTitle').value = response.data.title;
                     setProjectId(response.data.projectId);
+                    setProjectAuthor(response.data.ownerDisplayName);
 
                 } else {
                     console.log("error")
@@ -338,6 +340,11 @@ function Header(props) {
                             titleElement.value = response.data.title;
                         }
                         setProjectId(response.data.projectId);
+                        if(response.data.ownerDisplayName){
+                            setProjectAuthor(response.data.ownerDisplayName);
+                        } else {
+                            setProjectAuthor(null);
+                        }
 
                     } else {
                         console.log("error")
@@ -395,8 +402,9 @@ function Header(props) {
                     position: "absolute",
                     left: "4px",
                     top: "1.5em",
-                    fontSize: ".6em"
-                }}>By Author (TBD)</span>
+                    fontSize: ".6em",
+                    pointerEvents: 'none'
+                }}>{projectAuthor && user && projectAuthor !== user.displayName? `By ${projectAuthor}` : null}</span>
                 <span style={{ fontSize: ".8em" }}>{saveState}</span>
             </div>
      
