@@ -655,7 +655,7 @@ export default class Interpreter {
 
        canvas.style.width = (wrapper.offsetWidth - 5) + "px";
         canvas.style.height = (wrapper.offsetHeight - 5) + "px";
-        document.getElementById("canvasDimensionsLabel").innerHTML = `Canvas: ${Math.floor((wrapper.offsetWidth - 5) * newScale)}w x ${Math.floor((wrapper.offsetHeight - 5) * newScale)}h`
+    //    document.getElementById("canvasDimensionsLabel").innerHTML = `Canvas: ${Math.floor((wrapper.offsetWidth - 5) * newScale)}w x ${Math.floor((wrapper.offsetHeight - 5) * newScale)}h`
 
         this.move();
     }
@@ -713,8 +713,7 @@ export default class Interpreter {
         var ctx = c.getContext("2d");
         var img = new Image();
         img.src = url;
-        var widthTarget = document.getElementById('chartAreaWrapper').offsetWidth;
-        console.log(widthTarget);
+        var widthTarget = 1000;
         img.onload = function() {
             ctx.drawImage(img, 0, 0, widthTarget, widthTarget * img.height / img.width);
             context.hold = false;
