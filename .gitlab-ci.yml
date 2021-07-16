@@ -8,7 +8,7 @@ deploy_dev_api:
     script:
         - echo "Deploying dev API server"
         - npm install
-        - cp -R ./* /repos/lbym-app/api/
+        - cp -R ./* /repos/lbym-app/api-dev/
     environment:
         name: dev
         url: dev.lbym.org

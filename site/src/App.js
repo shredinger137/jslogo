@@ -14,7 +14,6 @@ import Chart from './components/Chart';
 import DataTable from './components/DataTable';
 import Terminal from './components/Terminal';
 import 'firebase/auth';
-//import firebase from 'firebase/app';
 
 let interpreter, projects;
 
@@ -58,8 +57,6 @@ end`,
     horizontalOffset: 0,
   };
 
-
-
   componentDidMount() {
 
     console.log("Serial API Check:");
@@ -93,11 +90,9 @@ end`,
     this.setState({
       includes: includes
     });
-
-      
   }
 
-  dragTest(e){
+  dragToResize(e){
 
     let context = this;
     e.preventDefault();
@@ -145,7 +140,7 @@ end`,
   }
 
   addToChart(x, y) {
-    var newData = this.state.chartData;
+    let newData = this.state.chartData;
     newData.push({ x: x, y: y });
     this.setState({ chartData: newData });
   }
@@ -250,7 +245,6 @@ end`,
               toggleModal={this.toggleShowNewProjectModal.bind(this)}
               updateCode={this.updateCode.bind(this)}
             />
-
             :
             null}
           <button onClick={() => { interpreter.runLine("go") }}>Go</button>
@@ -279,12 +273,13 @@ end`,
             <textarea id="includes" spellCheck="false" style={{ display: "none", whiteSpace: "nowrap", overflow: "visible" }} />
           </div>
                 
-          <div id="gutter" onMouseDown={(e) => {this.dragTest(e)}} ></div>
+          <div id="gutter" onMouseDown={(e) => {this.dragToResize(e)}} ></div>
           <div className="chartArea" id="chartAreaWrapper">
 
             <div id="cnvframe" className={this.state.view == "main" ? null : "hide"} style={{ height: "100%", width: "100%" }}>
               <canvas className="cnv" id="canvas" ></canvas>
             </div>
+            
             <div id="chartFrame" className={this.state.view == "graph" ? null : "hide"} style={{ height: "100%", width: "100%" }}>
               <Chart
                 chartType={this.state.chartType}
@@ -294,7 +289,6 @@ end`,
                 chartOptionsTop={this.state.chartOptionsTop}
                 chartOptionsBottom={this.state.chartOptionsBottom}
                 chartOptionsSingle={this.state.chartOptionsSingle}
-
               />
 
             </div>
@@ -309,17 +303,10 @@ end`,
             interpreter={interpreter}
           />
         </div>
-
         <textarea id="includes" style={{ display: "none" }} value={this.state.includes} />
-
-
       </div >
     );
   }
 }
-
-
-
-
 
 export default App;

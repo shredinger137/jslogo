@@ -6,13 +6,16 @@ app.use(express.json());
 var admin = require('firebase-admin');
 var userAccountFunctions = require('./userAccountFunctions');
 var projectFunctions = require('./projects');
-
+const dotenv = require('dotenv');
+dotenv.config({path: './.env'});
+console.log(`Env port is ${process.env.PORT}`);
 
 var serviceAccount = require("./credentials.json");
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
 });
+
 
 
 
@@ -41,6 +44,7 @@ MongoClient.connect('mongodb://localhost:27017/', { useUnifiedTopology: true, us
     dbConnection = client.db(config.globalDbName) // once connected, assign the connection to the global variable
     connectedToDatabase = true;
     console.log("Connected to database " + config.globalDbName);
+    console.log(config.port)
 
     //things that happen on startup should happen here, after the database connects
 })

@@ -45,8 +45,8 @@ export default class Interpreter {
         this.addToChart = addToChart;
         this.pushToTable = pushToTable;
         
-        this.cnvWidth = canvasWidth;
-        this.cnvHeight = canvasHeight;
+        this.cnvWidth = 1000;
+        this.cnvHeight = 600;
         this.scale = 1;
         this.ctx = document.getElementById('canvas');
         this.xcor = 0;
@@ -145,8 +145,12 @@ export default class Interpreter {
         this.img.onload = imgLoaded;
         var canvas = document.getElementById('canvas');
         this.ctx = canvas.getContext('2d');
-        canvas.width = document.getElementById("cnvframe").clientWidth;
-        canvas.height = document.getElementById("cnvframe").clientHeight;
+        canvas.width = 1000;
+        canvas.height = 600;
+
+        canvas.style.width = document.getElementById("cnvframe").clientWidth + "px";
+        canvas.style.height = document.getElementById("cnvframe").clientHeight + "px";
+
         t.ctx.textBaseline = "middle";
         t.clean();
         window.requestAnimationFrame(this.ticker);
@@ -167,7 +171,7 @@ export default class Interpreter {
     
     forward(n) {
 
-        n = n / this.turtleScale;
+    //    n = n / this.turtleScale;
 
         const t = this;
         if (t.pendown) {
@@ -651,8 +655,6 @@ export default class Interpreter {
 
        canvas.style.width = (wrapper.offsetWidth - 5) + "px";
         canvas.style.height = (wrapper.offsetHeight - 5) + "px";
-        //this.cnvWidth = wrapper.offsetWidth - 5;
-        //this.cnvHeight = wrapper.offsetHeight - 5;
         document.getElementById("canvasDimensionsLabel").innerHTML = `Canvas: ${Math.floor((wrapper.offsetWidth - 5) * newScale)}w x ${Math.floor((wrapper.offsetHeight - 5) * newScale)}h`
 
         this.move();

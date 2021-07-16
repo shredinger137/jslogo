@@ -11,9 +11,9 @@ TODO: We're changing the chart area to a fixed 1.7 ratio; everything else should
 
 :root {
     --interfaceHeight: calc(96vh - 90px);
-    --codeEntryWidth: calc(98vw - (65vh * (5/3)) - 3px);
+    --codeEntryWidth: calc(98vw - (70vh * (5/3)) - 3px);
     --chartHeight: 65vh;
-    --chartWidth: calc(65vh * (5/3));
+    --chartWidth: calc(70vh * (5/3));
     --gutterWidth: 3px;
   }
 
