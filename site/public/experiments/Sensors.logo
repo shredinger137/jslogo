@@ -30,7 +30,7 @@ to go
     ;     let "tempsensor1 readTempSensor1
     ;     let "sumt1 :sumt1 + :tempsensor1
     ; ]
-    ; print 'Average Temp1 Value: ' + :sumt1 / 5)
+    ; print 'Average Temp1 Value: ' + :sumt1 / 5
 
 end
 

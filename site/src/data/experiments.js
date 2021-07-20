@@ -29,6 +29,10 @@ export const experimentsList = [
     {
         name: "Evaporation",
         fileLocation: "/experiments/Evaporation.logo"
+    },
+    {
+        name: "Water Soil",
+        fileLocation: "/experiments/WaterSoil.logo"
     }
 ];
 
