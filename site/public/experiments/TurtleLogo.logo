@@ -13,12 +13,11 @@ to go
     setpensize 30
     loadpic "/beach.png
     wait 10
-    box
     rt 180
     fd 255
 end
 
-to box 	;sample line comment
+to nestingsite 	;sample line comment
 	repeat 4 [fd 100 rt 90]
 end
 
@@ -35,40 +34,11 @@ to box-car
 	left-box
 end
 
-to maze
-    fd 50
-    rt 90
-    fd 100
-    lt 90
-    fd 100
-    lt 90
-    fd 100
-    rt 90
-    fd 50
-    rt 90
-    fd 100
-    fd 50
-    rt 90
-    fd 200
-    rt 90
-    fd 50
-    fd 25
-    fd 25
-    lt 90
-    fd 200
-    rt 90
-    fd 50
-    fd 50
-    rt 90
-    fd 50
-    rt 90
-    fd 50
-    lt 90
-    fd 100
-    fd 25
-    fd 25
+to init-migration
+   clean 
+   loadpic "/migratorypath.png
+   wait 10
 end
-
 
 to rock
     pendown
@@ -96,7 +66,7 @@ to rock
 end
 
 to tree
-    setheading 0
+    seth 0
     pendown
     setcolor 10
     startfill
@@ -133,7 +103,7 @@ to sea
     repeat 300
     [setxy random2 "-55vw "55vw
     random2 "-55vh "-35vh
-    setheading random2 40 50
+    seth random2 40 50
     setpensize random2 5 10
     setshade random2 50 90
     arc 90 100]
@@ -141,7 +111,7 @@ to sea
     setpensize 5
     setshade 50
     setxy 0 0
-    setheading 0
+    seth 0
     pendown
 end
 
@@ -152,12 +122,12 @@ to land
     random2 "-35vh "50vh
     setpensize random2 20 25
     setshade random2 90 100
-    forward 0]
+    fd 0]
     penup
     setpensize 5
     setshade 50
     setxy 0 0
-    setheading 0
+    seth 0
     pendown
 end
 
