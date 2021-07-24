@@ -6,9 +6,7 @@ app.use(express.json());
 var admin = require('firebase-admin');
 var userAccountFunctions = require('./userAccountFunctions');
 var projectFunctions = require('./projects');
-const dotenv = require('dotenv');
-dotenv.config({path: './.env'});
-console.log(`Env port is ${process.env.PORT}`);
+
 
 var serviceAccount = require("./credentials.json");
 
