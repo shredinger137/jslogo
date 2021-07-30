@@ -17,10 +17,6 @@ to go
     fd 255
 end
 
-to nestingsite 	;sample line comment
-	repeat 4 [fd 100 rt 90]
-end
-
 to left-box
 	repeat 4 [ fd 100 lt 90 ]
 end
@@ -36,8 +32,12 @@ end
 
 to init-migration
    clean 
-   loadpic "/migratorypath.png
+   loadpic "/migratoryroute.png
    wait 10
+end
+
+to egg
+    arc 10 360
 end
 
 to rock

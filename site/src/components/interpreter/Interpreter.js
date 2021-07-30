@@ -1888,7 +1888,7 @@ prims['left'] = { nargs: 1, fcn: function (n) { this.right(this.getnum(-n)); } }
 prims['lt'] = { nargs: 1, fcn: function (n) { this.right(this.getnum(-n)); } }
 prims['setheading'] = { nargs: 1, fcn: function (n) { this.seth(this.getnum(n)); } }
 prims['seth'] = { nargs: 1, fcn: function (n) { this.seth(this.getnum(n)); } }
-prims['setxy'] = { nargs: 2, fcn: function (x, y) { this.setxy(this.getnum(x), this.getnum(y)); } }
+prims['setxy'] = { nargs: 2, fcn: function (x, y) { this.lineto(this.getnum(x), this.getnum(y)); } }
 prims['lineto'] = { nargs: 2, fcn: function (x, y) { this.lineto(this.getnum(x), this.getnum(y)); } }
 prims['arc'] = { nargs: 2, fcn: function (a, r) { this.arc(this.getnum(a), this.getnum(r)); } }
 
