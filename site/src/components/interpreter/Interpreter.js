@@ -495,7 +495,7 @@ export default class Interpreter {
             this.setValue("_xTickSteps", null)
             this.setValue("_yTickSteps", null)
             this.setValue("_domain", null)
-            var chartOptions = {};
+            chartOptions = {};
 
 
 
@@ -1111,6 +1111,13 @@ export default class Interpreter {
 
 
     setValue(name, value) {
+        if(Array.isArray(value)){
+            let arrayValue = [];
+            for(var item of value){
+                console.log(typeof item);
+            }
+            console.log(arrayValue)
+        }
         var updateChart = false;
         var t = this;
         var chartType = [];

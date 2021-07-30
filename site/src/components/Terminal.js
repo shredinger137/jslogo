@@ -12,6 +12,7 @@ function Terminal(props) {
 
     const [terminalEntries, setTerminalData] = useState([]);
     const [terminalSelection, setTerminalSelection] = useState(0);
+    let moved = false;
 
     useEffect(() => {
         scrollToBottom();   
@@ -28,12 +29,32 @@ function Terminal(props) {
     useEffect(() => {
         document.getElementById('prompt').addEventListener('paste', function(e) {
             e.preventDefault();
-
             let text = (e.originalEvent || e).clipboardData.getData('text/plain').replace(/\n|\r/g, " ").substring(0, 125);
-
             document.execCommand("insertHTML", false, text);
+        });
 
+        //when clicking on the terminal area, focus on the prompt unless movement is detected (highlighting text)
+        
+        let terminalWrapper = document.getElementById('terminal-wrapper');
+        const setMovedTrue = () => {
+            moved = true;
+        }
+
+        const upListener = () => {
+            if(!moved){
+                document.getElementById('prompt').focus();
+            } else {
+                moved = false;
+            }
+            terminalWrapper.removeEventListener('mousemove', setMovedTrue);
+            terminalWrapper.removeEventListener('mouseup', upListener);
+        }
+
+        terminalWrapper.addEventListener('mousedown', function(e) {
+            terminalWrapper.addEventListener('mousemove', setMovedTrue);
+            terminalWrapper.addEventListener('mouseup', upListener);
         })
+
     }, [])
 
 
@@ -123,13 +144,13 @@ function Terminal(props) {
         <div 
             tabIndex="0" 
             id="terminal-wrapper" 
-            onClick={() => { document.getElementById('prompt').focus() }} 
+            
             className="terminal" 
             style={{ border: "solid", outline: "none", zIndex: "1", backgroundColor: "white" }} 
             >
 
             <div id="terminalData" style={divStyle}> </div>
-            <span></span><span id="prompt" contentEditable={true} style={{ outline: "none", width: "100%" }} onKeyDown={(e) => { handleKeyDown(e) }}></span>
+            <span></span><span id="prompt" contentEditable={true} style={{ outline: "none", width: "100%", cursor: "text" }} onKeyDown={(e) => { handleKeyDown(e) }}></span>
             <p></p>
             <textarea id="cc" style={{ display: "none" }}></textarea>
         </div>

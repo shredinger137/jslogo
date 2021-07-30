@@ -1,6 +1,5 @@
 import Dexie from 'dexie';
 
-var globalUpdateCode;
 var localDatabase = new Dexie();
 
 export default class Projects {

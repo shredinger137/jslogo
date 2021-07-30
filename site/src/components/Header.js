@@ -318,10 +318,6 @@ function Header(props) {
 
         toggleUserMenu();
 
-        if (userObject) {
-            var user = userObject;
-        }
-
         if (true
             //user && user.uid - check temporarily disabled during troubleshooting
         ) {
