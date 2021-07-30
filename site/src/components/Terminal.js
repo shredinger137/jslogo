@@ -14,14 +14,7 @@ function Terminal(props) {
     const [terminalSelection, setTerminalSelection] = useState(0);
 
     useEffect(() => {
-        scrollToBottom();
-        document.getElementById('prompt').addEventListener('paste', function(e) {
-            e.preventDefault();
-            let text = (e.originalEvent || e).clipboardData.getData('text/plain');
-            document.execCommand("insertHTML", false, text);
-
-        })
-    
+        scrollToBottom();   
         //uncomment to get a bunch of test entries in terminal
         //  document.getElementById("terminalData").innerHTML = `<span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br /><span style={{ paddingLeft: ".75rem" }}>test</span><br />`
     })
@@ -31,6 +24,17 @@ function Terminal(props) {
     },
         [terminalSelection]
     );
+
+    useEffect(() => {
+        document.getElementById('prompt').addEventListener('paste', function(e) {
+            e.preventDefault();
+
+            let text = (e.originalEvent || e).clipboardData.getData('text/plain').replace(/\n|\r/g, " ").substring(0, 125);
+
+            document.execCommand("insertHTML", false, text);
+
+        })
+    }, [])
 
 
     function handleEnter() {
