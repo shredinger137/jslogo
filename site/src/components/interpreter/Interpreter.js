@@ -226,7 +226,6 @@ export default class Interpreter {
     }
 
     arc(a, r) {
-        r = r / this.turtleScale;
         var t = this;
         if (a == 0) return;
         if (r == 0) { t.seth(t.heading + a); }
