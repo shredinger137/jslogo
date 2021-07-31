@@ -11,10 +11,6 @@ function UserMenu(props) {
         setProjectList(props.projectList);
     }, [props.projectList]);
 
-    useEffect(() => {
-        console.log(props.refreshUserMenu)
-    },
-    [props.refreshUserMenu])
 
     const menuStyle = {
         minWidth: '200px',
@@ -40,7 +36,6 @@ function UserMenu(props) {
     const copyProjectLink = async (pid) => {
         var data = `${process.env.REACT_APP_BASE_URL}/pr${pid}`;
         navigator.clipboard.writeText(data).then(function () {
-            //console.log("Copied");
         }, function () {
             console.error("Unable to write to clipboard");
         });

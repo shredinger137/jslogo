@@ -226,7 +226,6 @@ export default class Interpreter {
     }
 
     arc(a, r) {
-        r = r / this.turtleScale;
         var t = this;
         if (a == 0) return;
         if (r == 0) { t.seth(t.heading + a); }
@@ -495,7 +494,7 @@ export default class Interpreter {
             this.setValue("_xTickSteps", null)
             this.setValue("_yTickSteps", null)
             this.setValue("_domain", null)
-            var chartOptions = {};
+            chartOptions = {};
 
 
 
@@ -1111,6 +1110,13 @@ export default class Interpreter {
 
 
     setValue(name, value) {
+        if(Array.isArray(value)){
+            let arrayValue = [];
+            for(var item of value){
+                console.log(typeof item);
+            }
+            console.log(arrayValue)
+        }
         var updateChart = false;
         var t = this;
         var chartType = [];
@@ -1888,7 +1894,7 @@ prims['left'] = { nargs: 1, fcn: function (n) { this.right(this.getnum(-n)); } }
 prims['lt'] = { nargs: 1, fcn: function (n) { this.right(this.getnum(-n)); } }
 prims['setheading'] = { nargs: 1, fcn: function (n) { this.seth(this.getnum(n)); } }
 prims['seth'] = { nargs: 1, fcn: function (n) { this.seth(this.getnum(n)); } }
-prims['setxy'] = { nargs: 2, fcn: function (x, y) { this.setxy(this.getnum(x), this.getnum(y)); } }
+prims['setxy'] = { nargs: 2, fcn: function (x, y) { this.lineto(this.getnum(x), this.getnum(y)); } }
 prims['lineto'] = { nargs: 2, fcn: function (x, y) { this.lineto(this.getnum(x), this.getnum(y)); } }
 prims['arc'] = { nargs: 2, fcn: function (a, r) { this.arc(this.getnum(a), this.getnum(r)); } }
 
