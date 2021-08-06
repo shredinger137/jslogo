@@ -204,7 +204,7 @@ end`,
       base: 'vs-dark',
       inherit: true,
       rules: [
-        { token: 'custom-words', foreground: 'FFFD8A' },
+        { token: 'custom-words', foreground: 'FF7F7F' },
         { token: 'numbers-custom', foreground: 'FFFD8A' }
       ],
       colors: {
