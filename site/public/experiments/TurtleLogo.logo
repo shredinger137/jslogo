@@ -37,7 +37,7 @@ to init-migration
 end
 
 to egg
-    arc 10 360
+    arc 360 10
 end
 
 to rock
