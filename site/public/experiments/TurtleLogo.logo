@@ -36,6 +36,14 @@ to init-migration
    wait 10
 end
 
+to init-nesting             ; initializes turtle location for 
+     cleans                 ; cleans the 	
+     loadpic "/beach.png    ; loads the 
+     penup                  ; pen up
+     bk 280                 ; moves
+     pendown                ; 
+end
+
 to egg
     arc 360 10
 end
