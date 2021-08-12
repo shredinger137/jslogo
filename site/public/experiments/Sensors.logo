@@ -16,7 +16,7 @@ to go
     let "sumt0 0
     let "sumt1 0
 	repeat 5 [
-		let "light readADC0 
+		let "light readADC2 
         let "suml :suml + :light
 	]
     print (se "Average: :suml / 5)
@@ -34,7 +34,7 @@ to go
 
 end
 
-to runForever
+to run-forever
 	ob1on
 	wait 10
 	ob1off	

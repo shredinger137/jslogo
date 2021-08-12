@@ -117,7 +117,7 @@ export const languageDef = {
   symbols: /[=><!~?:&|+\-*\/^%]+/,
   tokenizer: {
     root: [
-      [/to\s[a-zA-Z\-_re]+|\bend\b/, "custom-words"],      
+      [/to\s[a-zA-Z0-9\-_re]*|\bend\b/, "custom-words"],      
       { include: "@whitespace" },
       { include: "@numbers" },
       { include: "@strings" },
@@ -142,10 +142,10 @@ export const languageDef = {
     ],
     strings: [
       [/[=|][ @number]*$/, "string.escape"],
-      [/\'[a-zA-Z_/.\-\s\:]*\'/, "string.escape"],
+      [/\'[a-zA-Z0-9_/.\-\s\:]*\'/, "string.escape"],
       [/'(.*?)'/, "string.escape"],
-      [/\"[a-zA-Z_/.-]*/, "string.escape"],
-      [/\'[a-zA-Z_/.-]*/, "string.escape"],
+      [/\"[a-zA-Z0-9_/.-]*/, "string.escape"],
+      [/\'[a-zA-Z0-9_/.-]*/, "string.escape"],
 
     ],
     tags: [
