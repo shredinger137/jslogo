@@ -223,7 +223,7 @@ end`,
 
     const options = {
       selectOnLineNumbers: true,
-      automaticLayout: true,
+      automaticLayout: true, 
       minimap: {
         enabled: false
       },
