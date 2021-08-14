@@ -17,35 +17,22 @@ to go
     fd 255
 end
 
-to left-box
-	repeat 4 [ fd 100 lt 90 ]
-end
-
-to box-stack
-	repeat 2 [box fd 100]
-end
-
-to box-car
-	box
-	left-box
-end
-
 to init-migration
    clean 
    loadpic "/migratoryroute.png
    wait 10
 end
 
-to init-nesting             ; initializes turtle location for 
-     cleans                 ; cleans the 	
-     loadpic "/beach.png    ; loads the 
-     penup                  ; pen up
-     bk 280                 ; moves
-     pendown                ; 
+to egg
+    arc 360 10              ; draws a small circle 
 end
 
-to egg
-    arc 360 10
+to init-nesting             ; Welcome to TurtleWords.txt!
+     clean                  ; cleans the drawing window	
+     loadpic "/beach.png    ; loads the beach picture
+     penup                  ; lifts the pen up
+     bk 280                 ; moves backwards 280 pixels
+     pendown                ; leaves the pen down
 end
 
 to rock
@@ -108,13 +95,16 @@ end
 
 to sea
     setcolor 55
-    repeat 300
-    [setxy random2 "-55vw "55vw
-    random2 "-55vh "-35vh
-    seth random2 40 50
-    setpensize random2 5 10
-    setshade random2 50 90
-    arc 90 100]
+    penup
+    repeat 300 [
+        setxy random2 "-55vw "55vw
+        random2 "-55vh "-35vh
+        pendown
+        seth random2 40 50
+        setpensize random2 5 10
+        setshade random2 50 90
+        arc 90 100
+        ]
     penup
     setpensize 5
     setshade 50
@@ -125,12 +115,15 @@ end
 
 to land
     setcolor 12
-    repeat 600
-    [setxy random2 "-55vw "55vw
-    random2 "-35vh "50vh
-    setpensize random2 20 25
-    setshade random2 90 100
-    fd 0]
+    penup
+    repeat 600 [
+        setxy random2 "-55vw "55vw
+        random2 "-35vh "50vh
+        pendown
+        setpensize random2 20 25
+        setshade random2 90 100
+        fd 0
+        ]
     penup
     setpensize 5
     setshade 50
@@ -146,7 +139,7 @@ to map
     pendown
     sea
     penup
- ;   setxy 0 0
+   setxy 0 100
  ;  lt 125
  ;  lt 5
  ;   pendown
@@ -225,10 +218,13 @@ to map
     fd 100
     pendown
     rock
-    setxy -330 270
+    setxy -330 0
     lt 60
     lt 30
     setcolor 100
     pendown
 end
 
+;;;;;;;;;;;;
+; new code written by students
+;;;;;;;;;;;;
