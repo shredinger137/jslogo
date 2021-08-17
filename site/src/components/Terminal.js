@@ -61,6 +61,7 @@ function Terminal(props) {
     function handleEnter() {
 
         var inputValue = document.getElementById("prompt").innerText;
+        setTerminalSelection(0);
         props.interpreter.runLine(inputValue);
         var newData = [...terminalEntries];
         newData.push(inputValue);
