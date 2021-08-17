@@ -1,0 +1,142 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;; Sensors  Version ;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;this is our primary point of entry into the code
+to run-once    
+
+	;Takes the average of 5 measurements and prints it.
+	;We make a variable, suml, and add light measurements to it five times
+	;After that we'll divide out the five (to get an average) and print it
+	
+	OB1on
+	wait 10
+	OB1off
+    let[suml 0]
+    let[sumt0 0]
+    let[sumt1 0]
+	repeat 5 [
+		let[light readLightSensor] 
+        let[suml :suml + :light]
+	]
+    print (se "|Average Light Value: | :suml / 5)
+    
+	; repeat 5 [
+    ;    let[tempsensor0 readTempSensor0]
+    ;    let[sumt0 :sumt0 + :tempsensor0]
+    ; ]
+    ; print (se "|Average Temp0 Value: | :sumt0 / 5)
+    ; repeat 5 [
+    ;     let[tempsensor1 readTempSensor1]
+    ;     let[sumt1 :sumt1 + :tempsensor1]
+    ; ]
+    ; print (se "|Average Temp1 Value: | :sumt1 / 5)
+
+end
+
+to run-forever
+	OB1on
+	wait 10
+	OB1off	
+
+loop
+	[
+		let[light readLightSensor]
+		print :light
+		wait 10
+	]
+end
+
+to run-once-3TMP
+
+OB1on
+	wait 10
+	OB1off
+    let[sumt2 0]
+    let[sumt0 0]
+    let[sumt1 0]
+	
+    
+	repeat 5 [
+       let[tempsensor0 readTempSensor0]
+       let[sumt0 :sumt0 + :tempsensor0]
+    ]
+    print (se "|Average Temp0 Value: | :sumt0 / 5)
+    repeat 5 [
+         let[tempsensor1 readTempSensor1]
+         let[sumt1 :sumt1 + :tempsensor1]
+     ]
+    print (se "|Average Temp1 Value: | :sumt1 / 5)
+
+    repeat 5 [
+		let[tempsensor2 readtempsensor2] 
+        let[sumt2 :sumt2 + :tempsensor2]
+	]
+    print (se "|Average Temp2 Value: | :sumt2 / 5)
+
+end
+
+to run-3TMP  :ntimes  :nwait
+
+OB1on
+	wait 10
+	OB1off
+    make "temp2 []
+    make "temp1 []
+    make "temp0 []
+    make "time-list []
+    let [ic 0 ]
+	
+repeat :ntimes [
+       
+       let [ tempsensor0 readTempSensor0] 
+       make "temp0 ( se :temp0  :tempsensor0 ) 
+       print :ic 
+       let[tempsensor1 readTempSensor1]
+       make  "temp1 ( se :temp1  :tempsensor1 ) 
+       let[tempsensor2 readtempsensor2] 
+       make "temp2 ( se :temp2  :tempsensor2 ) 
+       wait :nwait 
+       make "time-list ( se :time-list :ic * :nwait / 10 )
+       let [ic :ic + 1 ]
+       ]
+    
+    print (se "|temp0 values | :temp0)
+    print (se "|temp1 Values: | :temp1)
+    print (se "|temp2 values: | :temp2)
+    print (se "|times: | :time-list)
+end
+
+to init-calibration 
+   make "temp1-list [] ;temperature calibration data 
+   make "temp0-list [] ;temperature calibration data
+end
+
+to line-equation :x1 :y1 :x2 :y2
+  make "slope  ( ( :y1 - :y2 ) / (:x1 - :x2 ) )
+  make "yintercept ( :y1 - :slope * :x1 )
+  print (se "|y = | :slope "|x + | :yintercept )
+end 
+
+to run-cal  :x1 :y1 :x2 :y2 :ntimes
+    init-calibration
+    line-equation :x1 :y1 :x2 :y2
+    let [icount 0 ]
+repeat :ntimes [
+    make "temp1-list ( se :temp1-list ( :slope * ( nth :icount :temp1 ) ) + :yintercept )
+ 
+    make "temp0-list ( se :temp0-list ( :slope * ( nth :icount :temp0 ) ) + :yintercept )
+    ;print (se "|Temp0 Values: | :temp0-list)
+    let [icount :icount + 1 ]
+    ;print ( se "|Temp1 Values: | :temp1-list )
+]
+plot-temp0
+plot-temp1
+end
+
+
+
+
+
+
+
