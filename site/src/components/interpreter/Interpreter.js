@@ -248,7 +248,7 @@ export default class Interpreter {
                 t.ctx.moveTo(t.xcor + t.cnvWidth / 2, t.cnvHeight / 2 - t.ycor);
                 t.ctx.arc(sx, sy, ar, astart, aend, dir);
                 if (t.pensize != 0) t.ctx.stroke();
-                if (t.fillpath) t.fillpath.push(function () { this.ctx.arc(sx, sy, ar, astart, aend, dir); });
+                if (t.fillpath) t.fillpath.push(function () { t.ctx.arc(sx, sy, ar, astart, aend, dir); });
             }
             t.seth(t.heading + a * sgn);
             t.xcor = cx - ar * turtleMath.cosdeg(t.heading);
@@ -271,7 +271,7 @@ export default class Interpreter {
                 t.ctx.moveTo(t.xcor + t.cnvWidth / 2, t.cnvHeight / 2 - t.ycor);
                 t.ctx.arc(sx, sy, ar, astart, aend, dir);
                 if (t.pensize != 0) t.ctx.stroke();
-                if (t.fillpath) t.fillpath.push(function () { this.ctx.arc(sx, sy, ar, astart, aend, dir); });
+                if (t.fillpath) t.fillpath.push(function () { t.ctx.arc(sx, sy, ar, astart, aend, dir); });
             }
             t.seth(t.heading + a * sgn);
             t.xcor = cx + ar * turtleMath.cosdeg(t.heading);

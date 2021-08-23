@@ -381,7 +381,7 @@ function Header(props) {
     return (
         <header className="header">
             <span style={{ width: "20px" }}></span>
-            {user ?
+            {user && user.displayName ?
                 <div onClick={toggleUserMenu} className="" style={userLogoStyle}>
                     <p>{user.displayName.substr(0, 1)}</p>
                 </div>
