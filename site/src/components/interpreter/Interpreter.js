@@ -85,15 +85,14 @@ export default class Interpreter {
         this.terminal = document.getElementById("cc");
         this.prompt = document.getElementById("prompt");
 
-        //these might be redundant, terminal and prompt
-
         this.procs.onfocus = function () { this.focused = true; };
-        this.terminal.onfocus = function () { this.focused = false; t.readProcs(); };
         this.prompt.onfocus = function () { this.focused = false; t.readProcs(); };
         this.procs.onkeydown = handleKeyDown;
 
+        //TODO: this doesn't actually seem to work... is it not applied anywhere?
         function handleKeyDown(e) {
             if (e.ctrlKey) {
+                console.log(e)
                 if (e.keyCode == 70) { e.preventDefault(); e.stopPropagation(); this.focus(); }
                 if (e.keyCode == 71) { e.preventDefault(); e.stopPropagation(); t.readProcs(); this.runLine('go'); }
                 if (e.keyCode == 190) { this.insert('stopped!\n'); this.reset([]); }
@@ -170,9 +169,6 @@ export default class Interpreter {
     }
     
     forward(n) {
-
-    //    n = n / this.turtleScale;
-
         const t = this;
         if (t.pendown) {
             t.ctx.beginPath();
@@ -220,6 +216,7 @@ export default class Interpreter {
 
     right(n) { this.seth(this.heading + n); }
     left(n) { this.seth(this.heading - n); }
+
     seth(a) {
         this.heading = a;
         this.heading = (this.heading % 360);
@@ -495,20 +492,11 @@ export default class Interpreter {
             this.setValue("_yTickSteps", null)
             this.setValue("_domain", null)
             chartOptions = {};
-
-
-
-
-
-
         } else {
 
         }
 
     }
-
-
-
 
 
     //TODO: This may be redundant; functions are now contained in terminal.js
@@ -975,27 +963,6 @@ export default class Interpreter {
                 t.pushResult(t.getValue(token));
             }
 
-
-            //If the function is make, var, or let (declarations), assume the second thing is the name of the variable. We already know " wasn't used due to a previouse else/if block.
-
-            //the goal is to assume anything following certain words is of a certain type; the previous code doesn't do that, because in the case of declarations the value
-            //doesn't yet exist
-
-            //when this is enabled make with se stops working; we need to check that se isn't being evaluated apparently ?
-
-            //Until this is solved, 'make' and 'let' still required the " or : symbols.
-
-
-            /*
-                      else if (t.cfun == "make" || t.cfun == "var" || t.cfun == "let" || token != "se") {
-                            console.log("second")
-                          //  t.pushResult(token)
-                          
-            
-                        }
-            */
-
-
             else {
 
                 if (token == '(') handleParend();
@@ -1006,8 +973,6 @@ export default class Interpreter {
 
                 //attempting to catch the case "make x se 5 6"; see above
                 if (t.cfun == "make" || t.cfun == "var" || t.cfun == "let") {
-                    //   console.log("got declaration in else")
-
                 }
 
                 t.stack.push(t.cfun);
@@ -1110,13 +1075,6 @@ export default class Interpreter {
 
 
     setValue(name, value) {
-        if(Array.isArray(value)){
-            let arrayValue = [];
-            for(var item of value){
-                console.log(typeof item);
-            }
-            console.log(arrayValue)
-        }
         var updateChart = false;
         var t = this;
         var chartType = [];
@@ -1745,19 +1703,6 @@ export default class Interpreter {
         }
     }
 
-    //TOOD: When running in a loop in which the value is reset, this results in the entire historical value - doesn't update. Ex:
-    /*
-    loop [
-        make "test []
-        push "test value1
-        print :test
-    ]
-
-    will print all of the historic values of test; it doesn't respect the value change on the first line of the loop. Se doesn't seem to have this problem.
-
-
-    */
-
     pushToArray(variable, value) {
         var variableValue = this.getValueInternal(variable);
 
@@ -1768,13 +1713,6 @@ export default class Interpreter {
             throw `${variable} is not a valid array`;
         }
     }
-
-    fillShape() {
-
-    }
-
-
-
 }
 
 /************************************************************
@@ -1784,12 +1722,8 @@ export default class Interpreter {
  * Defines all JSLogo functions that the user can perform
  ************************************************************/
 
-export var prims = {
 
-
-
-
-};
+export var prims = {};
 
 /* Charts */
 prims['x-data'] = { nargs: 1, fcn: function (a) { this.setChartListener("x", a) } }
@@ -1941,10 +1875,6 @@ prims['( '] = { nargs: 1, fcn: function (x) { this.evline.shift(); return x; } }
 prims['se '] = { nargs: 'ipm', fcn: function () { return this.ipm_se(arguments); } }
 
 prims['now'] = { nargs: 0, fcn: function () { return Math.floor(Date.now() / 1000) } }
-
-prims['resett'] = { nargs: 0, fcn: function (n) { this.resett(); } }
-prims['timer'] = { nargs: 0, fcn: function () { return this.timer(); } }
-prims['unixtime'] = { nargs: 0, fcn: function () { return Math.floor(Date.now() / 1000); } }
 prims['time'] = { nargs: 0, fcn: function () { return this.time(); } }
 prims['hours'] = { nargs: 0, fcn: function () { return this.hours(); } }
 prims['minutes'] = { nargs: 0, fcn: function () { return this.minutes(); } }
@@ -1960,7 +1890,6 @@ prims['push'] = { nargs: 2, fcn: function (a, b) { this.pushToArray(a, b); } }
 prims['make'] = { nargs: 2, fcn: function (a, b) { this.setValue(a, b); } }
 prims['let'] = { nargs: 2, fcn: function (a, b) { this.setLocalValue(a, b); } }
 prims['loadpic'] = { nargs: 1, fcn: function (a) { this.loadBackgroundImage(a) } }
-prims['local'] = { nargs: 1, fcn: function (a, b) { this.makeLocal(a); } }
 
 prims['ob1on'] = { nargs: 0, fcn: function () { this.ledOn(); this.mwait(1); } }
 prims['ob1off'] = { nargs: 0, fcn: function () { this.ledOff(); this.mwait(1); } }
