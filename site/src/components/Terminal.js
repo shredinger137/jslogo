@@ -13,6 +13,7 @@ function Terminal(props) {
     const [terminalEntries, setTerminalData] = useState([]);
     const [terminalSelection, setTerminalSelection] = useState(0);
     let moved = false;
+    let xpos;
 
     useEffect(() => {
         scrollToBottom();   
@@ -36,11 +37,15 @@ function Terminal(props) {
         //when clicking on the terminal area, focus on the prompt unless movement is detected (highlighting text)
         
         let terminalWrapper = document.getElementById('terminal-wrapper');
-        const setMovedTrue = () => {
-            moved = true;
+        const setMovedTrue = (e) => {
+            if((xpos - e.offsetX) > 5 || (xpos - e.offsetX) < -5){
+                moved = true;
+            }
+
         }
 
-        const upListener = () => {
+        const upListener = (e) => {
+
             if(!moved){
                 document.getElementById('prompt').focus();
             } else {
@@ -51,6 +56,7 @@ function Terminal(props) {
         }
 
         terminalWrapper.addEventListener('mousedown', function(e) {
+            xpos = e.offsetX;
             terminalWrapper.addEventListener('mousemove', setMovedTrue);
             terminalWrapper.addEventListener('mouseup', upListener);
         })
@@ -61,6 +67,7 @@ function Terminal(props) {
     function handleEnter() {
 
         var inputValue = document.getElementById("prompt").innerText;
+        setTerminalSelection(0);
         props.interpreter.runLine(inputValue);
         var newData = [...terminalEntries];
         newData.push(inputValue);

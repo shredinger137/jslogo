@@ -17,13 +17,10 @@ import { config } from '../config';
 
 //alright, latest issue is using 'user' in different ways. Stick to one.
 
-
-
 function Header(props) {
 
     var projects;
     projects = new Projects();
-
 
     const userLogoStyle = {
         zIndex: 2,
@@ -84,8 +81,6 @@ function Header(props) {
     //All links have the format /pr${projectId}, so we check if 'pr' is the start of it and take the rest.
     //This way you can still use URLs like /settings or whatever in the future, you just can't start them with pr.
 
-    //Currently missing: shared links will open as though they belong to you; if they don't, you have an issue. Author should
-    //be displayed now on the frontend, and if it isn't you saving won't work. In the future we can look into collaborative files or something.
 
     useEffect(() => {
         if (window.location.pathname.substr(1) && window.location.pathname.substr(1, 2) === "pr") {
@@ -107,9 +102,6 @@ function Header(props) {
     },
         []
     )
-
-
-
 
     //run getUserProjects if user changes; meaning, we want to wait until the login loads
     useEffect(() => {
@@ -146,35 +138,29 @@ function Header(props) {
 
 
         projects.getRecoverEntry().then(recoveryProject => {
-            if (!window.location.pathname.substr(1) || window.location.pathname.substr(1, 2) !== "pr"){
-            if (recoveryProject && recoveryProject[0] && recoveryProject[0]['code']) {
-                props.updateCode(recoveryProject[0]['code'])
-                props.updateCode(recoveryProject[0]['code'])
-                document.getElementById("projectTitle").value = "Recovered"
-
-
-
-                if (false) {
-                    console.log("project")
-                    //this is not a robust solution - it assumes that we're connected, that the correct user is the one on the computer,
-                    //and that we get a good response and don't need to fallback to code. Obviously all of that is wrong and we 
-                    //need to be more robust in the future.
-                    getSingleProject(recoveryProject[0]['projectId']);
-                } else {
-
+            if (!window.location.pathname.substr(1) || window.location.pathname.substr(1, 2) !== "pr") {
+                if (recoveryProject && recoveryProject[0] && recoveryProject[0]['code']) {
                     props.updateCode(recoveryProject[0]['code'])
-
+                    props.updateCode(recoveryProject[0]['code'])
                     document.getElementById("projectTitle").value = "Recovered"
-                }}
 
+                    if (false) {
+                        console.log("project")
+                        //this is not a robust solution - it assumes that we're connected, that the correct user is the one on the computer,
+                        //and that we get a good response and don't need to fallback to code. Obviously all of that is wrong and we 
+                        //need to be more robust in the future.
+                        getSingleProject(recoveryProject[0]['projectId']);
+                    } else {
 
+                        props.updateCode(recoveryProject[0]['code'])
 
-
+                        document.getElementById("projectTitle").value = "Recovered"
+                    }
+                }
 
 
                 //this is a little weird with cloud saves; we're just going to change the title to 'recovered', and hope that makes it clear
                 //the problem is if you go in and it already has the project you were working on you might not realize it's different
-
 
             }
         });
@@ -188,8 +174,6 @@ function Header(props) {
     },
         [],
     )
-
-
 
 
 
@@ -236,7 +220,6 @@ function Header(props) {
             var codeToSave = document.getElementById("procs").value;
             var projectTitle = document.getElementById("projectTitle").value;
 
-
             firebase.auth().currentUser.getIdToken(false).then(idToken => {
 
                 if (!projectId) {
@@ -254,7 +237,7 @@ function Header(props) {
                         //We're being very confident and assuming that the response is a valid ID
                         //in the future you'll want to add error handling here, or at least validation
 
-                        setProjectId(response.data)
+                        setProjectId(response.data);;
                     })
 
 
@@ -286,7 +269,6 @@ function Header(props) {
             })
 
             getUserProjects();
-            console.log("refresh")
             setRefreshUserMenu(!refreshUserMenu);
         }
     }
@@ -303,7 +285,6 @@ function Header(props) {
                 })
                     .then(response => {
                         getUserProjects();
-                        setProjectId(null);
                     })
             })
         }
@@ -336,7 +317,7 @@ function Header(props) {
                             titleElement.value = response.data.title;
                         }
                         setProjectId(response.data.projectId);
-                        if(response.data.ownerDisplayName){
+                        if (response.data.ownerDisplayName) {
                             setProjectAuthor(response.data.ownerDisplayName);
                         } else {
                             setProjectAuthor(null);
@@ -381,7 +362,7 @@ function Header(props) {
     return (
         <header className="header">
             <span style={{ width: "20px" }}></span>
-            {user ?
+            {user && user.displayName ?
                 <div onClick={toggleUserMenu} className="" style={userLogoStyle}>
                     <p>{user.displayName.substr(0, 1)}</p>
                 </div>
@@ -391,7 +372,8 @@ function Header(props) {
                 </div>
 
             }
-            <span id="dummyClickToClearPid" style={{display: 'none'}} onClick={() => {setProjectId(null)}}></span>
+
+            <span id="dummyClickToClearPid" style={{ display: 'none' }} onClick={() => { setProjectId(null) }}></span>
             <div style={titleStyle}>
                 <input type="text" id="projectTitle" defaultValue="Untitled" style={titleInputStyle} maxLength="22"></input>
                 <span style={{
@@ -400,10 +382,10 @@ function Header(props) {
                     top: "1.5em",
                     fontSize: ".6em",
                     pointerEvents: 'none'
-                }}>{projectAuthor && user && projectAuthor !== user.displayName? `By ${projectAuthor}` : null}</span>
+                }}>{projectAuthor && user && projectAuthor !== user.displayName ? `By ${projectAuthor}` : null}</span>
                 <span style={{ fontSize: ".8em" }}>{saveState}</span>
             </div>
-     
+
             <div className="buttonDiv" onClick={() => toggleNewProject()}>
                 <img src="/images/newProject.png" alt="New project icon"></img>
                 <span>New</span>
@@ -443,8 +425,8 @@ function Header(props) {
 
             {user ?
                 <>
-                    <div id="fullPage" className={userMenuShow ? "fullPage" : null} onClick={(e) => {setUserMenuShow(false)}}></div>
-                    <div id="userMenuWrapper" className={userMenuShow ? "userMenu userMenuShow" : "userMenu"} onClick={(e) => {e.stopPropagation()}}>
+                    <div id="fullPage" className={userMenuShow ? "fullPage" : null} onClick={(e) => { setUserMenuShow(false) }}></div>
+                    <div id="userMenuWrapper" className={userMenuShow ? "userMenu userMenuShow" : "userMenu"} onClick={(e) => { e.stopPropagation() }}>
 
                         <UserMenu
                             refreshUserMenu={refreshUserMenu}
