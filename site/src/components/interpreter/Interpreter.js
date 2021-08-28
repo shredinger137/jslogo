@@ -16,7 +16,7 @@ let flushtime = 200;
 
 export default class Interpreter {
 
-    constructor(canvasHeight, canvasWidth, addToChart, pushToTable, updateLogoVariables, pushNewChartData, updateChartOptions, updateChartType) {
+    constructor(props) {
 
         this.lastProc = "";
 
@@ -24,8 +24,8 @@ export default class Interpreter {
         //if the variable in question is one of the chart data ones we know to update the chart data in our app.
 
         this.offsetHorizontal = 0;
-        this.updateChartOptions = updateChartOptions;
-        this.updateChartType = updateChartType;
+        this.updateChartOptions = props.updateChartOptions;
+        this.updateChartType = props.updateChartType;
 
         this.turtleScale = 1;
 
@@ -37,13 +37,13 @@ export default class Interpreter {
         this.topChartYVariable = "";
         this.bottomChartYVariable = "";
 
-        this.pushNewChartData = pushNewChartData;
+        this.pushNewChartData = props.pushNewChartData;
 
         this.ticker = this.ticker.bind(this);
         this.isDone = this.isDone.bind(this);
 
-        this.addToChart = addToChart;
-        this.pushToTable = pushToTable;
+        this.addToChart = props.addToChart;
+        this.pushToTable = props.pushToTable;
         
         this.cnvWidth = 1000;
         this.cnvHeight = 600;

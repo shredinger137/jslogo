@@ -59,20 +59,18 @@ end`,
 
   componentDidMount() {
 
-    console.log("Serial API Check:");
-    console.log(this.checkIfSerialCapable());
+    console.log("Serial API Check:", this.checkIfSerialCapable() );
 
     this.setState({horizontalOffset: document.getElementById("gutter").getBoundingClientRect().left})
 
     interpreter = new Interpreter(
-      document.getElementById("cnvframe").offsetHeight,
-      document.getElementById("cnvframe").offsetWidth,
-      this.addToChart.bind(this),
-      this.pushToDataTable.bind(this),
-      this.updateLogoVariables.bind(this),
-      this.pushChartData.bind(this),
-      this.updateChartOptions.bind(this),
-      this.updateChartType.bind(this)
+      {
+        updateChartOptions: this.updateChartOptions,
+        updateChartType: this.updateChartType,
+        pushNewChartData: this.pushChartData,
+        addToChart: this.addToChart,
+        pushToTable: this.pushToDataTable
+      }
     );
     projects = new Projects(this.updateCode.bind(this));
     interpreter.setup();

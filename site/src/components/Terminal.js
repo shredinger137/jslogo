@@ -13,7 +13,7 @@ function Terminal(props) {
     const [terminalEntries, setTerminalData] = useState([]);
     const [terminalSelection, setTerminalSelection] = useState(0);
     let moved = false;
-    let xpos, ypos;
+    let xpos;
 
     useEffect(() => {
         scrollToBottom();   
@@ -57,7 +57,6 @@ function Terminal(props) {
 
         terminalWrapper.addEventListener('mousedown', function(e) {
             xpos = e.offsetX;
-            ypos = e.offsetY;
             terminalWrapper.addEventListener('mousemove', setMovedTrue);
             terminalWrapper.addEventListener('mouseup', upListener);
         })
