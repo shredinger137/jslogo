@@ -37,7 +37,8 @@ end
 
 to rock
     pendown
-    setcolor -9999
+    setcolor 10
+    setshade 10
     startfill
     rt 30
     fd 25
@@ -57,7 +58,6 @@ to rock
     fd 10
     endfill
     penup
-    fd 100
 end
 
 to tree
