@@ -1876,6 +1876,7 @@ prims['( '] = { nargs: 1, fcn: function (x) { this.evline.shift(); return x; } }
 prims['se '] = { nargs: 'ipm', fcn: function () { return this.ipm_se(arguments); } }
 
 prims['now'] = { nargs: 0, fcn: function () { return Math.floor(Date.now() / 1000) } }
+prims['unixtime'] = { nargs: 0, fcn: function () { return Math.floor(Date.now() / 1000) } }
 prims['time'] = { nargs: 0, fcn: function () { return this.time(); } }
 prims['hours'] = { nargs: 0, fcn: function () { return this.hours(); } }
 prims['minutes'] = { nargs: 0, fcn: function () { return this.minutes(); } }
