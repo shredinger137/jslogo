@@ -24,6 +24,11 @@ export const includes =
         output readADC1
     end
 
+    to showxy
+        print tcor
+    end
+
+
 
 
 `;
