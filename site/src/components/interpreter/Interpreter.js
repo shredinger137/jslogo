@@ -1853,8 +1853,9 @@ prims['setfont'] = { nargs: 1, fcn: function (f) { this.setfont(f); } }
 prims['setfontsize'] = { nargs: 1, fcn: function (s) { this.setfontsize(s); } }
 prims['setlinestyle'] = { nargs: 1, fcn: function (l) { this.setlinedash(l); } }
 
-prims['xcor'] = { nargs: 0, fcn: function (n) { return this.xcor; } }
-prims['ycor'] = { nargs: 0, fcn: function (n) { return this.ycor; } }
+prims['xcor'] = { nargs: 0, fcn: function (n) { return Math.floor(this.xcor); } }
+prims['ycor'] = { nargs: 0, fcn: function (n) { return Math.floor(this.ycor); } }
+prims['tcor'] = { nargs: 0, fcn: function (n) { return [Math.floor(this.xcor), Math.floor(this.ycor)]; } }
 prims['heading'] = { nargs: 0, fcn: function (n) { return this.heading; } }
 prims['color'] = { nargs: 0, fcn: function (n) { return this.color; } }
 prims['shade'] = { nargs: 0, fcn: function (n) { return this.shade; } }

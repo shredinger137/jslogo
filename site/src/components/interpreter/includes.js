@@ -2,7 +2,7 @@ export const includes =
 `
     to receive-packet
         make "_last-packet []
-        make "_last-packet se :_last-packet unixtime
+        make "_last-packet se :_last-packet now
         make "_last-packet se :_last-packet readADC0
         make "_last-packet se :_last-packet readADC1
         make "_last-packet se :_last-packet readADC2
@@ -23,6 +23,11 @@ export const includes =
     to readTempSensor1
         output readADC1
     end
+
+    to showxy
+        print tcor
+    end
+
 
 
 
