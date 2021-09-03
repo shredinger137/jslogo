@@ -65,11 +65,11 @@ end`,
 
     interpreter = new Interpreter(
       {
-        updateChartOptions: this.updateChartOptions,
-        updateChartType: this.updateChartType,
-        pushNewChartData: this.pushChartData,
-        addToChart: this.addToChart,
-        pushToTable: this.pushToDataTable
+        updateChartOptions: this.updateChartOptions.bind(this),
+        updateChartType: this.updateChartType.bind(this),
+        pushNewChartData: this.pushChartData.bind(this),
+        addToChart: this.addToChart.bind(this),
+        pushToTable: this.pushToDataTable.bind(this)
       }
     );
     projects = new Projects(this.updateCode.bind(this));
@@ -220,6 +220,7 @@ end`,
   render() {
 
     const options = {
+      quickSuggestions: false,
       selectOnLineNumbers: true,
       automaticLayout: true, 
       minimap: {
