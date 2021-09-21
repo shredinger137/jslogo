@@ -4,15 +4,15 @@ import Tokenizer from './Tokenizer';
 import turtleMath from './turtleMath';
 import { includes } from './includes';
 
+//built in modulus is weird, so we redefine it to one that works better... negatives, I think, are the main issue
 Number.prototype.mod = function (n) { return ((this % n) + n) % n; }
-
-const constants = {
-    black: '-9999&0', white: '-9999&100', red: '0&50', green: '30&50', blue: '70&50',
-    cyan: '50&50', magenta: '90&50', yellow: '20&50', orange: '14&50'
-}
 
 let port, reader, outputStream;
 let flushtime = 200;
+
+let constants = {
+    pi: 3.141592
+}
 
 export default class Interpreter {
 
@@ -44,7 +44,7 @@ export default class Interpreter {
 
         this.addToChart = props.addToChart;
         this.pushToTable = props.pushToTable;
-        
+
         this.cnvWidth = 1000;
         this.cnvHeight = 600;
         this.scale = 1;
@@ -54,6 +54,7 @@ export default class Interpreter {
         this.heading = 0;
         this.color = 0;
         this.shade = 50;
+        this.colorInHex = null;
         this.opacity = 1;
         this.pendown = true;
         this.pensize = 1;
@@ -118,6 +119,7 @@ export default class Interpreter {
         this.respStr = '';
         this.fe = undefined;
 
+
     }
 
 
@@ -167,11 +169,12 @@ export default class Interpreter {
         this.printToConsole(`The time is ${Math.floor(Date.now() / 1000)}`)
 
     }
-    
+
     forward(n) {
         const t = this;
         if (t.pendown) {
             t.ctx.beginPath();
+            t.ctx.globalAlpha = this.opacity;
             t.ctx.moveTo(t.xcor + t.cnvWidth / 2, t.cnvHeight / 2 - t.ycor);
         }
         t.xcor += n * turtleMath.sindeg(t.heading);
@@ -241,6 +244,7 @@ export default class Interpreter {
                 var astart = turtleMath.rad(t.heading + 180.0), aend = turtleMath.rad(t.heading + 180 + a * sgn);
                 if ((a % 360) == 0) aend += .0001;
                 var dir = r < 0;
+                t.ctx.globalAlpha = t.opacity;
                 t.ctx.beginPath();
                 t.ctx.moveTo(t.xcor + t.cnvWidth / 2, t.cnvHeight / 2 - t.ycor);
                 t.ctx.arc(sx, sy, ar, astart, aend, dir);
@@ -289,13 +293,20 @@ export default class Interpreter {
 
     setcolor(c) {
 
+        if (typeof c == 'string') {
+            this.setCtxColorCSS(c);
+            return;
+        }
+
         if ((typeof c) == 'object') { this.color = c[0]; this.shade = c[1]; }
         else this.color = c;
+
         this.setCtxColorShade(this.color, this.shade);
     }
 
     setshade(sh) {
         this.shade = sh;
+        console.log(this.color);
         this.setCtxColorShade(this.color, this.shade);
     }
 
@@ -618,9 +629,9 @@ export default class Interpreter {
 
         document.getElementById("codeEntryDiv").style.width = `calc(var(--codeEntryWidth) - var(--gutterWidth) + ${this.offsetHorizontal}px)`
         document.getElementById("chartAreaWrapper").style.width = `calc(var(--chartWidth) - ${this.offsetHorizontal}px)`
-        document.getElementById("chartAreaWrapper").style.height = `calc(var(--chartHeight) - ${this.offsetHorizontal * (3/5)}px)`
+        document.getElementById("chartAreaWrapper").style.height = `calc(var(--chartHeight) - ${this.offsetHorizontal * (3 / 5)}px)`
         document.getElementById("terminal-wrapper").style.width = `calc(var(--chartWidth) - ${this.offsetHorizontal}px)`
-        document.getElementById("terminal-wrapper").style.height = `calc(var(--interfaceHeight) - var(--chartHeight) + ${this.offsetHorizontal * (3/5)}px)`
+        document.getElementById("terminal-wrapper").style.height = `calc(var(--interfaceHeight) - var(--chartHeight) + ${this.offsetHorizontal * (3 / 5)}px)`
         document.getElementById("gutter").style.left = `calc(var(--codeEntryWidth) - var(--gutterWidth) + ${this.offsetHorizontal}px)`;
 
 
@@ -640,9 +651,9 @@ export default class Interpreter {
 
         this.turtleScale = newScale;
 
-       canvas.style.width = (wrapper.offsetWidth - 5) + "px";
+        canvas.style.width = (wrapper.offsetWidth - 5) + "px";
         canvas.style.height = (wrapper.offsetHeight - 5) + "px";
-    //    document.getElementById("canvasDimensionsLabel").innerHTML = `Canvas: ${Math.floor((wrapper.offsetWidth - 5) * newScale)}w x ${Math.floor((wrapper.offsetHeight - 5) * newScale)}h`
+        //    document.getElementById("canvasDimensionsLabel").innerHTML = `Canvas: ${Math.floor((wrapper.offsetWidth - 5) * newScale)}w x ${Math.floor((wrapper.offsetHeight - 5) * newScale)}h`
 
         this.move();
     }
@@ -656,6 +667,7 @@ export default class Interpreter {
         this.xcor = 0;
         t.ycor = 0;
         t.heading = 0;
+        t.ctx.globalAlpha = 1;
         t.setCtxColorShade(-9999, 98); // #FAFAFA
         t.ctx.fillRect(0, 0, t.cnvWidth, t.cnvHeight);
         t.color = 0;
@@ -682,13 +694,17 @@ export default class Interpreter {
         return this.nextRandomDouble() < .5 ? a : b;
     }
 
-    pickRandom(min, max) {
-        min = Math.ceil(min);
-        max = Math.floor(max);
-        return Math.floor(Math.random() * (max - min + 1)) + min;
+    getRandom(value) {
+        //if the input is an array, we want a range; if it's a number, we assume the lower limit is 0
+
+        if(Array.isArray(value) && value.length >= 2){
+            return Math.floor(Math.random() * (value[1] - value[0] + 1)) + value[0];
+        } else {
+            return Math.floor(Math.random() * (value + 1)); 
+        }
     }
 
-    
+
 
     //load a background
 
@@ -701,12 +717,12 @@ export default class Interpreter {
         var img = new Image();
         img.src = url;
         var widthTarget = 1000;
-        img.onload = function() {
+        img.onload = function () {
             ctx.drawImage(img, 0, 0, widthTarget, widthTarget * img.height / img.width);
             context.hold = false;
         };
 
-        img.onerror = function() {
+        img.onerror = function () {
             context.printToConsole("Error loading image");
             context.hold = false;
         }
@@ -781,6 +797,11 @@ export default class Interpreter {
             t.ctx.fillStyle = cc;
         }
 
+    }
+
+    setCtxColorCSS(color) {
+        this.ctx.strokeStyle = color;
+        this.ctx.fillStyle = color;
     }
 
     parse(s) { return new Tokenizer(s).tokenize(); }
@@ -1405,7 +1426,7 @@ export default class Interpreter {
 
     textAlign(str) {
         if (['center', 'left', 'right'].indexOf(str) > -1) this.ctx.textAlign = str;
-        else throw "error: " + this.cfun + " doesn't like " + this.printstr(str) + ' as input';
+        else throw "error: " + this.cfun + " doesn't like " + this.printstr(str) + ' as input; expected center, left or right';
     }
 
 
@@ -1452,7 +1473,7 @@ export default class Interpreter {
 
     getlist(x) {
         if ((typeof x) == 'object') return x;
-        throw "error: " + this.cfun + " doesn't like " + this.printstr(x) + ' as input';
+        throw "error: " + this.cfun + " doesn't like " + this.printstr(x) + ' as input, expected array';
     }
 
     getbool(x) {
@@ -1464,7 +1485,7 @@ export default class Interpreter {
     getcolor(x) {
         var type = typeof x;
         if (type == 'object') throw "error: " + this.cfun + " doesn't like " + this.printstr(x) + ' as input';
-        if (type == 'number') return x;
+        else if (type == 'number' || type == 'string') return x;
         var l = x.split('&');
         if (l.length == 1) return Number(x);
         return [Number(l[0]), Number(l[1])];
@@ -1507,12 +1528,12 @@ export default class Interpreter {
 
     //specific to SI1145 sensor
 
-    readIR(){
+    readIR() {
         this.hold = true;
         this.sendReceive([0xf8], 2, this.gotsensor)
     }
 
-    readVisible(){
+    readVisible() {
         this.hold = true;
         this.sendReceive([0xf9], 2, this.gotsensor)
     }
@@ -1766,7 +1787,7 @@ prims['wait'] = { nargs: 1, fcn: function (x) { this.mwait(100 * this.getnum(x))
 prims['mwait'] = { nargs: 1, fcn: function (x) { this.mwait(this.getnum(x)); } }
 
 prims['+'] = { nargs: 2, priority: -1, fcn: function (a, b) { return a + b; } }
-prims['%'] = { nargs: 2, priority: -1, fcn: function(a, b){return a % b}}
+prims['%'] = { nargs: 2, priority: -1, fcn: function (a, b) { return a % b } }
 prims['-'] = { nargs: 2, priority: -1, fcn: function (a, b) { return a - b; } }
 prims['*'] = { nargs: 2, priority: -2, fcn: function (a, b) { return a * b; } }
 prims['/'] = { nargs: 2, priority: -2, fcn: function (a, b) { return a / b; } }
@@ -1781,8 +1802,8 @@ prims['minus'] = { nargs: 1, fcn: function (a) { return -a; } }
 prims['sin'] = { nargs: 1, fcn: function (a) { return turtleMath.sindeg(this.getnum(a)); } }
 prims['cos'] = { nargs: 1, fcn: function (a) { return turtleMath.cosdeg(this.getnum(a)); } }
 prims['sqrt'] = { nargs: 1, fcn: function (a) { return Math.sqrt(this.getnum(a)); } }
-prims['random2'] = { nargs: 2, fcn: function (a, b) { return this.pickRandom(this.getnum(a), this.getnum(b)); } }
-prims['oneof'] = { nargs: 2, fcn: function (a, b) {  return this.nextRandomDouble() < .5 ? a : b; } }
+prims['random'] = { nargs: 1, fcn: function (a) { return this.getRandom(a); } }
+prims['oneof'] = { nargs: 2, fcn: function (a, b) { return this.nextRandomDouble() < .5 ? a : b; } }
 
 prims['sum'] = { nargs: 2, fcn: function (a, b) { return a + b; } }
 prims['product'] = { nargs: 2, fcn: function (a, b) { return a * b; } }
@@ -1809,7 +1830,7 @@ prims['nth'] = { nargs: 2, fcn: function (n, l) { return this.getlist(l)[this.ge
 prims['setnth'] = { nargs: 3, fcn: function (n, l, d) { this.getlist(l)[this.getnum(n)] = d; } }
 prims['member?'] = { nargs: 2, fcn: function (x, l) { return this.member(x, l); } }
 prims['empty?'] = { nargs: 1, fcn: function (l) { return l.length == 0; } }
-prims['pick'] = { nargs: 1, fcn: function (l) { return l[this.random.pickRandom(0, this.getlist(l).length - 1)]; } }
+prims['pick'] = { nargs: 1, fcn: function (l) { return l[this.getRandom(0, this.getlist(l).length - 1)]; } }
 
 prims['print'] = { nargs: 1, fcn: function (x) { this.printToConsole(this.printstr(x)); } }
 
@@ -1924,4 +1945,7 @@ prims['readADC4'] = { nargs: 0, fcn: function () { this.readSensor(4); return th
 prims['readADC5'] = { nargs: 0, fcn: function () { this.readSensor(5); return this.cfun; } }
 prims['read-ir'] = { nargs: 0, fcn: function () { this.readIR(); return this.cfun; } }
 prims['read-visible'] = { nargs: 0, fcn: function () { this.readVisible(); return this.cfun; } }
-prims['init-ir'] = {nargs: 0, fcn: function() {this.sendl([0xf1]);}}
+prims['init-ir'] = { nargs: 0, fcn: function () { this.sendl([0xf1]); } }
+
+
+prims['colortest'] = { nargs: 1, fcn: function (color) { this.setCtxColorCSS(color); } }
