@@ -37,7 +37,7 @@ end
 ;;;;;; single blink words ;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;	
 
-to OB1-blink :t
+to ob1-blink :t
 		repeat :t [			;repeat t times
 		ob1on				;turn on on-board LED
 		wait 10				;wait 10 deciseconds		
