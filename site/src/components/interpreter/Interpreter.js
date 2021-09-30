@@ -11,7 +11,8 @@ let port, reader, outputStream;
 let flushtime = 200;
 
 let constants = {
-    pi: 3.141592
+    pi: 3.141592,
+    e: 2.71828,
 }
 
 export default class Interpreter {
@@ -132,6 +133,37 @@ export default class Interpreter {
      *************************************
      */
 
+    setclass(name){
+        if(name == "warrior"){
+            document.getElementById('turtleimage').src = 'turtleWarrior.svg'
+        }
+        else if (name == "none") {
+            document.getElementById('turtleimage').src = 'turtle.svg'
+        }
+
+        else if (name == "mage") {
+            document.getElementById('turtleimage').src = 'turtleMage.svg'
+        }
+
+        else if (name == "ranger") {
+            document.getElementById('turtleimage').src = 'turtleRanger.svg'
+        }
+    }
+
+    aboutClass(name) {
+        if(name == "warrior"){
+            return `These turtles hail from the seas of the North, where hatchlings hone themselves on sea monsters and protect trade routes. The turtles of Turtlaheim have migrated into the world, seeking fortune and often finding their way as sellswords. Warriors excel at the use of melee weapons and use strength as their primary stat.`
+        }
+
+        else if (name == "mage") {
+            return 'Gifted turtles train in the arcane arts, manipulating energy and the very forces of natural through willpower. These mages seek knowledge of the world and the arcane arts, though some seek power of their own. Mages use intelligence as their primary stat.'
+        }
+
+        else if (name == "ranger") {
+            return 'The undersea forests are a place bandits fear to roam, for the rangers are known to dispatch foes silently and unseen. These expert archers have dexterity as a primary stat and excel at the use of bows, crossbows and javalins.'
+        }
+    }
+
 
     setup() {
 
@@ -141,6 +173,7 @@ export default class Interpreter {
         this.element.setAttribute('id', 'turtle')
         document.getElementById('cnvframe').appendChild(t.element);
         this.img = document.createElement('img');
+        this.img.id = "turtleimage"
         this.img.src = 'turtle.svg';
         this.element.appendChild(t.img);
         this.img.onload = imgLoaded;
@@ -959,7 +992,17 @@ export default class Interpreter {
             else if ((token.substring(0, 1) == "'") && (token.slice(-1) == "'")) t.pushResult(token.substring(1, token.length - 1));
             else if (constants[token]) t.pushResult(constants[token]);
 
+            /*
+
+            TODO: The following commented code allows JSLogo to function without using : and " before variables. It also allow implicit delcaration
+            of the form x = 5. These would be a huge asset to the program, but it was requested that we not allow the functionality. So it's sitting here,
+            commented out, until management can be convinced otherwise.
+
+
             //no type declaration, no value, no current function, but followed by = - implicit declaration
+
+            
+
             else if (!t.cfun && t.evline[0] === `=` && t.evline[1] != undefined) {
 
                 //not sure if undefined works to catch errors here
@@ -979,10 +1022,12 @@ export default class Interpreter {
             }
 
 
+
             //If no declaration, but value exists as a variable, get that value. 
             else if (t.getValueInternal(token)) {
                 t.pushResult(t.getValue(token));
             }
+                        */
 
             else {
 
@@ -1746,6 +1791,9 @@ export default class Interpreter {
 
 export var prims = {};
 
+prims['setclass'] = {nargs: 1, fcn: function(a) {this.setclass(a)}}
+prims['aboutclass'] = {nargs: 1, fcn: function(a) {this.printToConsole(this.aboutClass(a))}}
+
 /* Charts */
 prims['x-data'] = { nargs: 1, fcn: function (a) { this.setChartListener("x", a) } }
 prims['plot-title'] = { nargs: 1, fcn: function (a) { this.setValue("_plotTitle", a) } }
@@ -1783,18 +1831,30 @@ prims['break'] = { nargs: 0, fcn: function (n) { this.break() } }
 prims['.'] = { nargs: 0, flow: true, fcn: function () { this.procOutput(this); } }
 prims['stop'] = { nargs: 0, flow: true, fcn: function () { this.procOutput(this); } }
 prims['output'] = { nargs: 1, flow: true, fcn: function (x) { return this.procOutput(this, x); } }
+prims['return'] = { nargs: 1, flow: true, fcn: function (x) { return this.procOutput(this, x); } }
 prims['wait'] = { nargs: 1, fcn: function (x) { this.mwait(100 * this.getnum(x)); } }
 prims['mwait'] = { nargs: 1, fcn: function (x) { this.mwait(this.getnum(x)); } }
+
+
+
+/*****
+ * 
+ *  Math functions and operators
+ * 
+ */
 
 prims['+'] = { nargs: 2, priority: -1, fcn: function (a, b) { return a + b; } }
 prims['%'] = { nargs: 2, priority: -1, fcn: function (a, b) { return a % b } }
 prims['-'] = { nargs: 2, priority: -1, fcn: function (a, b) { return a - b; } }
 prims['*'] = { nargs: 2, priority: -2, fcn: function (a, b) { return a * b; } }
 prims['/'] = { nargs: 2, priority: -2, fcn: function (a, b) { return a / b; } }
+prims['>='] = { nargs: 2, priority: -2, fcn: function(a, b) {return a >= b}}
+prims['<='] = { nargs: 2, priority: -2, fcn: function(a, b) {return a <= b}}
 prims['='] = { nargs: 2, priority: -2, fcn: function (a, b) { return this.equals(a, b); } }
 prims['!='] = { nargs: 2, priority: -2, fcn: function (a, b) { return !this.equals(a, b); } }
 prims['>'] = { nargs: 2, priority: -2, fcn: function (a, b) { return a > b; } }
 prims['<'] = { nargs: 2, priority: -2, fcn: function (a, b) { return a < b; } }
+
 prims['remainder'] = { nargs: 2, fcn: function (a, b) { return this.getnum(a).mod(this.getnum(b)); } }
 prims['round'] = { nargs: 1, fcn: function (a) { return Math.round(this.getnum(a)); } }
 prims['int'] = { nargs: 1, fcn: function (a) { return Math.floor(this.getnum(a)); } }
@@ -1804,9 +1864,23 @@ prims['cos'] = { nargs: 1, fcn: function (a) { return turtleMath.cosdeg(this.get
 prims['sqrt'] = { nargs: 1, fcn: function (a) { return Math.sqrt(this.getnum(a)); } }
 prims['random'] = { nargs: 1, fcn: function (a) { return this.getRandom(a); } }
 prims['oneof'] = { nargs: 2, fcn: function (a, b) { return this.nextRandomDouble() < .5 ? a : b; } }
+prims['tan'] = { nargs: 1, fcn: function(a) {return Math.tan(this.getnum(a))}}
+
 
 prims['sum'] = { nargs: 2, fcn: function (a, b) { return a + b; } }
+prims['difference'] = { nargs: 2, fcn: function (a, b) { return a - b; } }
 prims['product'] = { nargs: 2, fcn: function (a, b) { return a * b; } }
+prims['quotiant'] = { nargs: 2, fcn: function (a, b) { return a / b; } }
+prims['ln'] = { nargs: 1, fcn: function(a) {return Math.log(this.getnum(a))}}
+prims['power'] = { nargs: 2, fcn: function(a, b) {return Math.pow(this.getnum(a), this.getnum(b))}}
+prims['exp'] = {nargs: 1, fcn: function (a){return Math.pow(2.71828, this.getnum(a))} }
+
+
+
+
+
+
+
 
 prims['se'] = { nargs: 2, fcn: function (a, b) { return [].concat(a, b); } }
 prims['word'] = { nargs: 2, fcn: function (a, b) { return this.word(a, b); } }
