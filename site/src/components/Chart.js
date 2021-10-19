@@ -1,89 +1,107 @@
 /* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off", no-use-before-define: "off" */
 
-import React, { Component } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import '../css/styles.css';
 import '../css/layout.css';
 import { Scatter } from 'react-chartjs-2'
 
-export default class Chart extends Component {
+function Chart(props) {
 
-    state = {
-        options: {}
+    const chartRefSingle = useRef(null);
+    const chartRefTop = useRef(null);
+    const chartRefBottom = useRef(null);
+
+
+    //TODO: Set this to take an argument for the ref, then download an image for the appropriate chart. Add text or a button to save.
+    const downloadSingle = () => {
+        if (chartRefSingle && chartRefSingle.current && chartRefSingle.current.chartInstance) {
+            const base64image = chartRefSingle.current.chartInstance.toBase64Image();
+            let filename = 'chart.png';
+            var a = document.createElement('a');
+            a.href = base64image;
+            a.download = filename;
+            a.click();
+        }
+
     }
 
-    chartRef = {}
-
-    render() {
-        return (
-            <div style={{ height: "100%", width: "100%" }}>
-                {this.props.chartType == "single" ?
+    return (
+        <div style={{ height: "100%", width: "100%" }}>
+            {props.chartType == "single" ?
+                <>
+                    <p style={{ fontSize: '.8rem', padding: 0, margin: 0, position: 'absolute', top: '5px', left: '5px' }}>Download chart</p>
                     <Scatter
                         data={{
                             datasets:
                                 [
                                     {
-                                        data: this.props.chartDataSingle
+                                        data: props.chartDataSingle
                                     }
 
                                 ]
                         }}
 
 
-                        options={this.props.chartOptionsSingle}                        
+                        options={props.chartOptionsSingle}
                         redraw={true}
-                        ref={this.chartReference
+                        ref={chartRefSingle
                         }
                     />
-                    :
+                </>
+                :
 
-                    this.props.chartType == "double" ?
-                        <>
-                            <div style={{ height: "50%" }}>
-                                <Scatter
-                                    data={{
-                                        datasets:
-                                            [
-                                                {
-                                                    data: this.props.chartDataTop
-                                                }
+                props.chartType == "double" ?
+                    <>
 
-                                            ]
-                                    }}
+                        <div style={{ height: "50%" }}>
+                            <p style={{ fontSize: '.8rem', padding: 0, margin: 0, position: 'absolute', top: '5px', left: '5px' }}>Download chart</p>
+                            <Scatter
+                                data={{
+                                    datasets:
+                                        [
+                                            {
+                                                data: props.chartDataTop
+                                            }
 
-
-                                    options={
-                                        this.props.chartOptionsTop}
-                                    redraw={true}
-                                    ref={this.chartReference}
-                                />
-                            </div>
-
-                            <div style={{ height: "50%" }}>
-                                <Scatter
-                                    data={{
-                                        datasets:
-                                            [
-                                                {
-                                                    data: this.props.chartDataBottom
-                                                }
-
-                                            ]
-                                    }}
+                                        ]
+                                }}
 
 
-                                    options={this.props.chartOptionsBottom}
-                                    redraw={true}
-                                    ref={this.chartReference}
-                                />
-                            </div>
-                        </>
+                                options={
+                                    props.chartOptionsTop}
+                                redraw={true}
+                                ref={chartRefTop}
+                            />
+                        </div>
 
-                        : null
+                        <div style={{ height: "50%" }}>
+                            <p style={{ fontSize: '.8rem', padding: 0, margin: 0, position: 'absolute', top: 'calc(50% + 5px)', left: '5px' }}>Download chart</p>
+                            <Scatter
+                                data={{
+                                    datasets:
+                                        [
+                                            {
+                                                data: props.chartDataBottom
+                                            }
 
-                }
+                                        ]
+                                }}
 
-            </div>
-        )
 
-    }
+                                options={props.chartOptionsBottom}
+                                redraw={true}
+                                ref={chartRefBottom}
+                            />
+                        </div>
+                    </>
+
+                    : null
+
+            }
+
+        </div>
+    )
+
 }
+
+export default Chart;

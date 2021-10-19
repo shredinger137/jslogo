@@ -19,6 +19,8 @@ export default class Interpreter {
 
     constructor(props) {
 
+        this.instantiatedObjects = {};
+
         this.lastProc = "";
 
         //charts are given assigned variables for data; these are effectively listened for in 'make', so that 
@@ -133,25 +135,31 @@ export default class Interpreter {
      *************************************
      */
 
-    setclass(name){
-        if(name == "warrior"){
+    setclass(name) {
+        if (name == "warrior") {
             document.getElementById('turtleimage').src = 'turtleWarrior.svg'
+            return;
         }
         else if (name == "none") {
             document.getElementById('turtleimage').src = 'turtle.svg'
+            return;
         }
 
         else if (name == "mage") {
             document.getElementById('turtleimage').src = 'turtleMage.svg'
+            return;
         }
 
         else if (name == "ranger") {
             document.getElementById('turtleimage').src = 'turtleRanger.svg'
+            return;
+        } else {
+            this.printToConsole("Invalid class: expected warrior, mage, ranger or none.")
         }
     }
 
     aboutClass(name) {
-        if(name == "warrior"){
+        if (name == "warrior") {
             return `These turtles hail from the seas of the North, where hatchlings hone themselves on sea monsters and protect trade routes. The turtles of Turtlaheim have migrated into the world, seeking fortune and often finding their way as sellswords. Warriors excel at the use of melee weapons and use strength as their primary stat.`
         }
 
@@ -161,6 +169,8 @@ export default class Interpreter {
 
         else if (name == "ranger") {
             return 'The undersea forests are a place bandits fear to roam, for the rangers are known to dispatch foes silently and unseen. These expert archers have dexterity as a primary stat and excel at the use of bows, crossbows and javalins.'
+        } else {
+            return 'Invalid class: expected warrior, mage or ranger.'
         }
     }
 
@@ -373,12 +383,74 @@ export default class Interpreter {
     }
 
 
+    /*
+     *************************************
+     * 
+     * Instantiated Objects
+     * 
+     *************************************
+     */
+
+    //add an image to the canvas - mostly works, but needs to be positioned and added to the records (this.instantiatedObjects)
+    //Note that turtle position is handled largely by 'move'. So we should add a 'target' argument to move; assume turtle if not specified,
+    //otherwise select the object in the array and move it.
 
 
 
+    //TODO: The entire 'move' paradigm uses offsets, which is confusing when absolute can work with top/left, since we know the pixel count here.
+    createInstantiatedObject(name, image, coordinates) {
+        let t = this;
+        let width = 60;
+        let height = 60;
+        var canvas = document.getElementById("canvas");
 
+        t.instantiatedObjects[name] = {
+            xpos: coordinates[0],
+            ypos: coordinates[1]
+        }
 
+        let objectElement = document.createElement('div');
+        objectElement.setAttribute('id', `${name}-div`);
+        objectElement.setAttribute('class', 'object');
+        let styles = {
+            height: "60px",
+            width: "60px",
+            position: "absolute",
+            top: (-height / 2 + (t.cnvHeight / 2 - coordinates[1]) * canvas.offsetHeight / t.cnvHeight) + 'px',
+            left: (-width / 2 + (coordinates[0] + t.cnvWidth / 2) * canvas.offsetWidth / t.cnvWidth) + 'px'
+        }
 
+        Object.assign(objectElement.style, styles);
+
+        document.getElementById('cnvframe').appendChild(objectElement);
+        let img = document.createElement('img');
+        img.id = name;
+        img.src = image;
+        img.height = 60;
+        img.width = 60;
+        
+        objectElement.appendChild(img);
+    }
+
+    deleteInsantiatedObject(name){
+        if(this.instantiatedObjects[name] && document.getElementById(`${name}-div`) != null){
+            delete this.instantiatedObjects[name];
+            document.getElementById(`${name}-div`).remove();
+        }
+    }
+
+    moveInsantiatedObject(name, x, y){
+        let height = 60;
+        let width = 60;
+
+        var canvas = document.getElementById("canvas");
+        if(document.getElementById(`${name}-div`) !== null){
+            document.getElementById(`${name}-div`).style.top = (-height / 2 + (this.cnvHeight / 2 - y) * canvas.offsetHeight / this.cnvHeight) + 'px';
+            document.getElementById(`${name}-div`).style.left = (-width / 2 + (x + this.cnvWidth / 2) * canvas.offsetWidth / this.cnvWidth) + 'px';
+        } else {
+            this.printToConsole('Error: Object is not defined')
+        }
+    }
 
 
     /*
@@ -614,45 +686,34 @@ export default class Interpreter {
     /////////////////////////
 
     move() {
-
-        var t = this;
+              
         var canvas = document.getElementById("canvas");
         if (canvas == null) return;
 
-        if (!t.img.complete) return;
-        var img = t.element.firstChild;
+        if (!this.img.complete) return;
+        var img = this.element.firstChild;
+        console.log(img)
+        console.log("here")
 
-        var dx = screenLeft();
-        var dy = screenTop();
+        var dx = -img.width / 2 + (this.xcor + this.cnvWidth / 2) * canvas.offsetWidth / this.cnvWidth;
+        var dy = -img.height / 2 + (this.cnvHeight / 2 - this.ycor) * canvas.offsetHeight / this.cnvHeight;
         //var s = 1;
-        var s = canvas.offsetHeight / t.cnvHeight * t.zoom;
+        var s = canvas.offsetHeight / this.cnvHeight * this.zoom;
 
-        t.element.style.webkitTransform = `translate(${dx}px, ${dy}px) rotate(${t.heading}deg) scale(${s}, ${s})`;
-        // 'translate(' + dx + 'px, ' + dy + 'px) rotate(' + t.heading + 'deg)' + ' scale(' + s + ',' + s + ')';
-        t.element.left = dx;
-        t.element.top = dy;
+        this.element.style.transform = `translate(${dx}px, ${dy}px) rotate(${this.heading}deg) scale(${s}, ${s})`;
 
-        if (t.ycor > (t.cnvHeight / 2) || t.ycor < ((t.cnvHeight / 2) * -1) || t.xcor > (t.cnvWidth / 2) || t.xcor < ((t.cnvWidth / 2) * -1)) {
-            t.element.style.visibility = "hidden";
-            t.outOfBounds = true;
+        this.element.left = dx;
+        this.element.top = dy;
+
+        if (this.ycor > (this.cnvHeight / 2) || this.ycor < ((this.cnvHeight / 2) * -1) || this.xcor > (this.cnvWidth / 2) || this.xcor < ((this.cnvWidth / 2) * -1)) {
+            this.element.style.visibility = "hidden";
+            this.outOfBounds = true;
         } else {
-            if (t.outOfBounds == true) {
-                t.element.style.visibility = "visible";
+            if (this.outOfBounds == true) {
+                this.element.style.visibility = "visible";
             }
         }
-
-
-        function screenLeft() { return -img.width / 2 + (t.xcor + t.cnvWidth / 2) * canvas.offsetWidth / t.cnvWidth; }
-        function screenTop() { return -img.height / 2 + (t.cnvHeight / 2 - t.ycor) * canvas.offsetHeight / t.cnvHeight; }
-
-
     }
-
-
-
-
-    getDocumentHeight() { return Math.max(document.body.clientHeight, document.documentElement.clientHeight); }
-    getDocumentWidth() { return Math.max(document.body.clientWidth, document.documentElement.clientWidth); }
 
 
     handleResizeHorizontal(offset) {
@@ -730,10 +791,10 @@ export default class Interpreter {
     getRandom(value) {
         //if the input is an array, we want a range; if it's a number, we assume the lower limit is 0
 
-        if(Array.isArray(value) && value.length >= 2){
+        if (Array.isArray(value) && value.length >= 2) {
             return Math.floor(Math.random() * (value[1] - value[0] + 1)) + value[0];
         } else {
-            return Math.floor(Math.random() * (value + 1)); 
+            return Math.floor(Math.random() * (value + 1));
         }
     }
 
@@ -1496,22 +1557,7 @@ export default class Interpreter {
 
     getnum(x) {
         var n;
-        var cleaned;
-
-        if (typeof x == "string") {
-            if (x.includes("vh")) {
-                cleaned = x.replace("vh", "");
-                n = Number(cleaned) / 100 * this.cnvHeight;
-            }
-            if (x.includes("vw")) {
-                cleaned = x.replace("vw", "");
-                n = Number(cleaned) / 100 * this.cnvWidth;
-            }
-        }
-        else {
-            n = Number(x);
-        }
-
+        n = Number(x);
         if (isNaN(n) || (String(x) == 'false') || (String(x) == 'true')) throw "error: " + this.cfun + " doesn't like " + this.printstr(x) + ' as input';
         return n;
     }
@@ -1791,8 +1837,8 @@ export default class Interpreter {
 
 export var prims = {};
 
-prims['setclass'] = {nargs: 1, fcn: function(a) {this.setclass(a)}}
-prims['aboutclass'] = {nargs: 1, fcn: function(a) {this.printToConsole(this.aboutClass(a))}}
+prims['setclass'] = { nargs: 1, fcn: function (a) { this.setclass(a) } }
+prims['aboutclass'] = { nargs: 1, fcn: function (a) { this.printToConsole(this.aboutClass(a)) } }
 
 /* Charts */
 prims['x-data'] = { nargs: 1, fcn: function (a) { this.setChartListener("x", a) } }
@@ -1848,8 +1894,8 @@ prims['%'] = { nargs: 2, priority: -1, fcn: function (a, b) { return a % b } }
 prims['-'] = { nargs: 2, priority: -1, fcn: function (a, b) { return a - b; } }
 prims['*'] = { nargs: 2, priority: -2, fcn: function (a, b) { return a * b; } }
 prims['/'] = { nargs: 2, priority: -2, fcn: function (a, b) { return a / b; } }
-prims['>='] = { nargs: 2, priority: -2, fcn: function(a, b) {return a >= b}}
-prims['<='] = { nargs: 2, priority: -2, fcn: function(a, b) {return a <= b}}
+prims['>='] = { nargs: 2, priority: -2, fcn: function (a, b) { return a >= b } }
+prims['<='] = { nargs: 2, priority: -2, fcn: function (a, b) { return a <= b } }
 prims['='] = { nargs: 2, priority: -2, fcn: function (a, b) { return this.equals(a, b); } }
 prims['!='] = { nargs: 2, priority: -2, fcn: function (a, b) { return !this.equals(a, b); } }
 prims['>'] = { nargs: 2, priority: -2, fcn: function (a, b) { return a > b; } }
@@ -1864,16 +1910,16 @@ prims['cos'] = { nargs: 1, fcn: function (a) { return turtleMath.cosdeg(this.get
 prims['sqrt'] = { nargs: 1, fcn: function (a) { return Math.sqrt(this.getnum(a)); } }
 prims['random'] = { nargs: 1, fcn: function (a) { return this.getRandom(a); } }
 prims['oneof'] = { nargs: 2, fcn: function (a, b) { return this.nextRandomDouble() < .5 ? a : b; } }
-prims['tan'] = { nargs: 1, fcn: function(a) {return Math.tan(this.getnum(a))}}
+prims['tan'] = { nargs: 1, fcn: function (a) { return Math.tan(this.getnum(a)) } }
 
 
 prims['sum'] = { nargs: 2, fcn: function (a, b) { return a + b; } }
 prims['difference'] = { nargs: 2, fcn: function (a, b) { return a - b; } }
 prims['product'] = { nargs: 2, fcn: function (a, b) { return a * b; } }
 prims['quotiant'] = { nargs: 2, fcn: function (a, b) { return a / b; } }
-prims['ln'] = { nargs: 1, fcn: function(a) {return Math.log(this.getnum(a))}}
-prims['power'] = { nargs: 2, fcn: function(a, b) {return Math.pow(this.getnum(a), this.getnum(b))}}
-prims['exp'] = {nargs: 1, fcn: function (a){return Math.pow(2.71828, this.getnum(a))} }
+prims['ln'] = { nargs: 1, fcn: function (a) { return Math.log(this.getnum(a)) } }
+prims['power'] = { nargs: 2, fcn: function (a, b) { return Math.pow(this.getnum(a), this.getnum(b)) } }
+prims['exp'] = { nargs: 1, fcn: function (a) { return Math.pow(2.71828, this.getnum(a)) } }
 
 
 
@@ -1961,7 +2007,7 @@ prims['hide-turtle'] = { nargs: 0, fcn: function (n) { this.hideTurtle(); } }
 prims['ht'] = { nargs: 0, fcn: function (n) { this.hideTurtle(); } }
 prims['showturtle'] = { nargs: 0, fcn: function (n) { this.showTurtle(); } }
 prims['st'] = { nargs: 0, fcn: function (n) { this.showTurtle(); } }
-prims['setup'] = { nargs: 0, fcn: function () { this.setup(true) } }
+prims['setup'] = { nargs: 0, fcn: function () { this.setup() } }
 
 prims['drawsnap'] = { nargs: 1, fcn: function (n) { this.hold = true; this.loadimg(this.snaps[n], function () { this.hold = false; }); } }
 
@@ -2021,5 +2067,7 @@ prims['read-ir'] = { nargs: 0, fcn: function () { this.readIR(); return this.cfu
 prims['read-visible'] = { nargs: 0, fcn: function () { this.readVisible(); return this.cfun; } }
 prims['init-ir'] = { nargs: 0, fcn: function () { this.sendl([0xf1]); } }
 
-
-prims['colortest'] = { nargs: 1, fcn: function (color) { this.setCtxColorCSS(color); } }
+prims['object'] = { nargs: 2, fcn: function (a, b) { this.createInstantiatedObject('testobject', 'url', [a, b]) } }
+prims['move'] = { nargs: 3, fcn: function(name, x, y) {this.moveInsantiatedObject(name, x, y)}}
+prims['delete'] = {nargs: 1, fcn: function(name) {this.deleteInsantiatedObject(name)}}
+prims['new'] = {nargs: 4, fcn: function(name, url, xpos, ypos) {this.createInstantiatedObject(name, url, [xpos, ypos])}};

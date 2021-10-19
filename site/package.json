@@ -103,6 +103,7 @@
     ]
   },
   "devDependencies": {
+    "cypress": "^8.6.0",
     "react-app-rewired": "^2.1.8"
   },
   "jest": {
