@@ -1,7 +1,8 @@
 to go
+    set-packet-count 4
+    set-packet-log true
     loop [
         receive-packet
-        logData :_last-packet
         wait 5
     ]
 end

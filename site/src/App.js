@@ -170,6 +170,7 @@ end`,
   pushToDataTable(newDataLine) {
     let newData = this.state.tableData;
     newData.push(newDataLine);
+    console.log(newDataLine);
     this.setState({
       tableData: newData
     })

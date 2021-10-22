@@ -349,7 +349,6 @@ export default class Interpreter {
 
     setshade(sh) {
         this.shade = sh;
-        console.log(this.color);
         this.setCtxColorShade(this.color, this.shade);
     }
 
@@ -398,7 +397,7 @@ export default class Interpreter {
 
 
     //TODO: The entire 'move' paradigm uses offsets, which is confusing when absolute can work with top/left, since we know the pixel count here.
-    createInstantiatedObject(name, image, coordinates) {
+    createInstantiatedObject(name, imageLocation, coordinates) {
         let t = this;
         let width = 60;
         let height = 60;
@@ -425,26 +424,26 @@ export default class Interpreter {
         document.getElementById('cnvframe').appendChild(objectElement);
         let img = document.createElement('img');
         img.id = name;
-        img.src = image;
+        img.src = imageLocation;
         img.height = 60;
         img.width = 60;
-        
+
         objectElement.appendChild(img);
     }
 
-    deleteInsantiatedObject(name){
-        if(this.instantiatedObjects[name] && document.getElementById(`${name}-div`) != null){
+    deleteInsantiatedObject(name) {
+        if (this.instantiatedObjects[name] && document.getElementById(`${name}-div`) != null) {
             delete this.instantiatedObjects[name];
             document.getElementById(`${name}-div`).remove();
         }
     }
 
-    moveInsantiatedObject(name, x, y){
+    moveInsantiatedObject(name, x, y) {
         let height = 60;
         let width = 60;
 
         var canvas = document.getElementById("canvas");
-        if(document.getElementById(`${name}-div`) !== null){
+        if (document.getElementById(`${name}-div`) !== null) {
             document.getElementById(`${name}-div`).style.top = (-height / 2 + (this.cnvHeight / 2 - y) * canvas.offsetHeight / this.cnvHeight) + 'px';
             document.getElementById(`${name}-div`).style.left = (-width / 2 + (x + this.cnvWidth / 2) * canvas.offsetWidth / this.cnvWidth) + 'px';
         } else {
@@ -686,14 +685,12 @@ export default class Interpreter {
     /////////////////////////
 
     move() {
-              
+
         var canvas = document.getElementById("canvas");
         if (canvas == null) return;
 
         if (!this.img.complete) return;
         var img = this.element.firstChild;
-        console.log(img)
-        console.log("here")
 
         var dx = -img.width / 2 + (this.xcor + this.cnvWidth / 2) * canvas.offsetWidth / this.cnvWidth;
         var dy = -img.height / 2 + (this.cnvHeight / 2 - this.ycor) * canvas.offsetHeight / this.cnvHeight;
@@ -934,8 +931,6 @@ export default class Interpreter {
                 else if (sl[0] == 'end') { thisproc = undefined; return; }
                 if (thisproc == undefined) return;
                 prims[thisproc].fcn += (l + '\n');
-                if (thisproc == "something") {
-                }
             }
         }
 
@@ -1151,7 +1146,7 @@ export default class Interpreter {
                 for (var i in inputs) bindings[inputs[i]] = arglist[i];
                 t.locals.unshift(bindings);
             }
-        }
+        } 
     }
 
     pushResult(res) {
@@ -1179,7 +1174,15 @@ export default class Interpreter {
         }
     }
 
-    getValue(name) {
+    isDefined(name){
+        if(this.getValueInternal(name)){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+   getValue(name) {
 
         for (var i in this.locals) {
             if (this.locals[i][name] != undefined) return this.locals[i][name];
@@ -1187,6 +1190,8 @@ export default class Interpreter {
 
         throw 'warning: ' + name + ' has no value';
     }
+
+
 
     //unlike the Logo version, this returns false if values do not exist
     //seems redundant but... here we are. 
@@ -1242,7 +1247,6 @@ export default class Interpreter {
                 this.updateChartData(types);
             }
         }
-
     }
 
 
@@ -1769,8 +1773,6 @@ export default class Interpreter {
                 // var string = new TextDecoder("utf-8").decode(value);
                 //   console.log(string);
 
-
-
                 this.handleReceiveData(value);
 
                 //I guess I didn't need this part? Is it for the packet example above?
@@ -1799,8 +1801,6 @@ export default class Interpreter {
             this.gotChar(value[i]);
         }
     }
-
-
 
     gotChar(c) {
         if (this.respCount == 0) return;
@@ -1951,6 +1951,7 @@ prims['setnth'] = { nargs: 3, fcn: function (n, l, d) { this.getlist(l)[this.get
 prims['member?'] = { nargs: 2, fcn: function (x, l) { return this.member(x, l); } }
 prims['empty?'] = { nargs: 1, fcn: function (l) { return l.length == 0; } }
 prims['pick'] = { nargs: 1, fcn: function (l) { return l[this.getRandom(0, this.getlist(l).length - 1)]; } }
+prims['is-defined'] = {nargs: 1, fcn: function (name) {return this.isDefined(name)}}
 
 prims['print'] = { nargs: 1, fcn: function (x) { this.printToConsole(this.printstr(x)); } }
 
@@ -2063,11 +2064,11 @@ prims['readADC2'] = { nargs: 0, fcn: function () { this.readSensor(2); return th
 prims['readADC3'] = { nargs: 0, fcn: function () { this.readSensor(3); return this.cfun; } }
 prims['readADC4'] = { nargs: 0, fcn: function () { this.readSensor(4); return this.cfun; } }
 prims['readADC5'] = { nargs: 0, fcn: function () { this.readSensor(5); return this.cfun; } }
+prims['readADC'] = {nargs: 1, fcn: function (pinNumber) {this.readSensor(pinNumber); return this.cfun;}}
 prims['read-ir'] = { nargs: 0, fcn: function () { this.readIR(); return this.cfun; } }
 prims['read-visible'] = { nargs: 0, fcn: function () { this.readVisible(); return this.cfun; } }
 prims['init-ir'] = { nargs: 0, fcn: function () { this.sendl([0xf1]); } }
 
-prims['object'] = { nargs: 2, fcn: function (a, b) { this.createInstantiatedObject('testobject', 'url', [a, b]) } }
-prims['move'] = { nargs: 3, fcn: function(name, x, y) {this.moveInsantiatedObject(name, x, y)}}
-prims['delete'] = {nargs: 1, fcn: function(name) {this.deleteInsantiatedObject(name)}}
-prims['new'] = {nargs: 4, fcn: function(name, url, xpos, ypos) {this.createInstantiatedObject(name, url, [xpos, ypos])}};
+prims['move'] = { nargs: 3, fcn: function (name, x, y) { this.moveInsantiatedObject(name, x, y) } }
+prims['delete'] = { nargs: 1, fcn: function (name) { this.deleteInsantiatedObject(name) } }
+prims['new'] = { nargs: 4, fcn: function (name, url, xpos, ypos) { this.createInstantiatedObject(name, url, [xpos, ypos]) } };

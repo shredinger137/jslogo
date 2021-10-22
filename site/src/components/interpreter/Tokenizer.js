@@ -26,6 +26,39 @@ export default class Tokenizer {
             return arrayOfTokens;
         }
 
+        //when faced with {}, interpret it as an object (JavaScript native style)
+        //this will work with make/let, but it needs to be in JSON format - double quotes and the like - and needs spaces between brackets and text
+
+        //It doesn't work with strings properly because JSLogo is trying to interpret it as we go I think
+        //even if you use a replace function for single quotes it behaves odd, so you need double quotes
+        //If you use double quotes with spaces, the spaces get deleted
+
+        function readObject() {
+            var data = "";
+           // skipSpace();
+            while (true) {
+                if (eof()) break;
+                var token = readToken();
+                if (token == null) break;
+                data = data + token;
+            }
+
+            data = '{' + data + '}';
+
+            try {
+                console.log(data)
+                data = JSON.parse(data);
+            } catch (e) {
+                console.log(e);
+            }
+
+            finally {
+                return(data);
+            }
+
+
+        }
+
         function readToken() {
             var s = next();
             var n = Number(s);
@@ -33,6 +66,8 @@ export default class Tokenizer {
             var first = s.charAt(0);
             if (first === "]") return null;
             if (first === "[") return readList();
+            if (first === "{") return readObject();
+            if (first === "}") return null;
             return s;
         }
 

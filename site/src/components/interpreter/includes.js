@@ -1,16 +1,40 @@
 export const includes = 
 `
     to receive-packet
-        make "_last-packet []
+
+        if (is-defined '_packet-length') = false
+        [
+            make '_packet-length' 6
+        ]
+
+        let "i 0
+        make '_last-packet' []
         make "_last-packet se :_last-packet now
-        make "_last-packet se :_last-packet readADC0
-        make "_last-packet se :_last-packet readADC1
-        make "_last-packet se :_last-packet readADC2
-        make "_last-packet se :_last-packet readADC3
-        make "_last-packet se :_last-packet readADC4
-        make "_last-packet se :_last-packet readADC5
+
+        repeat :_packet-length [
+            make "_last-packet se :_last-packet ( readADC :i )
+            let 'i' :i + 1
+        ]
+
+        if (is-defined '_packet-log') = false 
+        [
+            make '_packet-log' false
+        ]
+
+        if (:_packet-log = true)[
+            logData :_last-packet
+        ]
+
+
     end
 
+    to set-packet-count :n
+        make '_packet-length' :n
+    end
+
+    to set-packet-log :value
+        make '_packet-log' :value
+    end
 
     to readLightSensor
         output readADC2
