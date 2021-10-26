@@ -277,7 +277,11 @@ end`,
           <div className="chartArea" id="chartAreaWrapper">
 
             <div id="cnvframe" className={this.state.view == "main" ? null : "hide"} style={{ height: "100%", width: "100%" }}>
-              <canvas className="cnv" id="canvas" ></canvas>
+              <canvas className="cnv" id="canvas" >
+                <div className="turtle" id="turtle">
+                  <img id="turtleimage" src="turtle.svg" />
+                </div>
+              </canvas>
             </div>
             
             <div id="chartFrame" className={this.state.view == "graph" ? null : "hide"} style={{ height: "100%", width: "100%" }}>

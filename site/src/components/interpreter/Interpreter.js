@@ -178,14 +178,9 @@ export default class Interpreter {
     setup() {
 
         let t = this;
-        this.element = document.createElement('div');
-        this.element.setAttribute('class', 'turtle');
-        this.element.setAttribute('id', 'turtle')
+        this.element = document.getElementById('turtle')
         document.getElementById('cnvframe').appendChild(t.element);
-        this.img = document.createElement('img');
-        this.img.id = "turtleimage"
-        this.img.src = 'turtle.svg';
-        this.element.appendChild(t.img);
+        this.img = document.getElementById('turtleimage')
         this.img.onload = imgLoaded;
         var canvas = document.getElementById('canvas');
         this.ctx = canvas.getContext('2d');

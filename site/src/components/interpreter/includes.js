@@ -1,7 +1,6 @@
 export const includes = 
 `
     to receive-packet
-
         if (is-defined '_packet-length') = false
         [
             make '_packet-length' 6
@@ -24,8 +23,6 @@ export const includes =
         if (:_packet-log = true)[
             logData :_last-packet
         ]
-
-
     end
 
     to set-packet-count :n
