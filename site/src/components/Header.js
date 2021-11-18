@@ -14,6 +14,15 @@ import axios from 'axios';
 import UserMenu from './UserMenu';
 import { config } from '../config';
 
+import saveIcon from '../images/cloud-save.png';
+import connectIcon from '../images/connect-icon.png';
+import downloadIcon from '../images/download.png';
+import newWindowIcon from '../images/new-window.png';
+import newProjectIcon from '../images/newProject.png';
+import uploadIcon from '../images/upload.png';
+
+
+
 
 //alright, latest issue is using 'user' in different ways. Stick to one.
 
@@ -387,20 +396,20 @@ function Header(props) {
             </div>
 
             <div className="buttonDiv" onClick={() => toggleNewProject()}>
-                <img src="/images/newProject.png" alt="New project icon"></img>
+                <img src={newProjectIcon} alt="New project icon"></img>
                 <span>New</span>
             </div>
             <div className="buttonDiv" onClick={() => saveAs()}>
-                <img src="/images/download.png" alt="Download icon"></img>
+                <img src={downloadIcon} alt="Download icon"></img>
                 <span>Download</span>
             </div>
             <div className="buttonDiv" onClick={() => loadFile()}>
-                <img src="/images/upload.png" alt="Upload icon"></img>
+                <img src={uploadIcon} alt="Upload icon"></img>
                 <span>Open</span>
             </div>
             {user ?
                 <div className="buttonDiv" onClick={() => saveToCloud()}>
-                    <img src="/images/cloud-save.png" alt="Save"></img>
+                    <img src={saveIcon} alt="Save"></img>
                     <span>Save</span>
                 </div>
                 :
@@ -409,16 +418,16 @@ function Header(props) {
 
             <a href="https://docs.lbym.org" target="_new">
                 <div className="buttonDiv">
-                    <img src="/images/new-window.png" alt="Open docs icon"></img>
+                    <img src={newWindowIcon} alt="Open docs icon"></img>
                     <span>Docs</span>
                 </div>
             </a>
             <div id="connectButton" className="buttonDiv" >
-                <img src="/images/connect-icon.png" alt="Connect icon"></img>
+                <img src={connectIcon} alt="Connect icon"></img>
                 <span>Connect</span>
             </div>
             <div id="disconnectButton" className="buttonDiv" style={{ display: "none" }}>
-                <img src="/images/connect-icon.png" alt="Connect icon"></img>
+                <img src={connectIcon} alt="Connect icon"></img>
                 <span>Disconnect</span>
             </div>
             <span style={{ width: "20px" }}></span>
