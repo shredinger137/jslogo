@@ -1,0 +1,1 @@
+The Learning by Making app is a product of EdEon at Sonoma State University. Development of the app was funded primarily by the U.S. Department of Education. The source code is licensed with the Creative Commons Non-Commerical Share-Alike 4.0 license.
