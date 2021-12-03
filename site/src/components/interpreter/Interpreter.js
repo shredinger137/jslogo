@@ -719,8 +719,7 @@ export default class Interpreter {
         document.getElementById("terminal-wrapper").style.width = `calc(var(--chartWidth) - ${this.offsetHorizontal}px)`
         document.getElementById("terminal-wrapper").style.height = `calc(var(--interfaceHeight) - var(--chartHeight) + ${this.offsetHorizontal * (3 / 5)}px)`
         document.getElementById("gutter").style.left = `calc(var(--codeEntryWidth) - var(--gutterWidth) + ${this.offsetHorizontal}px)`;
-
-
+        document.getElementById("view-tabs").style.left = `calc(var(--codeEntryWidth) + var(--gutterWidth) + ${this.offsetHorizontal}px)`;
         this.handleResize();
 
     }
@@ -1859,6 +1858,7 @@ prims['limits'] = {
 
 prims['calibrate-list'] = { nargs: 3, fcn: function (a, b, c) { return this.calibrateList(a, b, c) } }
 prims['logData'] = { nargs: 1, fcn: function (a) { this.pushToTable(a) } }
+prims['clear-data'] = {nargs: 0, fcn: function(){this.pushToTable(false)}}
 prims['repeat'] = { nargs: 2, flow: true, fcn: function (a, b) { this.repeat(a, b); } }
 prims['forever'] = { nargs: 1, flow: true, fcn: function (a) { this.loop(a); } }
 prims['loop'] = { nargs: 1, flow: true, fcn: function (a) { this.loop(a); } }
@@ -1895,6 +1895,11 @@ prims['='] = { nargs: 2, priority: -2, fcn: function (a, b) { return this.equals
 prims['!='] = { nargs: 2, priority: -2, fcn: function (a, b) { return !this.equals(a, b); } }
 prims['>'] = { nargs: 2, priority: -2, fcn: function (a, b) { return a > b; } }
 prims['<'] = { nargs: 2, priority: -2, fcn: function (a, b) { return a < b; } }
+prims['xor'] = { nargs: 2, priority: -1, fcn: function(a, b){return ((a == true && b != true) || (a != true && b == true)) }}
+prims['not'] = { nargs: 1, priority: -1, fcn: function(a){ if(a == true){return false} return false}}
+prims['or'] = { nargs: 2, priority: -1, fcn: function(a, b){if(a == true || b == true){return true} return false}}
+prims['and'] = { nargs: 2, priority: -1, fcn: function(a, b){if(a == true && b == true){return true} return false}}
+
 
 prims['remainder'] = { nargs: 2, fcn: function (a, b) { return this.getnum(a).mod(this.getnum(b)); } }
 prims['round'] = { nargs: 1, fcn: function (a) { return Math.round(this.getnum(a)); } }

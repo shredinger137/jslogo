@@ -47,6 +47,10 @@ MongoClient.connect('mongodb://localhost:27017/', { useUnifiedTopology: true, us
 
 //We get a login post, saying a login happened. Check if the authorization token matches the expected UID. Check if user is already in the database. If it is, cool. If not, create an entry.
 
+app.get("/ping", function( req, res) {
+    res.send(true);
+});
+
 app.post("/login/:id", function (req, res) {
     console.log("login");
     if (req.params.id && req.body && req.body.authorization) {

@@ -29,7 +29,7 @@ export const includes =
         make '_packet-length' :n
     end
 
-    to set-packet-log :value
+    to set-packet-save :value
         make '_packet-log' :value
     end
 

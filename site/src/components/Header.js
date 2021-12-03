@@ -73,7 +73,7 @@ function Header(props) {
 
 
     const { data: user } = useUser();
-    const reactAuth = useAuth();
+    const reactAuth = user;
 
 
     //in progress: change toggleUserMenu to use this state instead
@@ -84,14 +84,22 @@ function Header(props) {
     const [projectId, setProjectId] = useState(null);
     const [userMenuShow, setUserMenuShow] = useState(false);
     const [projectAuthor, setProjectAuthor] = useState(null);
+    const [isOnline, setIsOnline] = useState(true);
 
 
     //On mount, check to see if a project is defined in the URL.
     //All links have the format /pr${projectId}, so we check if 'pr' is the start of it and take the rest.
     //This way you can still use URLs like /settings or whatever in the future, you just can't start them with pr.
 
+    //Also start the process that will check if we're online or not.
+
 
     useEffect(() => {
+
+        //Periodically check to see if we can hit the API /ping URL; if not, the API is down or the user isn't online. Either way, set online status to false.
+        setInterval(function () { axios.get(`${config.apiUrl}/ping`, {}).then(response => { setIsOnline(true) }).catch(function (error) { setIsOnline(false) }) }, 10000);
+
+
         if (window.location.pathname.substr(1) && window.location.pathname.substr(1, 2) === "pr") {
             setProjectId(window.location.pathname.substr(3));
 
@@ -318,7 +326,6 @@ function Header(props) {
                         authorization: idToken
                     }
                 }).then(response => {
-                    console.log(response)
                     if (response && response.data && response.data.code && response.data.title) {
                         props.updateCode(response.data.code);
                         var titleElement = document.getElementById('projectTitle');
@@ -408,7 +415,18 @@ function Header(props) {
                 <span>Open</span>
             </div>
             {user ?
-                <div className="buttonDiv" onClick={() => saveToCloud()}>
+
+
+                <div className=
+                    {
+                        isOnline ?
+                            "buttonDiv"
+                            :
+                            "buttonDiv disabled"
+
+                    }
+
+                    onClick={() => saveToCloud()}>
                     <img src={saveIcon} alt="Save"></img>
                     <span>Save</span>
                 </div>

@@ -88,6 +88,7 @@ end`,
     this.setState({
       includes: includes
     });
+
   }
 
   dragToResize(e) {
@@ -168,6 +169,13 @@ end`,
   }
 
   pushToDataTable(newDataLine) {
+
+    if(newDataLine == false){
+      this.setState({
+        tableData: [[]]
+      })
+    }
+
     let newData = this.state.tableData;
     newData.push(newDataLine);
     console.log(newDataLine);
@@ -251,7 +259,9 @@ end`,
 
             <ul>
               <li id="go-button" onClick={() => { interpreter.runLine("go") }}>Go</li>
-              <li onClick={() => { this.setState({ view: "main" }); interpreter.runLine("st") }} className={this.state.view == "main" ? "activeButton" : null}>Main View</li>
+            </ul>
+            <ul id="view-tabs">
+              <li onClick={() => { this.setState({ view: "main" }); interpreter.runLine("st") }} className={this.state.view == "main" ? "activeButton" : null}>Canvas</li>
               <li onClick={() => this.setState({ view: "graph" })} className={this.state.view == "graph" ? "activeButton" : null}>Plots</li>
               <li onClick={() => this.setState({ view: "data" })} className={this.state.view == "data" ? "activeButton" : null}>Data</li>
             </ul>

@@ -34,7 +34,7 @@ function DataTable(props) {
         fileReader.onload = function (fileLoadedEvent, context) {
 
             var textFromFileLoaded = fileLoadedEvent.target.result;
-            if(textFromFileLoaded.charAt(0) == "T"){
+            if(textFromFileLoaded.charAt(0) == "T" && textFromFileLoaded.charAt(0) != 'i'){
                 console.log("T");
                 typed = true;
             }

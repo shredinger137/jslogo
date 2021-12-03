@@ -18,6 +18,11 @@
   html {
     overflow: hidden;
   }
+
+  .disabled {
+    color: darkgray;
+    pointer-events: none;
+  }
   
   body {
     align-content: stretch;
@@ -120,6 +125,10 @@
   
   .menu ul {
     list-style: none;
+  }
+
+  #chartFrame, #dataFrame {
+    background-color: white;
   }
 
 	.menuExpanded {

@@ -1,9 +1,10 @@
 to go
     set-packet-count 4
-    set-packet-log true
+    set-packet-save true
     loop [
         receive-packet
         wait 5
+        print :_last-packet
     ]
 end
 
