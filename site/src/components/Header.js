@@ -104,10 +104,10 @@ function Header(props) {
         setInterval(function () { axios.get(`${config.apiUrl}/ping`, {}).then(response => { setIsOnline(true) }).catch(function (error) { setIsOnline(false) }) }, 10000);
 
 
-        if (window.location.pathname.substr(1) && window.location.pathname.substr(1, 2) === "pr") {
-            setProjectId(window.location.pathname.substr(3));
+        if (window.location.pathname.substring(1) && window.location.pathname.substring(1, 2) === "pr") {
+            setProjectId(window.location.pathname.substring(3));
 
-            axios.get(`${config.apiUrl}/projects/${window.location.pathname.substr(3)}`, {
+            axios.get(`${config.apiUrl}/projects/${window.location.pathname.substring(3)}`, {
             }).then(response => {
                 if (response && response.data && response.data.code && response.data.title) {
                     props.updateCode(response.data.code);
