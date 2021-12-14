@@ -74,7 +74,7 @@ function Header(props) {
     //TODO: Validating log in is rather slow
     //consider using the native firebase stuff
 
-    const {data: user} = useUser();
+    const { data: user } = useUser();
     const reactAuth = useAuth();
 
 
@@ -262,7 +262,7 @@ function Header(props) {
 
                         setProjectId(response.data);;
                         getUserProjects();
-                      //  setRefreshUserMenu(!refreshUserMenu);
+                        //  setRefreshUserMenu(!refreshUserMenu);
                     })
 
 
@@ -372,7 +372,11 @@ function Header(props) {
                 })
                     .then(response => {
                         //we believe that response.data is an array of projects; this should do something different if there's an error
-                        setProjectList(response.data)
+                        //TODO, I guess
+                        if (response && response.data && Array.isArray(response.data)) {
+                            setProjectList(response.data)
+                        }
+
                     })
             })
         }
@@ -398,6 +402,7 @@ function Header(props) {
             }
 
             <span id="dummyClickToClearPid" style={{ display: 'none' }} onClick={() => { setProjectId(null) }}></span>
+            <span id="dummyClickToClearAuthor" style={{ display: 'none' }} onClick={() => { setProjectAuthor(null) }}></span>
             <div style={titleStyle}>
                 <input type="text" id="projectTitle" defaultValue="Untitled" style={titleInputStyle} maxLength="22"></input>
                 <span style={{
@@ -422,25 +427,19 @@ function Header(props) {
                 <img src={uploadIcon} alt="Upload icon"></img>
                 <span>Open</span>
             </div>
-            {user ?
+            <div className=
+                {
+                    user && isOnline ?
+                        "buttonDiv"
+                        :
+                        "buttonDiv disabled"
 
+                }
 
-                <div className=
-                    {
-                        isOnline ?
-                            "buttonDiv"
-                            :
-                            "buttonDiv disabled"
-
-                    }
-
-                    onClick={() => saveToCloud()}>
-                    <img src={saveIcon} alt="Save"></img>
-                    <span>Save</span>
-                </div>
-                :
-                null
-            }
+                onClick={() => saveToCloud()}>
+                <img src={saveIcon} alt="Save"></img>
+                <span>Save</span>
+            </div>
 
             <a href="https://docs.lbym.org" target="_new">
                 <div className="buttonDiv">
