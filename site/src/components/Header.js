@@ -71,9 +71,13 @@ function Header(props) {
 
     }
 
+    //TODO: Validating log in is rather slow
+    //consider using the native firebase stuff
 
-    const { data: user } = useUser();
-    const reactAuth = user;
+    const {data: user} = useUser();
+    const reactAuth = useAuth();
+
+
 
 
     //in progress: change toggleUserMenu to use this state instead
@@ -100,10 +104,10 @@ function Header(props) {
         setInterval(function () { axios.get(`${config.apiUrl}/ping`, {}).then(response => { setIsOnline(true) }).catch(function (error) { setIsOnline(false) }) }, 10000);
 
 
-        if (window.location.pathname.substring(1) && window.location.pathname.substring(1, 2) === "pr") {
-            setProjectId(window.location.pathname.substring(3));
+        if (window.location.pathname.substr(1) && window.location.pathname.substr(1, 2) === "pr") {
+            setProjectId(window.location.pathname.substr(3));
 
-            axios.get(`${config.apiUrl}/projects/${window.location.pathname.substring(3)}`, {
+            axios.get(`${config.apiUrl}/projects/${window.location.pathname.substr(3)}`, {
             }).then(response => {
                 if (response && response.data && response.data.code && response.data.title) {
                     props.updateCode(response.data.code);
@@ -123,6 +127,7 @@ function Header(props) {
     //run getUserProjects if user changes; meaning, we want to wait until the login loads
     useEffect(() => {
         getUserProjects();
+        console.log(user)
     },
         [user]
     );
@@ -253,8 +258,11 @@ function Header(props) {
 
                         //We're being very confident and assuming that the response is a valid ID
                         //in the future you'll want to add error handling here, or at least validation
+                        //TODO
 
                         setProjectId(response.data);;
+                        getUserProjects();
+                      //  setRefreshUserMenu(!refreshUserMenu);
                     })
 
 
@@ -279,14 +287,14 @@ function Header(props) {
                             setSaveState("");
                         }, 3000);
 
+                        getUserProjects();
+                        //setRefreshUserMenu(!refreshUserMenu);
                     })
 
 
                 }
             })
 
-            getUserProjects();
-            setRefreshUserMenu(!refreshUserMenu);
         }
     }
 
@@ -364,11 +372,7 @@ function Header(props) {
                 })
                     .then(response => {
                         //we believe that response.data is an array of projects; this should do something different if there's an error
-                        //TODO, I guess
-                        if (response && response.data && Array.isArray(response.data)) {
-                            setProjectList(response.data)
-                        }
-
+                        setProjectList(response.data)
                     })
             })
         }
@@ -394,7 +398,6 @@ function Header(props) {
             }
 
             <span id="dummyClickToClearPid" style={{ display: 'none' }} onClick={() => { setProjectId(null) }}></span>
-            <span id="dummyClickToClearAuthor" style={{ display: 'none' }} onClick={() => { setProjectAuthor(null) }}></span>
             <div style={titleStyle}>
                 <input type="text" id="projectTitle" defaultValue="Untitled" style={titleInputStyle} maxLength="22"></input>
                 <span style={{
@@ -419,19 +422,25 @@ function Header(props) {
                 <img src={uploadIcon} alt="Upload icon"></img>
                 <span>Open</span>
             </div>
-            <div className=
-                {
-                    user && isOnline ?
-                        "buttonDiv"
-                        :
-                        "buttonDiv disabled"
+            {user ?
 
-                }
 
-                onClick={() => saveToCloud()}>
-                <img src={saveIcon} alt="Save"></img>
-                <span>Save</span>
-            </div>
+                <div className=
+                    {
+                        isOnline ?
+                            "buttonDiv"
+                            :
+                            "buttonDiv disabled"
+
+                    }
+
+                    onClick={() => saveToCloud()}>
+                    <img src={saveIcon} alt="Save"></img>
+                    <span>Save</span>
+                </div>
+                :
+                null
+            }
 
             <a href="https://docs.lbym.org" target="_new">
                 <div className="buttonDiv">

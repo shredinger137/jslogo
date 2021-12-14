@@ -25,8 +25,8 @@ class App extends Component {
     tableData: [[]],
     view: "main",
     showNewProjectModal: false,
-    code: 
-`to go
+    code:
+      `to go
     print 'Hello World'
 end`,
     canvasHeight: 400,
@@ -59,9 +59,9 @@ end`,
 
   componentDidMount() {
 
-    console.log("Serial API Check:", this.checkIfSerialCapable() );
+    console.log("Serial API Check:", this.checkIfSerialCapable());
 
-    this.setState({horizontalOffset: document.getElementById("gutter").getBoundingClientRect().left})
+    this.setState({ horizontalOffset: document.getElementById("gutter").getBoundingClientRect().left })
 
     interpreter = new Interpreter(
       {
@@ -80,7 +80,7 @@ end`,
     const connectButton = document.getElementById('connectButton');
     const disconnectButton = document.getElementById('disconnectButton');
 
-    if(connectButton !== null && disconnectButton !== null){
+    if (connectButton !== null && disconnectButton !== null) {
       connectButton.addEventListener('click', interpreter.openSerialPort.bind(interpreter));
       disconnectButton.addEventListener('click', interpreter.disconnectSerialPort.bind(interpreter));
     }
@@ -91,28 +91,28 @@ end`,
 
   }
 
-  dragToResize(e){
+  dragToResize(e) {
 
     let context = this;
     e.preventDefault();
 
-    function handleDrag(e){
+    function handleDrag(e) {
       interpreter.handleResizeHorizontal(e.clientX - context.state.horizontalOffset);
     }
 
-    function handleMouseUp(e){
+    function handleMouseUp(e) {
       document.removeEventListener('mousemove', handleDrag)
       document.removeEventListener('mouseup', handleMouseUp)
       return;
     }
- 
+
     document.addEventListener('mouseup', handleMouseUp)
     document.addEventListener('mousemove', handleDrag)
   }
 
 
-  setDataTable(newData){
-    this.setState({tableData: newData})
+  setDataTable(newData) {
+    this.setState({ tableData: newData })
   }
 
   updateChartType(newType) {
@@ -231,7 +231,7 @@ end`,
     const options = {
       quickSuggestions: false,
       selectOnLineNumbers: true,
-      automaticLayout: true, 
+      automaticLayout: true,
       minimap: {
         enabled: false
       },
@@ -255,10 +255,18 @@ end`,
             />
             :
             null}
-          <button onClick={() => { interpreter.runLine("go") }}>Go</button>
-          <button onClick={() => {this.setState({ view: "main" }); interpreter.runLine("st")  }} className={this.state.view == "main" ? "activeButton" : null}>Main View</button>
-          <button onClick={() => this.setState({ view: "graph" })} className={this.state.view == "graph" ? "activeButton" : null}>Plots</button>
-          <button onClick={() => this.setState({ view: "data" })} className={this.state.view == "data" ? "activeButton" : null}>Data</button>
+          <div className="top-buttons">
+
+            <ul>
+              <li id="go-button" onClick={() => { interpreter.runLine("go") }}>Go</li>
+            </ul>
+            <ul id="view-tabs">
+              <li onClick={() => { this.setState({ view: "main" }); interpreter.runLine("st") }} className={this.state.view == "main" ? "activeButton" : null}>Canvas</li>
+              <li onClick={() => this.setState({ view: "graph" })} className={this.state.view == "graph" ? "activeButton" : null}>Plots</li>
+              <li onClick={() => this.setState({ view: "data" })} className={this.state.view == "data" ? "activeButton" : null}>Data</li>
+            </ul>
+          </div>
+
           <input id="load" type="file" onChange={() => projects.loadFile()} style={{ display: "none" }} />
           <span style={{ float: "right" }} id="canvasDimensionsLabel"></span>
 
@@ -280,8 +288,8 @@ end`,
             </textarea>
             <textarea id="includes" spellCheck="false" style={{ display: "none", whiteSpace: "nowrap", overflow: "visible" }} />
           </div>
-                
-          <div id="gutter" onMouseDown={(e) => {this.dragToResize(e)}} ></div>
+
+          <div id="gutter" onMouseDown={(e) => { this.dragToResize(e) }} ></div>
           <div className="chartArea" id="chartAreaWrapper">
 
             <div id="cnvframe" className={this.state.view == "main" ? null : "hide"} style={{ height: "100%", width: "100%" }}>
@@ -291,7 +299,7 @@ end`,
                 </div>
               </canvas>
             </div>
-            
+
             <div id="chartFrame" className={this.state.view == "graph" ? null : "hide"} style={{ height: "100%", width: "100%" }}>
               <Chart
                 chartType={this.state.chartType}

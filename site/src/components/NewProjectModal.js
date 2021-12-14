@@ -41,12 +41,7 @@ export default class NewProjectModal extends Component {
                                 if (request.readyState === 4 && request.status === 200) {
                                     scopedUpdateCode(request.responseText);
                                     document.getElementById("projectTitle").value = "Untitled"
-
-                                    //Due to poor choices in control flow, we use a dummy element to clear data in the parent. This is bad. Don't do this.
-                                    //TODO: Rework the flow so that state is meaningful and doesn't use trickery like this.
-
                                     document.getElementById("dummyClickToClearPid").click();
-                                    document.getElementById("dummyClickToClearAuthor").click();
                                 }
                             }
                         } else {

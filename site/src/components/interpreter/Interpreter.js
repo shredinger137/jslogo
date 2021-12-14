@@ -2056,6 +2056,7 @@ prims['dp9on'] = { nargs: 0, fcn: function () { this.pinOn(9); this.mwait(1); } 
 prims['dp9off'] = { nargs: 0, fcn: function () { this.pinOff(9); this.mwait(1); } }
 prims['dp10on'] = { nargs: 0, fcn: function () { this.pinOn(10); this.mwait(1); } }
 prims['dp10off'] = { nargs: 0, fcn: function () { this.pinOff(10); this.mwait(1); } }
+prims['send'] = {nargs: 1, fnc: function(a) {this.sendl(a); this.mwait(1)}}
 
 
 prims['readADC0'] = { nargs: 0, fcn: function () { this.readSensor(0); return this.cfun; } }

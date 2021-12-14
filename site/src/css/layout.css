@@ -50,6 +50,7 @@ TODO: We're changing the chart area to a fixed 1.7 ratio; everything else should
 
 
 .interfaceGrid {
+    z-index: 500;
     position: relative;
     margin: 0 auto;
     height: var(--interfaceHeight);
