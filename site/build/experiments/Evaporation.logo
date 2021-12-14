@@ -1,0 +1,103 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; Evaporation ;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+to go  
+	print 'Starting Project'
+    make "startTime now
+
+    ;makes the needed calibration lists
+    make "temp0_cal [116 0 161 26] ;the calibration list for an average of 10 readings from tempsensor0
+	make "temp1_cal [116 0 161 26] ;the calibration list for an average of 10 readings from tempsensor1
+    make "temp0-data []
+    make "temp1-data []
+    make "time-list []
+    make "temp0-data-calibrated []
+
+    init-plot
+    
+    loop [
+        make "timeElapsed now - :startTime
+       ; if (:timeElapsed > (2 * 1)) [stop]
+        receive-packet
+        logData :_last-packet
+        process-data-packet
+        wait 10
+    ]
+
+end
+
+
+;handles a packet after it has been received
+to process-data-packet
+    ;add the readings from the two sensors to the two lists
+
+    push "temp0-data nth 1 :_last-packet
+    push "temp1-data nth 2 :_last-packet
+    push "time-list :timeElapsed
+    
+
+    calibrate-list "temp0-data-calibrated :temp0-data :temp0_cal ;calibrate list of ADU into list of Deg C
+    calibrate-list "temp1-data-calibrated :temp1-data :temp1_cal ;calibrate list of ADU into list of Deg C  	
+
+
+	;make "temp-first first :temp0-list ;create variable to hold the very first reading from temp0	
+	;make "temp-second first :temp1-list ;create variable to hold the very first reading from temp1		
+	;calc-min ;find the minimum value of temperature
+
+	;plot-temp0 ;create the plot of temperature vs time		
+	;plot-temp1 ;create the plot of temperature vs time				
+end
+
+to init-plot
+    top-plot
+    plot-title 'Plotting Demo Top'
+    x-data "time-list
+    y-data "temp0-data-calibrated
+    x-label "Numbers
+    show-plot
+
+    ;bottom-plot
+    ;plot-title 'Temp 1'
+   ; x-data "time-list
+  ;  y-data "temp1-data-calibrated
+    ;x-label 'Elapsed Time (sec)'
+    ;y-label 'Temp (deg)'
+  ; show-plot
+
+end
+
+;find the minimum value of temperature
+to calc-min
+	make "temp-min MinEntry :temp0-list ;find the minimum value of temperature
+	let [temp-index itempos :temp-min :temp0-list] ;find its position in the list
+	make "temp-time item :temp-index :time-list ;find the corresponding value of time
+end
+
+to plot-temp0
+   plot-title "|Temp 0|                     ; every plot must start with a title
+   top-plot                                 ; one plot on top right
+                                            ; other options are one-plot and bottom-plot
+   x-data "|Elapsed_Time_(sec)| :time-list  ; xdata is time
+   y-data "|Temp_0_(deg_C)|     :temp0-list ; ydata is temp0
+   select-all                               ; select all times
+   limits xlower xupper ylower yupper       ; auto scale both x and y axis
+   x-tick 10 5                              ; 10 major ticks 5 minor ticks per major tick
+   y-tick  5 4				    ; 5 major ticks 4 minor ticks per major tick
+
+   show-plot				    ; every plot must end with show-plot
+end
+
+to plot-temp1
+   plot-title "|Temp 1|                     ; every plot must start with a title
+   bottom-plot                              ; one plot on bottom right
+                                            ; other options are one-plot and bottom-plot
+   x-data "|Elapsed_Time_(sec)| :time-list  ; xdata is time
+   y-data "|Temp_1_(deg_C)|     :temp1-list ; ydata is temp1
+   select-all                               ; select all times
+   limits xlower xupper ylower yupper       ; auto scale both x and y axis
+   x-tick 10 5                              ; 10 major ticks 5 minor ticks per major tick
+   y-tick  5 4				    ; 5 major ticks 4 minor ticks per major tick
+
+   show-plot				    ; every plot must end with show-plot
+end

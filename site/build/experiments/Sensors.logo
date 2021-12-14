@@ -1,0 +1,48 @@
+;;;;;;;;;;;;;;;;;;;;;;
+;;;;;; Sensors  ;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;
+
+;this is our primary point of entry into the code
+to go 
+
+	;Takes the average of 5 measurements and prints it.
+	;We make a variable, suml, and add light measurements to it five times
+	;After that we'll divide out the five (to get an average) and print it
+	
+	ob1on
+	wait 10
+	ob1off
+    let "suml 0
+    let "sumt0 0
+    let "sumt1 0
+	repeat 5 [
+		let "light readADC2 
+        let "suml :suml + :light
+	]
+    print (se "Average: :suml / 5)
+    
+	; repeat 5 [
+    ;    let "tempsensor0 readTempSensor0
+    ;    let "sumt0 :sumt0 + :tempsensor0
+    ; ]
+    ; print 'Average Temp0 Value: ' + :sumt0 / 5
+    ; repeat 5 [
+    ;     let "tempsensor1 readTempSensor1
+    ;     let "sumt1 :sumt1 + :tempsensor1
+    ; ]
+    ; print 'Average Temp1 Value: ' + :sumt1 / 5
+
+end
+
+to run-forever
+	ob1on
+	wait 10
+	ob1off	
+
+    loop
+        [
+            let "light readADC0
+            print :light
+            wait 10
+        ]
+end

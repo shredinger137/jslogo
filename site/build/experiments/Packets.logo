@@ -1,0 +1,11 @@
+to go
+    set-packet-count 4
+    set-packet-save true
+    loop [
+        receive-packet
+        wait 5
+        print :_last-packet
+    ]
+end
+
+;Click on the 'data' tab to see results

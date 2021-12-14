@@ -71,13 +71,9 @@ function Header(props) {
 
     }
 
-    //TODO: Validating log in is rather slow
-    //consider using the native firebase stuff
 
     const { data: user } = useUser();
-    const reactAuth = useAuth();
-
-
+    const reactAuth = user;
 
 
     //in progress: change toggleUserMenu to use this state instead
@@ -127,7 +123,6 @@ function Header(props) {
     //run getUserProjects if user changes; meaning, we want to wait until the login loads
     useEffect(() => {
         getUserProjects();
-        console.log(user)
     },
         [user]
     );
@@ -258,11 +253,8 @@ function Header(props) {
 
                         //We're being very confident and assuming that the response is a valid ID
                         //in the future you'll want to add error handling here, or at least validation
-                        //TODO
 
                         setProjectId(response.data);;
-                        getUserProjects();
-                        //  setRefreshUserMenu(!refreshUserMenu);
                     })
 
 
@@ -287,14 +279,14 @@ function Header(props) {
                             setSaveState("");
                         }, 3000);
 
-                        getUserProjects();
-                        //setRefreshUserMenu(!refreshUserMenu);
                     })
 
 
                 }
             })
 
+            getUserProjects();
+            setRefreshUserMenu(!refreshUserMenu);
         }
     }
 
