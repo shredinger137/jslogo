@@ -178,7 +178,6 @@ end`,
 
     let newData = this.state.tableData;
     newData.push(newDataLine);
-    console.log(newDataLine);
     this.setState({
       tableData: newData
     })
@@ -295,7 +294,7 @@ end`,
             <div id="cnvframe" className={this.state.view == "main" ? null : "hide"} style={{ height: "100%", width: "100%" }}>
               <canvas className="cnv" id="canvas" >
                 <div className="turtle" id="turtle">
-                  <img id="turtleimage" src="turtle.svg" />
+                  <img id="turtleimage" src="turtle.svg" alt="Turtle avatar" />
                 </div>
               </canvas>
             </div>

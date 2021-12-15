@@ -41,7 +41,11 @@ export default class NewProjectModal extends Component {
                                 if (request.readyState === 4 && request.status === 200) {
                                     scopedUpdateCode(request.responseText);
                                     document.getElementById("projectTitle").value = "Untitled"
+
+                                    //TODO: This is a hack. We shouldn't do it. Look at how data flows and fix it.
+                                    
                                     document.getElementById("dummyClickToClearPid").click();
+                                    document.getElementById('dummyClickToClearAuthor').click();
                                 }
                             }
                         } else {

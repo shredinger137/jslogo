@@ -42,13 +42,6 @@ function UserMenu(props) {
         });
     }
 
-
-
-
-
-
-
-
     return (
         <div style={menuStyle}>
 

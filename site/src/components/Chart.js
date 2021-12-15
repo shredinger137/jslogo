@@ -1,6 +1,6 @@
 /* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off", no-use-before-define: "off" */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import '../css/styles.css';
 import '../css/layout.css';
 import { Scatter } from 'react-chartjs-2'
@@ -29,7 +29,7 @@ function Chart(props) {
         <div style={{ height: "100%", width: "100%" }}>
             {props.chartType == "single" ?
                 <>
-                    <p style={{ fontSize: '.8rem', padding: 0, margin: 0, position: 'absolute', top: '5px', left: '5px' }}>Download chart</p>
+                    <p onClick={() => {downloadSingle()}}  style={{ fontSize: '.8rem', padding: 0, margin: 0, position: 'absolute', top: '5px', left: '5px' }}>Download chart</p>
                     <Scatter
                         data={{
                             datasets:
@@ -54,7 +54,6 @@ function Chart(props) {
                     <>
 
                         <div style={{ height: "50%" }}>
-                            <p style={{ fontSize: '.8rem', padding: 0, margin: 0, position: 'absolute', top: '5px', left: '5px' }}>Download chart</p>
                             <Scatter
                                 data={{
                                     datasets:
@@ -75,7 +74,6 @@ function Chart(props) {
                         </div>
 
                         <div style={{ height: "50%" }}>
-                            <p style={{ fontSize: '.8rem', padding: 0, margin: 0, position: 'absolute', top: 'calc(50% + 5px)', left: '5px' }}>Download chart</p>
                             <Scatter
                                 data={{
                                     datasets:

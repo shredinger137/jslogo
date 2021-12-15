@@ -83,7 +83,6 @@ function Header(props) {
     //in progress: change toggleUserMenu to use this state instead
 
     const [projectList, setProjectList] = useState([]);
-    const [refreshUserMenu, setRefreshUserMenu] = useState(false);
     const [saveState, setSaveState] = useState("");
     const [projectId, setProjectId] = useState(null);
     const [userMenuShow, setUserMenuShow] = useState(false);
@@ -101,11 +100,12 @@ function Header(props) {
     useEffect(() => {
 
         //Periodically check to see if we can hit the API /ping URL; if not, the API is down or the user isn't online. Either way, set online status to false.
-        setInterval(function () { axios.get(`${config.apiUrl}/ping`, {}).then(response => { setIsOnline(true) }).catch(function (error) { setIsOnline(false) }) }, 10000);
+        //TODO I guess
+        // setInterval(function () { axios.get(`${config.apiUrl}/ping`, {}).then(response => { setIsOnline(true) }).catch(function (error) { setIsOnline(false) }) }, 10000);
 
 
-        if (window.location.pathname.substr(1) && window.location.pathname.substr(1, 2) === "pr") {
-            setProjectId(window.location.pathname.substr(3));
+        if (window.location.pathname.substr(1) && window.location.pathname.substring(1, 2) === "pr") {
+            setProjectId(window.location.pathname.substring(3));
 
             axios.get(`${config.apiUrl}/projects/${window.location.pathname.substr(3)}`, {
             }).then(response => {
@@ -127,7 +127,6 @@ function Header(props) {
     //run getUserProjects if user changes; meaning, we want to wait until the login loads
     useEffect(() => {
         getUserProjects();
-        console.log(user)
     },
         [user]
     );
@@ -262,7 +261,6 @@ function Header(props) {
 
                         setProjectId(response.data);;
                         getUserProjects();
-                      //  setRefreshUserMenu(!refreshUserMenu);
                     })
 
 
@@ -288,7 +286,6 @@ function Header(props) {
                         }, 3000);
 
                         getUserProjects();
-                        //setRefreshUserMenu(!refreshUserMenu);
                     })
 
 
@@ -398,6 +395,7 @@ function Header(props) {
             }
 
             <span id="dummyClickToClearPid" style={{ display: 'none' }} onClick={() => { setProjectId(null) }}></span>
+            <span id="dummyClickToClearAuthor" style={{ display: 'none' }} onClick={() => { setProjectAuthor(null) }}></span>
             <div style={titleStyle}>
                 <input type="text" id="projectTitle" defaultValue="Untitled" style={titleInputStyle} maxLength="22"></input>
                 <span style={{
@@ -422,12 +420,9 @@ function Header(props) {
                 <img src={uploadIcon} alt="Upload icon"></img>
                 <span>Open</span>
             </div>
-            {user ?
-
-
                 <div className=
                     {
-                        isOnline ?
+                        user && isOnline ?
                             "buttonDiv"
                             :
                             "buttonDiv disabled"
@@ -438,10 +433,6 @@ function Header(props) {
                     <img src={saveIcon} alt="Save"></img>
                     <span>Save</span>
                 </div>
-                :
-                null
-            }
-
             <a href="https://docs.lbym.org" target="_new">
                 <div className="buttonDiv">
                     <img src={newWindowIcon} alt="Open docs icon"></img>
@@ -464,7 +455,6 @@ function Header(props) {
                     <div id="userMenuWrapper" className={userMenuShow ? "userMenu userMenuShow" : "userMenu"} onClick={(e) => { e.stopPropagation() }}>
 
                         <UserMenu
-                            refreshUserMenu={refreshUserMenu}
                             toggleUserMenu={toggleUserMenu.bind(this)}
                             getSingleProject={getSingleProject.bind(this)}
                             deleteProject={deleteProject.bind(this)}
