@@ -1,4 +1,8 @@
 /* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off", no-use-before-define: "off" */
+//NEXT TODO: Either use a new function or check something in ticker if it runs constantly as the name implies. When 'startreading' has been done,
+//check all sensors every half second and update a state variable. Display that in semi-realtime. Later, allow the bitrate to be changed. Assuming
+//doing it in the first place doesn't screw performance.
+
 
 import Tokenizer from './Tokenizer';
 import turtleMath from './turtleMath';
@@ -1722,6 +1726,7 @@ export default class Interpreter {
         }
     }
 
+
     //TODO: There's no error handling for disconnect/reconnect events. This assumes everything works perfectly.
     //Add a state to track if the connection is live. 
 
@@ -1766,7 +1771,8 @@ export default class Interpreter {
 
                 // var string = new TextDecoder("utf-8").decode(value);
                 //   console.log(string);
-
+                var convertedValue = Array.from(new Uint8Array(value));
+                console.log(convertedValue)
                 this.handleReceiveData(value);
 
                 //I guess I didn't need this part? Is it for the packet example above?
@@ -1858,6 +1864,7 @@ prims['limits'] = {
 
 prims['calibrate-list'] = { nargs: 3, fcn: function (a, b, c) { return this.calibrateList(a, b, c) } }
 prims['logData'] = { nargs: 1, fcn: function (a) { this.pushToTable(a) } }
+prims['save-data'] = { nargs: 1, fcn: function (a) { this.pushToTable(a) } }
 prims['clear-data'] = {nargs: 0, fcn: function(){this.pushToTable(false)}}
 prims['repeat'] = { nargs: 2, flow: true, fcn: function (a, b) { this.repeat(a, b); } }
 prims['forever'] = { nargs: 1, flow: true, fcn: function (a) { this.loop(a); } }

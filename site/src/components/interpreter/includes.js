@@ -20,9 +20,9 @@ export const includes =
             make '_packet-log' false
         ]
 
-        if (:_packet-log = true)[
-            logData :_last-packet
-        ]
+       ; if (:_packet-log = true)[
+       ;     logData :_last-packet
+       ; ]
     end
 
     to set-packet-count :n

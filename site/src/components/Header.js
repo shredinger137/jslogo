@@ -384,17 +384,17 @@ function Header(props) {
         <header className="header">
             <span style={{ width: "20px" }}></span>
             {user && user.displayName ?
-                <div onClick={toggleUserMenu} className="" style={userLogoStyle}>
+                <div onClick={toggleUserMenu} tabIndex="0" onKeyDown={(e) => {if(e.key == "Enter"){toggleUserMenu()}}} className="" style={userLogoStyle}>
                     <p>{user.displayName.substr(0, 1)}</p>
                 </div>
                 :
                 <div style={loginStyle} >
-                    <span onClick={signIn}>Login</span>
+                    <span onClick={signIn} onKeyDown={(e) => {if(e.key == "Enter"){ signIn() }}} tabIndex={0}>Login</span>
                 </div>
 
             }
 
-            <span id="dummyClickToClearPid" style={{ display: 'none' }} onClick={() => { setProjectId(null) }}></span>
+            <span id="dummyClickToClearPid" style={{ display: 'none' }} onClick={() => { setProjectId(null) }} ></span>
             <span id="dummyClickToClearAuthor" style={{ display: 'none' }} onClick={() => { setProjectAuthor(null) }}></span>
             <div style={titleStyle}>
                 <input type="text" id="projectTitle" defaultValue="Untitled" style={titleInputStyle} maxLength="22"></input>
@@ -408,19 +408,19 @@ function Header(props) {
                 <span style={{ fontSize: ".8em" }}>{saveState}</span>
             </div>
 
-            <div className="buttonDiv" onClick={() => toggleNewProject()}>
+            <div className="buttonDiv" onClick={() => toggleNewProject()} onKeyDown={(e) => {if(e.key == "Enter"){ toggleNewProject() }}}>
                 <img src={newProjectIcon} alt="New project icon"></img>
-                <span>New</span>
+                <span tabIndex={0}>New</span>
             </div>
-            <div className="buttonDiv" onClick={() => saveAs()}>
+            <div className="buttonDiv" onClick={() => saveAs()} onKeyDown={(e) => {if(e.key == "Enter"){ saveAs() }}}>
                 <img src={downloadIcon} alt="Download icon"></img>
-                <span>Download</span>
+                <span tabIndex={0}>Download</span>
             </div>
-            <div className="buttonDiv" onClick={() => loadFile()}>
+            <div className="buttonDiv" onClick={() => loadFile()} onKeyDown={(e) => {if(e.key == "Enter"){ loadFile() }}}>
                 <img src={uploadIcon} alt="Upload icon"></img>
-                <span>Open</span>
+                <span tabIndex={0}>Open</span>
             </div>
-                <div className=
+                <div tabIndex={0} className=
                     {
                         user && isOnline ?
                             "buttonDiv"
@@ -429,7 +429,7 @@ function Header(props) {
 
                     }
 
-                    onClick={() => saveToCloud()}>
+                    onClick={() => saveToCloud()} onKeyDown={(e) => {if(e.key == "Enter"){ saveToCloud() }}}>
                     <img src={saveIcon} alt="Save"></img>
                     <span>Save</span>
                 </div>
@@ -441,18 +441,18 @@ function Header(props) {
             </a>
             <div id="connectButton" className="buttonDiv" >
                 <img src={connectIcon} alt="Connect icon"></img>
-                <span>Connect</span>
+                <span tabIndex={0}>Connect</span>
             </div>
             <div id="disconnectButton" className="buttonDiv" style={{ display: "none" }}>
                 <img src={connectIcon} alt="Connect icon"></img>
-                <span>Disconnect</span>
+                <span tabIndex={0}>Disconnect</span>
             </div>
             <span style={{ width: "20px" }}></span>
 
             {user ?
                 <>
                     <div id="fullPage" className={userMenuShow ? "fullPage" : null} onClick={(e) => { setUserMenuShow(false) }}></div>
-                    <div id="userMenuWrapper" className={userMenuShow ? "userMenu userMenuShow" : "userMenu"} onClick={(e) => { e.stopPropagation() }}>
+                    <div id="userMenuWrapper" className={userMenuShow ? "userMenu userMenuShow" : "userMenu"} onClick={(e) => { e.stopPropagation() }} tabIndex={0}>
 
                         <UserMenu
                             toggleUserMenu={toggleUserMenu.bind(this)}

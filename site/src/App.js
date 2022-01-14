@@ -81,6 +81,9 @@ end`,
     const disconnectButton = document.getElementById('disconnectButton');
 
     if (connectButton !== null && disconnectButton !== null) {
+      connectButton.addEventListener('keydown', (e) => {if(e.key == "Enter"){interpreter.openSerialPort.bind(interpreter)}});
+      disconnectButton.addEventListener('keydown', (e) => {if(e.key == "Enter"){interpreter.disconnectSerialPort.bind(interpreter)}});
+
       connectButton.addEventListener('click', interpreter.openSerialPort.bind(interpreter));
       disconnectButton.addEventListener('click', interpreter.disconnectSerialPort.bind(interpreter));
     }
@@ -257,12 +260,12 @@ end`,
           <div className="top-buttons">
 
             <ul>
-              <li id="go-button" onClick={() => { interpreter.runLine("go") }}>Go</li>
+              <li id="go-button" onClick={() => { interpreter.runLine("go") }} tabIndex="0">Go</li>
             </ul>
             <ul id="view-tabs">
-              <li onClick={() => { this.setState({ view: "main" }); interpreter.runLine("st") }} className={this.state.view == "main" ? "activeButton" : null}>Canvas</li>
-              <li onClick={() => this.setState({ view: "graph" })} className={this.state.view == "graph" ? "activeButton" : null}>Plots</li>
-              <li onClick={() => this.setState({ view: "data" })} className={this.state.view == "data" ? "activeButton" : null}>Data</li>
+              <li tabIndex="0" onKeyDown={(e) => {if(e.key == "Enter"){this.setState({view: "main"})}}} onClick={() => { this.setState({ view: "main" }); interpreter.runLine("st") }} className={this.state.view == "main" ? "activeButton" : null} >Canvas</li>
+              <li tabIndex="0" onKeyDown={(e) => {if(e.key == "Enter"){this.setState({view: "graph"})}}} onClick={() => this.setState({ view: "graph" })} className={this.state.view == "graph" ? "activeButton" : null}>Plots</li>
+              <li tabIndex="0" onKeyDown={(e) => {if(e.key == "Enter"){this.setState({view: "data"})}}} onClick={() => this.setState({ view: "data" })} className={this.state.view == "data" ? "activeButton" : null}>Data</li>
             </ul>
           </div>
 
