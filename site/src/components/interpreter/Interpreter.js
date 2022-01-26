@@ -49,7 +49,6 @@ export default class Interpreter {
         this.ticker = this.ticker.bind(this);
         this.isDone = this.isDone.bind(this);
 
-        this.addToChart = props.addToChart;
         this.pushToTable = props.pushToTable;
 
         this.cnvWidth = 1000;
@@ -1772,7 +1771,6 @@ export default class Interpreter {
                 // var string = new TextDecoder("utf-8").decode(value);
                 //   console.log(string);
                 var convertedValue = Array.from(new Uint8Array(value));
-                console.log(convertedValue)
                 this.handleReceiveData(value);
 
                 //I guess I didn't need this part? Is it for the packet example above?

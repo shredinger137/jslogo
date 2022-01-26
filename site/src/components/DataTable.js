@@ -94,12 +94,13 @@ function DataTable(props) {
     }
 
 
-
+    let row = 0;
     return (
         <div style={{ overflow: "scroll", height: "100%", width: "100%" }}>
             <span onClick={exportData.bind(this)}>Export</span>
             <input id="loadData" type="file" accept=".csv, .pac" onChange={() => importData()} style={{ display: "none" }} />
             <span onClick={pickFile} style={{marginLeft: "20px"}}>Import</span>
+            <span style={{marginLeft: "20px"}}>{props.pid ? 'Save' : null}</span>
             <table style={{ width: "80%" }}>
                 <thead style={{ textAlign: "left" }}>
                     <tr>
@@ -114,15 +115,15 @@ function DataTable(props) {
                 </thead>
                 <tbody>
                     {props.tableData.map(dataLine => {
+                        row++;
                         return (
-                            <tr key={`${dataLine[0]}row`}>
-                                <td key={dataLine[0]} >{dataLine[0]}</td>
-                                <td key={dataLine[1]}>{dataLine[1]}</td>
-                                <td key={dataLine[2]}>{dataLine[2]}</td>
-                                <td key={dataLine[3]}>{dataLine[3]}</td>
-                                <td key={dataLine[4]}>{dataLine[4]}</td>
-                                <td key={dataLine[5]}>{dataLine[5]}</td>
-                                <td key={dataLine[6]}>{dataLine[6]}</td>
+                            <tr key={`${dataLine[0]}row${row}`}>
+                                <td key={`${dataLine[0]}${row}`} >{dataLine[0]}</td>
+                                <td key={`${dataLine[0]}${row}1`}>{dataLine[1]}</td>
+                                <td key={`${dataLine[0]}${row}2`}>{dataLine[2]}</td>
+                                <td key={`${dataLine[0]}${row}3`}>{dataLine[3]}</td>
+                                <td key={`${dataLine[0]}${row}4`}>{dataLine[4]}</td>
+                                <td key={`${dataLine[0]}${row}5`}>{dataLine[5]}</td>    
                             </tr>
                         )
 

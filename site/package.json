@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@babel/core": "7.9.0",
-    "@reduxjs/toolkit": "^1.5.1",
+    "@reduxjs/toolkit": "^1.7.1",
     "@svgr/webpack": "4.3.3",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
@@ -22,6 +22,7 @@
     "case-sensitive-paths-webpack-plugin": "2.3.0",
     "chart.js": "^2.9.4",
     "chartjs": "^0.3.24",
+    "concurrently": "^7.0.0",
     "css-loader": "3.4.2",
     "dexie": "^3.0.3",
     "dotenv": "8.2.0",
@@ -82,6 +83,7 @@
   },
   "scripts": {
     "start": "node scripts/start.js",
+    "dev": "concurrently \"cd ../api && nodemon app.js \" \"npm run start\"",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js"
   },

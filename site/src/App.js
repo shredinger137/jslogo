@@ -1,6 +1,7 @@
-/* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off", no-use-before-define: "off" */
+/* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off", no-use-before-define: "off", react-hooks/exhaustive-deps: off */
 
-import React, { Component } from 'react';
+
+import React, { useEffect, useState } from 'react';
 import './css/styles.css';
 import './css/layout.css';
 import Interpreter from './components/interpreter/Interpreter';
@@ -17,62 +18,65 @@ import 'firebase/auth';
 
 let interpreter, projects;
 
-class App extends Component {
+const App = () => {
+
+  const [showNewProjectModal, setShowNewProjectModal] = useState(false);
+  const [view, setView] = useState('main');
+  const [tableData, setTableData] = useState([]);
+  const [code, setCode] = useState(`to go
+print 'Hello World'
+end`,);
+  //pid is a placeholder; this needs to be put into global state
+  let pid = null;
+  var editor = null;
+
+  const [horizontalOffset, setHorizontalOffset] = useState(0);
+  const [chartType, setChartType] = useState('');
+  const [chartDataSingle, setChartDataSingle] = useState([]);
+  const [chartDataTop, setChartDataTop] = useState([]);
+  const [chartDataBottom, setChartDataBottom] = useState([]);
+  const [chartOptionsTop, setChartOptionsTop] = useState({
+
+    responsive: true,
+    maintainAspectRatio: false,
+  });
+
+  const [chartOptionsBottom, setChartOptionsBottom] = useState({
+
+    responsive: true,
+    maintainAspectRatio: false,
+  });
+  const [chartOptionsSingle, setChartOptionsSingle] = useState({
+
+    responsive: true,
+    maintainAspectRatio: false,
+  });
 
 
-  chartRef = {}
-  state = {
-    tableData: [[]],
-    view: "main",
-    showNewProjectModal: false,
-    code:
-      `to go
-    print 'Hello World'
-end`,
-    canvasHeight: 400,
-    canvasWidth: 900,
-    chartType: "",
-    chartOptionsSingle: {
-      yLabel: "",
-      xLabel: "",
-      ticks: {},
-      responsive: true
-    },
-    chartDataSingle: [],
-    chartOptionsTop: {
 
-      responsive: true,
-      maintainAspectRatio: false,
-    },
+  useEffect(() => {
+    setup();
+  },
+    []
+  );
 
-    chartDataTop: [],
-    chartOptionsBottom: {
-      responsive: true,
-      maintainAspectRatio: false,
-    },
-    chartDataBottom: [],
-    logoVariables: [],
-    uid: null,
-    uname: null,
-    horizontalOffset: 0,
-  };
 
-  componentDidMount() {
+  const setup = () => {
 
-    console.log("Serial API Check:", this.checkIfSerialCapable());
+    console.log("Serial API Check:", checkIfSerialCapable());
 
-    this.setState({ horizontalOffset: document.getElementById("gutter").getBoundingClientRect().left })
+    setHorizontalOffset(document.getElementById("gutter").getBoundingClientRect().left);
 
     interpreter = new Interpreter(
       {
-        updateChartOptions: this.updateChartOptions.bind(this),
-        updateChartType: this.updateChartType.bind(this),
-        pushNewChartData: this.pushChartData.bind(this),
-        addToChart: this.addToChart.bind(this),
-        pushToTable: this.pushToDataTable.bind(this)
+        updateChartOptions: updateChartOptions,
+        updateChartType: updateChartType,
+        pushNewChartData: pushChartData,
+        pushToTable: pushToDataTable,
       }
     );
-    projects = new Projects(this.updateCode.bind(this));
+
+    projects = new Projects(updateCode);
     interpreter.setup();
 
     window.onresize = interpreter.handleResize.bind(interpreter);
@@ -81,26 +85,26 @@ end`,
     const disconnectButton = document.getElementById('disconnectButton');
 
     if (connectButton !== null && disconnectButton !== null) {
-      connectButton.addEventListener('keydown', (e) => {if(e.key == "Enter"){interpreter.openSerialPort.bind(interpreter)}});
-      disconnectButton.addEventListener('keydown', (e) => {if(e.key == "Enter"){interpreter.disconnectSerialPort.bind(interpreter)}});
+      connectButton.addEventListener('keydown', (e) => { if (e.key == "Enter") { interpreter.openSerialPort.bind(interpreter) } });
+      disconnectButton.addEventListener('keydown', (e) => { if (e.key == "Enter") { interpreter.disconnectSerialPort.bind(interpreter) } });
 
       connectButton.addEventListener('click', interpreter.openSerialPort.bind(interpreter));
       disconnectButton.addEventListener('click', interpreter.disconnectSerialPort.bind(interpreter));
     }
 
-    this.setState({
-      includes: includes
-    });
+    ////    this.setState({
+    //     includes: includes
+    //    });
 
   }
 
-  dragToResize(e) {
+  const dragToResize = (e) => {
 
     let context = this;
     e.preventDefault();
 
     function handleDrag(e) {
-      interpreter.handleResizeHorizontal(e.clientX - context.state.horizontalOffset);
+      interpreter.handleResizeHorizontal(e.clientX - horizontalOffset);
     }
 
     function handleMouseUp(e) {
@@ -114,56 +118,47 @@ end`,
   }
 
 
-  setDataTable(newData) {
-    this.setState({ tableData: newData })
+  const setDataTable = (newData) => {
+    setTableData(newData);
   }
 
-  updateChartType(newType) {
-    this.setState({ chartType: newType });
+  const updateChartType = (newType) => {
+    setChartType(newType);
   }
 
-  updateChartOptions(chartType, newOptions) {
+  const updateChartOptions = (chartType, newOptions) => {
     if (chartType == "single") {
-      this.setState({ chartOptionsSingle: newOptions });
+      setChartOptionsSingle(newOptions)
     }
 
     if (chartType == "top") {
-      this.setState({ chartOptionsTop: newOptions });
+      setChartOptionsTop(newOptions);
     }
 
     if (chartType == "bottom") {
-      this.setState({ chartOptionsBottom: newOptions });
+      setChartOptionsBottom(newOptions);
     }
 
   }
 
-  updateLogoVariables(newVariables) {
-    this.setState({ logoVariables: newVariables });
-  }
 
-  addToChart(x, y) {
-    let newData = this.state.chartData;
-    newData.push({ x: x, y: y });
-    this.setState({ chartData: newData });
-  }
-
-  pushChartData(chartType, newData) {
+  const pushChartData = (chartType, newData) => {
     if (chartType == "single") {
-      this.setState({ chartDataSingle: newData });
+      setChartDataSingle(newData);
       return;
     }
     if (chartType == "top") {
-      this.setState({ chartDataTop: newData });
+      setChartDataTop(newData);
       return
     }
     if (chartType == "bottom") {
-      this.setState({ chartDataBottom: newData });
+      setChartOptionsBottom(newData);
       return;
     }
 
   }
 
-  checkIfSerialCapable = () => {
+  const checkIfSerialCapable = () => {
     if ('serial' in navigator) {
       return true;
     } else {
@@ -171,35 +166,32 @@ end`,
     }
   }
 
-  pushToDataTable(newDataLine) {
+  const pushToDataTable = (newDataLine) => {
 
-    if(newDataLine == false){
-      this.setState({
-        tableData: [[]]
-      })
+
+    if (newDataLine == false) {
+      setTableData([[]])
     }
 
-    let newData = this.state.tableData;
+    let newData = tableData;
     newData.push(newDataLine);
-    this.setState({
-      tableData: newData
-    })
+    setTableData(
+      newData
+    )
   }
 
-  updateCode(newCode) {
-    this.setState({
-      code: newCode,
-    });
-  }
-
-
-  toggleShowNewProjectModal() {
-    this.setState({ showNewProjectModal: !this.state.showNewProjectModal });
+  const updateCode = (newCode) => {
+    setCode(newCode);
   }
 
 
-  editorWillMount = monaco => {
-    this.editor = monaco
+  const toggleShowNewProjectModal = () => {
+    setShowNewProjectModal(!showNewProjectModal);
+  }
+
+
+  const editorWillMount = monaco => {
+    editor = monaco
     if (!monaco.languages.getLanguages().some(({ id }) => id === 'jslogo')) {
       // Register a new language
       monaco.languages.register({ id: 'jslogo' })
@@ -223,112 +215,109 @@ end`,
 
   }
 
-  editorDidMount(editor, monaco) {
+  const editorDidMount = (editor, monaco) => {
     editor.focus();
   }
 
 
-  render() {
+  const options = {
+    quickSuggestions: false,
+    selectOnLineNumbers: true,
+    automaticLayout: true,
+    minimap: {
+      enabled: false
+    },
+  };
 
-    const options = {
-      quickSuggestions: false,
-      selectOnLineNumbers: true,
-      automaticLayout: true,
-      minimap: {
-        enabled: false
-      },
-    };
-
-    return (
-      <div>
-        <Header
-          pid={this.state.pid}
-          toggleNewProjectModal={this.toggleShowNewProjectModal.bind(this)}
-          interpreter={this.interpreter}
-          chartToggle={this.chartToggle}
-          updateCode={this.updateCode.bind(this)}
-        />
-        <div style={{ height: "20px" }}></div>
-        <div className="main">
-          {this.state.showNewProjectModal ?
-            <NewProjectModal
-              toggleModal={this.toggleShowNewProjectModal.bind(this)}
-              updateCode={this.updateCode.bind(this)}
-            />
-            :
-            null}
-          <div className="top-buttons">
-
-            <ul>
-              <li id="go-button" onClick={() => { interpreter.runLine("go") }} tabIndex="0">Go</li>
-            </ul>
-            <ul id="view-tabs">
-              <li tabIndex="0" onKeyDown={(e) => {if(e.key == "Enter"){this.setState({view: "main"})}}} onClick={() => { this.setState({ view: "main" }); interpreter.runLine("st") }} className={this.state.view == "main" ? "activeButton" : null} >Canvas</li>
-              <li tabIndex="0" onKeyDown={(e) => {if(e.key == "Enter"){this.setState({view: "graph"})}}} onClick={() => this.setState({ view: "graph" })} className={this.state.view == "graph" ? "activeButton" : null}>Plots</li>
-              <li tabIndex="0" onKeyDown={(e) => {if(e.key == "Enter"){this.setState({view: "data"})}}} onClick={() => this.setState({ view: "data" })} className={this.state.view == "data" ? "activeButton" : null}>Data</li>
-            </ul>
-          </div>
-
-          <input id="load" type="file" onChange={() => projects.loadFile()} style={{ display: "none" }} />
-          <span style={{ float: "right" }} id="canvasDimensionsLabel"></span>
-
-        </div>
-
-        <div className="interfaceGrid" id="mainInterfaceGrid">
-          <div className="codeEntry" id="codeEntryDiv">
-            <MonacoEditor
-              language="jslogo"
-              theme="jslogo"
-              value={this.state.code}
-              options={options}
-              onChange={this.updateCode.bind(this)}
-              editorDidMount={this.editorDidMount}
-              editorWillMount={this.editorWillMount}
-            />
-
-            <textarea id="procs" style={{ whiteSpace: "nowrap", display: "none" }} value={this.state.code} readOnly>
-            </textarea>
-            <textarea id="includes" spellCheck="false" style={{ display: "none", whiteSpace: "nowrap", overflow: "visible" }} />
-          </div>
-
-          <div id="gutter" onMouseDown={(e) => { this.dragToResize(e) }} ></div>
-          <div className="chartArea" id="chartAreaWrapper">
-
-            <div id="cnvframe" className={this.state.view == "main" ? null : "hide"} style={{ height: "100%", width: "100%" }}>
-              <canvas className="cnv" id="canvas" >
-                <div className="turtle" id="turtle">
-                  <img id="turtleimage" src="turtle.svg" alt="Turtle avatar" />
-                </div>
-              </canvas>
-            </div>
-
-            <div id="chartFrame" className={this.state.view == "graph" ? null : "hide"} style={{ height: "100%", width: "100%" }}>
-              <Chart
-                chartType={this.state.chartType}
-                chartDataSingle={this.state.chartDataSingle}
-                chartDataTop={this.state.chartDataTop}
-                chartDataBottom={this.state.chartDataBottom}
-                chartOptionsTop={this.state.chartOptionsTop}
-                chartOptionsBottom={this.state.chartOptionsBottom}
-                chartOptionsSingle={this.state.chartOptionsSingle}
-              />
-
-            </div>
-            <div id="dataFrame" className={this.state.view == "data" ? null : "hide"} style={{ height: "100%", width: "100%" }}>
-              <DataTable
-                tableData={this.state.tableData}
-                setTableData={this.setDataTable.bind(this)}
-              />
-            </div>
-          </div>
-          <Terminal
-            interpreter={interpreter}
+  return (
+    <div>
+      <Header
+        toggleNewProjectModal={toggleShowNewProjectModal}
+        interpreter={interpreter}
+        updateCode={updateCode}
+      />
+      <div style={{ height: "20px" }}></div>
+      <div className="main">
+        {showNewProjectModal ?
+          <NewProjectModal
+            toggleModal={toggleShowNewProjectModal}
+            updateCode={updateCode}
           />
+          :
+          null}
+        <div className="top-buttons">
+
+          <ul>
+            <li id="go-button" onClick={() => { interpreter.runLine("go") }} tabIndex="0">Go</li>
+          </ul>
+          <ul id="view-tabs">
+            <li tabIndex="0" onKeyDown={(e) => { if (e.key == "Enter") { setView('main') } }} onClick={() => { setView('main'); interpreter.runLine("st") }} className={view == "main" ? "activeButton" : null} >Canvas</li>
+            <li tabIndex="0" onKeyDown={(e) => { if (e.key == "Enter") { setView('graph') } }} onClick={() => setView('graph')} className={view == "graph" ? "activeButton" : null}>Plots</li>
+            <li tabIndex="0" onKeyDown={(e) => { if (e.key == "Enter") { setView('data') } }} onClick={() => setView('data')} className={view == "data" ? "activeButton" : null}>Data</li>
+          </ul>
         </div>
-        <textarea id="includes" style={{ display: "none" }} value={this.state.includes} />
-      </div >
-    );
-  }
+
+        <input id="load" type="file" onChange={() => projects.loadFile()} style={{ display: "none" }} />
+        <span style={{ float: "right" }} id="canvasDimensionsLabel"></span>
+
+      </div>
+
+      <div className="interfaceGrid" id="mainInterfaceGrid">
+        <div className="codeEntry" id="codeEntryDiv">
+          <MonacoEditor
+            language="jslogo"
+            theme="jslogo"
+            value={code}
+            options={options}
+            onChange={updateCode}
+            editorDidMount={editorDidMount}
+            editorWillMount={editorWillMount}
+          />
+
+          <textarea id="procs" style={{ whiteSpace: "nowrap", display: "none" }} value={code} readOnly>
+          </textarea>
+          <textarea id="includes" spellCheck="false" style={{ display: "none", whiteSpace: "nowrap", overflow: "visible" }} />
+        </div>
+
+        <div id="gutter" onMouseDown={(e) => { dragToResize(e) }} ></div>
+        <div className="chartArea" id="chartAreaWrapper">
+
+          <div id="cnvframe" className={view == "main" ? null : "hide"} style={{ height: "100%", width: "100%" }}>
+            <canvas className="cnv" id="canvas" >
+              <div className="turtle" id="turtle">
+                <img id="turtleimage" src="turtle.svg" alt="Turtle avatar" />
+              </div>
+            </canvas>
+          </div>
+
+          <div id="chartFrame" className={view == "graph" ? null : "hide"} style={{ height: "100%", width: "100%" }}>
+            <Chart
+              chartType={chartType}
+              chartDataSingle={chartDataSingle}
+              chartDataTop={chartDataTop}
+              chartDataBottom={chartDataBottom}
+              chartOptionsTop={chartOptionsTop}
+              chartOptionsBottom={chartOptionsBottom}
+              chartOptionsSingle={chartOptionsSingle}
+            />
+
+          </div>
+          <div id="dataFrame" className={view == "data" ? null : "hide"} style={{ height: "100%", width: "100%" }}>
+            <DataTable
+              pid={pid}
+              tableData={tableData}
+              setTableData={setDataTable}
+            />
+          </div>
+        </div>
+        <Terminal
+          interpreter={interpreter}
+        />
+      </div>
+      <textarea id="includes" style={{ display: "none" }} value={includes} readOnly />
+    </div >
+  );
+
 }
 
 export default App;

@@ -107,6 +107,7 @@ function Header(props) {
         if (window.location.pathname.substring(1) && window.location.pathname.substring(1, 3) === "pr") {
             setProjectId(window.location.pathname.substring(3));
 
+
             axios.get(`${config.apiUrl}/projects/${window.location.pathname.substring(3)}`, {
             }).then(response => {
                 if (response && response.data && response.data.code && response.data.title) {
@@ -338,6 +339,7 @@ function Header(props) {
                             titleElement.value = response.data.title;
                         }
                         setProjectId(response.data.projectId);
+                        props.setParentState({pid: response.data.projectId});
                         if (response.data.ownerDisplayName) {
                             setProjectAuthor(response.data.ownerDisplayName);
                         } else {
