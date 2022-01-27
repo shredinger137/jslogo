@@ -38,7 +38,8 @@ to run-forever
 	ob1off	
 
     loop [
-		print readLightSensor
+        let "light readLightSensor
+		print :light
 		wait 10
 	]
 end
