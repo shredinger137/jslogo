@@ -22,7 +22,7 @@ to go
     print 'Average Light Value: ' + (:suml / 5)
     
 	; repeat 5 [
-    ;    let "sum0 ( :sumt0 + readTempSensor0 )
+    ;    let "sumt0 ( :sumt0 + readTempSensor0 )
     ; ]
     ; print 'Average Temp0 Value: ' + (:sumt0 / 5)
     ; repeat 5 [
