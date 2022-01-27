@@ -171,13 +171,11 @@ end`,);
 
     if (newDataLine == false) {
       setTableData([[]])
+      return;
     }
 
-    let newData = tableData;
-    newData.push(newDataLine);
-    setTableData(
-      newData
-    )
+    setDataTable(DataTable => [...DataTable, newDataLine]);
+    
   }
 
   const updateCode = (newCode) => {
