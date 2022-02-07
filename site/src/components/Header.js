@@ -85,10 +85,8 @@ function Header(props) {
     const [projectList, setProjectList] = useState([]);
     const [saveState, setSaveState] = useState("");
     const [projectId, setProjectId] = useState(null);
-    const [userMenuShow, setUserMenuShow] = useState(true);
+    const [userMenuShow, setUserMenuShow] = useState(false);
     const [projectAuthor, setProjectAuthor] = useState(null);
-    const [isOnline, setIsOnline] = useState(true);
-
 
     //On mount, check to see if a project is defined in the URL.
     //All links have the format /pr${projectId}, so we check if 'pr' is the start of it and take the rest.
@@ -98,11 +96,6 @@ function Header(props) {
 
 
     useEffect(() => {
-
-        //Periodically check to see if we can hit the API /ping URL; if not, the API is down or the user isn't online. Either way, set online status to false.
-        //TODO I guess
-        // setInterval(function () { axios.get(`${config.apiUrl}/ping`, {}).then(response => { setIsOnline(true) }).catch(function (error) { setIsOnline(false) }) }, 10000);
-
 
         if (window.location.pathname.substring(1) && window.location.pathname.substring(1, 3) === "pr") {
             setProjectId(window.location.pathname.substring(3));
@@ -458,15 +451,7 @@ function Header(props) {
                 <img src={uploadIcon} alt="Upload icon"></img>
                 <span tabIndex={0}>Open</span>
             </div>
-            <div tabIndex={0} className=
-                {
-                    user && isOnline ?
-                        "buttonDiv"
-                        :
-                        "buttonDiv disabled"
-
-                }
-
+            <div tabIndex={0} className="buttonDiv"
                 onClick={() => saveToCloud()} onKeyDown={(e) => { if (e.key == "Enter") { saveToCloud() } }}>
                 <img src={saveIcon} alt="Save"></img>
                 <span>Save</span>

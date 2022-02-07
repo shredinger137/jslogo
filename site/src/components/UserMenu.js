@@ -53,6 +53,24 @@ function UserMenu(props) {
                         <span key={`${project.title}span`} onClick={() => { props.getSingleProject(project.projectId) }} style={{ marginRight: "10px" }}>{project.title}</span><br />
                         <span key={`${project.title}del`} style={{ marginRight: "10px", fontSize: "1rem" }} onClick={() => { props.deleteProject(project.projectId) }}>[delete]</span>
                         <span key={`${project.title}copy`} style={{ fontSize: "1rem", marginRight: '10px' }} onClick={() => { copyProjectLink(`${project.projectId}`) }}>[copy link]</span>
+
+
+                    </div>
+
+                )
+
+            }
+        </div>
+
+    )
+
+}
+
+export default UserMenu;
+
+
+
+/*
                         {project.dataIndex ?
                             <span key={`${project.title}data`} style={{ fontSize: "1rem" }}>[data]</span>
                             :
@@ -64,7 +82,7 @@ function UserMenu(props) {
                                 {
                                     project.dataIndex.map((dataEntry) =>
 
-                                        <div className='user-menu-data block'>
+                                        <div className='user-menu-data'>
                                             <p><strong>Saved Data</strong></p>
                                             <ul style={{ padding: '10px' }}>
                                                 <span>{new Date(dataEntry).toLocaleString().split(',')[0]}</span>
@@ -82,16 +100,4 @@ function UserMenu(props) {
                             null
 
                         }
-
-                    </div>
-
-                )
-
-            }
-        </div>
-
-    )
-
-}
-
-export default UserMenu;
+*/

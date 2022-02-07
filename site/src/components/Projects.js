@@ -62,7 +62,7 @@ export default class Projects {
         var recoveryId = entries[0]["id"];
         await localDatabase.projects.update(recoveryId, {
           projectId: pid
-        }).then(context.getRecoverEntry().then(result => { console.log(result) }))
+        }).then(context.getRecoverEntry())
       } else {
         await localDatabase.projects.add({
           name: 'recover',
