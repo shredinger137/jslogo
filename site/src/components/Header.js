@@ -439,10 +439,6 @@ function Header(props) {
                 <img src={newProjectIcon} alt="New project icon"></img>
                 <span tabIndex={0}>New</span>
             </div>
-            <div className="buttonDiv" onClick={() => tempSaveData()} onKeyDown={(e) => { if (e.key == "Enter") { tempSaveData() } }}>
-                <img src={newProjectIcon} alt="New project icon"></img>
-                <span tabIndex={0}>Test</span>
-            </div>
             <div className="buttonDiv" onClick={() => saveAs()} onKeyDown={(e) => { if (e.key == "Enter") { saveAs() } }}>
                 <img src={downloadIcon} alt="Download icon"></img>
                 <span tabIndex={0}>Download</span>
