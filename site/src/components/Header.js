@@ -74,7 +74,7 @@ function Header(props) {
     //TODO: Validating log in is rather slow
     //consider using the native firebase stuff
 
-    const {data: user} = useUser();
+    const { data: user } = useUser();
     const reactAuth = useAuth();
 
 
@@ -85,7 +85,7 @@ function Header(props) {
     const [projectList, setProjectList] = useState([]);
     const [saveState, setSaveState] = useState("");
     const [projectId, setProjectId] = useState(null);
-    const [userMenuShow, setUserMenuShow] = useState(false);
+    const [userMenuShow, setUserMenuShow] = useState(true);
     const [projectAuthor, setProjectAuthor] = useState(null);
     const [isOnline, setIsOnline] = useState(true);
 
@@ -103,7 +103,7 @@ function Header(props) {
         //TODO I guess
         // setInterval(function () { axios.get(`${config.apiUrl}/ping`, {}).then(response => { setIsOnline(true) }).catch(function (error) { setIsOnline(false) }) }, 10000);
 
-        
+
         if (window.location.pathname.substring(1) && window.location.pathname.substring(1, 3) === "pr") {
             setProjectId(window.location.pathname.substring(3));
 
@@ -198,6 +198,34 @@ function Header(props) {
     )
 
 
+    function tempSaveData() {
+
+
+        if (user) {
+
+            firebase.auth().currentUser.getIdToken(false).then(idToken => {
+
+                if (!projectId) {
+
+                    //error handling - shouldn't be clickable without an ID, but just in
+
+
+                } else {
+                    //not the first time - update an existing
+
+                    axios.post(`${config.apiUrl}/data/${projectId}`, {
+                        authorization: idToken,
+                        data: [0, 1, 2],
+                    }).then((response) => {
+                        console.log(response)
+                    }).catch((err) => { console.log(err) })
+
+
+                }
+            })
+
+        }
+    }
 
     function loadFile() {
         document.getElementById("load").click();
@@ -339,7 +367,6 @@ function Header(props) {
                             titleElement.value = response.data.title;
                         }
                         setProjectId(response.data.projectId);
-                        props.setParentState({pid: response.data.projectId});
                         if (response.data.ownerDisplayName) {
                             setProjectAuthor(response.data.ownerDisplayName);
                         } else {
@@ -371,7 +398,12 @@ function Header(props) {
                 })
                     .then(response => {
                         //we believe that response.data is an array of projects; this should do something different if there's an error
-                        setProjectList(response.data)
+                        if (response && response.data && Array.isArray(response.data)) {
+
+                            setProjectList(response.data)
+                        }
+
+
                     })
             })
         }
@@ -386,12 +418,12 @@ function Header(props) {
         <header className="header">
             <span style={{ width: "20px" }}></span>
             {user && user.displayName ?
-                <div onClick={toggleUserMenu} tabIndex="0" onKeyDown={(e) => {if(e.key == "Enter"){toggleUserMenu()}}} className="" style={userLogoStyle}>
+                <div onClick={toggleUserMenu} tabIndex="0" onKeyDown={(e) => { if (e.key == "Enter") { toggleUserMenu() } }} className="" style={userLogoStyle}>
                     <p>{user.displayName.substr(0, 1)}</p>
                 </div>
                 :
                 <div style={loginStyle} >
-                    <span onClick={signIn} onKeyDown={(e) => {if(e.key == "Enter"){ signIn() }}} tabIndex={0}>Login</span>
+                    <span onClick={signIn} onKeyDown={(e) => { if (e.key == "Enter") { signIn() } }} tabIndex={0}>Login</span>
                 </div>
 
             }
@@ -410,31 +442,35 @@ function Header(props) {
                 <span style={{ fontSize: ".8em" }}>{saveState}</span>
             </div>
 
-            <div className="buttonDiv" onClick={() => toggleNewProject()} onKeyDown={(e) => {if(e.key == "Enter"){ toggleNewProject() }}}>
+            <div className="buttonDiv" onClick={() => toggleNewProject()} onKeyDown={(e) => { if (e.key == "Enter") { toggleNewProject() } }}>
                 <img src={newProjectIcon} alt="New project icon"></img>
                 <span tabIndex={0}>New</span>
             </div>
-            <div className="buttonDiv" onClick={() => saveAs()} onKeyDown={(e) => {if(e.key == "Enter"){ saveAs() }}}>
+            <div className="buttonDiv" onClick={() => tempSaveData()} onKeyDown={(e) => { if (e.key == "Enter") { tempSaveData() } }}>
+                <img src={newProjectIcon} alt="New project icon"></img>
+                <span tabIndex={0}>Test</span>
+            </div>
+            <div className="buttonDiv" onClick={() => saveAs()} onKeyDown={(e) => { if (e.key == "Enter") { saveAs() } }}>
                 <img src={downloadIcon} alt="Download icon"></img>
                 <span tabIndex={0}>Download</span>
             </div>
-            <div className="buttonDiv" onClick={() => loadFile()} onKeyDown={(e) => {if(e.key == "Enter"){ loadFile() }}}>
+            <div className="buttonDiv" onClick={() => loadFile()} onKeyDown={(e) => { if (e.key == "Enter") { loadFile() } }}>
                 <img src={uploadIcon} alt="Upload icon"></img>
                 <span tabIndex={0}>Open</span>
             </div>
-                <div tabIndex={0} className=
-                    {
-                        user && isOnline ?
-                            "buttonDiv"
-                            :
-                            "buttonDiv disabled"
+            <div tabIndex={0} className=
+                {
+                    user && isOnline ?
+                        "buttonDiv"
+                        :
+                        "buttonDiv disabled"
 
-                    }
+                }
 
-                    onClick={() => saveToCloud()} onKeyDown={(e) => {if(e.key == "Enter"){ saveToCloud() }}}>
-                    <img src={saveIcon} alt="Save"></img>
-                    <span>Save</span>
-                </div>
+                onClick={() => saveToCloud()} onKeyDown={(e) => { if (e.key == "Enter") { saveToCloud() } }}>
+                <img src={saveIcon} alt="Save"></img>
+                <span>Save</span>
+            </div>
             <a href="https://docs.lbym.org" target="_new">
                 <div className="buttonDiv">
                     <img src={newWindowIcon} alt="Open docs icon"></img>

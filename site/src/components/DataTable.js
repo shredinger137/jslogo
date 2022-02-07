@@ -34,7 +34,7 @@ function DataTable(props) {
         fileReader.onload = function (fileLoadedEvent, context) {
 
             var textFromFileLoaded = fileLoadedEvent.target.result;
-            if(textFromFileLoaded.charAt(0) == "T" && textFromFileLoaded.charAt(0) != 'i'){
+            if (textFromFileLoaded.charAt(0) == "T" && textFromFileLoaded.charAt(0) != 'i') {
                 console.log("T");
                 typed = true;
             }
@@ -43,7 +43,7 @@ function DataTable(props) {
 
             for (var line of textInLines) {
                 var lineData = line.split(" ");
-                if(typed){
+                if (typed) {
                     lineData.splice(2, 2);
                     lineData.shift();
                     lineData.pop();
@@ -99,11 +99,12 @@ function DataTable(props) {
         <div style={{ overflow: "scroll", height: "100%", width: "100%" }}>
             <span onClick={exportData.bind(this)}>Export</span>
             <input id="loadData" type="file" accept=".csv, .pac" onChange={() => importData()} style={{ display: "none" }} />
-            <span onClick={pickFile} style={{marginLeft: "20px"}}>Import</span>
-            <span style={{marginLeft: "20px"}}>{props.pid ? 'Save' : null}</span>
+            <span onClick={pickFile} style={{ marginLeft: "20px" }}>Import</span>
+            <span style={{ marginLeft: "20px" }}>{props.pid ? 'Save' : null}</span>
             <table style={{ width: "80%" }}>
                 <thead style={{ textAlign: "left" }}>
                     <tr>
+                        <th>Type</th>
                         <th>Time</th>
                         <th>ADC0</th>
                         <th>ADC1</th>
@@ -111,19 +112,50 @@ function DataTable(props) {
                         <th>ADC3</th>
                         <th>ADC4</th>
                         <th>ADC5</th>
+                        <th>CHCK</th>
                     </tr>
                 </thead>
                 <tbody>
                     {props.tableData.map(dataLine => {
+                        //hack to stop getting warnings about matchine keys when time is the same (less than a second)
                         row++;
                         return (
                             <tr key={`${dataLine[0]}row${row}`}>
-                                <td key={`${dataLine[0]}${row}`} >{dataLine[0]}</td>
-                                <td key={`${dataLine[0]}${row}1`}>{dataLine[1]}</td>
-                                <td key={`${dataLine[0]}${row}2`}>{dataLine[2]}</td>
-                                <td key={`${dataLine[0]}${row}3`}>{dataLine[3]}</td>
-                                <td key={`${dataLine[0]}${row}4`}>{dataLine[4]}</td>
-                                <td key={`${dataLine[0]}${row}5`}>{dataLine[5]}</td>    
+                                <td key={`${dataLine[0]}${row}type`} >{dataLine[0]}</td>
+                                <td key={`${dataLine[0]}${row}time`} >{dataLine[1]}</td>
+                                <td key={`${dataLine[0]}${row}1`}>{dataLine[2]}</td>
+                                {
+                                    dataLine.length > 4 ?
+                                        <td key={`${dataLine[0]}${row}2`}>{dataLine[3]}</td>
+                                        :
+                                        <td></td>
+                                }
+                                {
+                                    dataLine.length > 5 ?
+                                        <td key={`${dataLine[0]}${row}3`}>{dataLine[4]}</td>
+                                        :
+                                        <td></td>
+                                }
+                                {
+                                    dataLine.length > 6 ?
+                                        <td key={`${dataLine[0]}${row}4`}>{dataLine[5]}</td>
+                                        :
+                                        <td></td>
+                                }
+                                {
+                                    dataLine.length > 7 ?
+                                        <td key={`${dataLine[0]}${row}5`}>{dataLine[6]}</td>
+                                        :
+                                        <td></td>
+                                }
+                                {
+                                    dataLine.length > 8 ?
+                                        <td key={`${dataLine[0]}${row}6`}>{dataLine[7]}</td>
+                                        :
+                                        <td></td>
+                                }
+
+                                <td key={`${dataLine[0]}${row}check`}>{dataLine[dataLine.length - 1]}</td>
                             </tr>
                         )
 

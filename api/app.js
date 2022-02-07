@@ -1,3 +1,5 @@
+//TODO: Auth needs to be made more robust, as proper middleware. It also needs to be passed to the database functions, since we have to verify the user actually has permissions.
+
 var express = require("express");
 var app = express();
 var config = require("./config.js");
@@ -12,7 +14,10 @@ admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
 });
 
-
+const getUserFromToken = async (token) => {
+    console.log('got token');
+    admin.auth().verifyIdToken(token).then((decodedToken) => { return decodedToken })
+}
 
 
 app.use(function (req, res, next) {
@@ -47,7 +52,7 @@ MongoClient.connect('mongodb://localhost:27017/', { useUnifiedTopology: true, us
 
 //We get a login post, saying a login happened. Check if the authorization token matches the expected UID. Check if user is already in the database. If it is, cool. If not, create an entry.
 
-app.get("/ping", function( req, res) {
+app.get("/ping", function (req, res) {
     res.send(true);
 });
 
@@ -150,6 +155,7 @@ app.patch("/project/:pid", function (req, res) {
 })
 
 
+
 app.delete("/project/:pid", function (req, res) {
     admin
         .auth()
@@ -206,6 +212,30 @@ app.get("/user-projects/:uid", function (req, res) {
 
 })
 
+app.post("/data/:pid", function (req, res) {
+
+    if (req.body && req.body.data && req.params && req.params.pid && req.body.authorization) {
+
+        admin
+            .auth()
+            .verifyIdToken(req.body.authorization)
+            .then((decodedToken) => {
+                const uid = decodedToken.uid;
+                projectFunctions.doesUserHavePermission(decodedToken.uid, req.params.pid, 'write').then((permissions) => {
+                    if (permissions == true) {
+                        projectFunctions.saveDataRun(req.params.pid, req.body.data)
+                    }
+                    res.send('saved');
+                })
+            }
+            )
+    } else {
+        res.send('error');
+    }
+
+})
+
+
 
 
 app.get("/projects/:pid", function (req, res) {
@@ -216,37 +246,6 @@ app.get("/projects/:pid", function (req, res) {
             res.send(response)
         })
     }
-
-
-    /*
-    
-    **Disabling auth on get requests - this enables link sharing without credential checking, but also makes all projects viewable by default
-    Probably good to have this be temporary; we don't want users having write access from links, so we'll need to display that properly**
-
-    if (req.headers.authorization) {
-        admin
-            .auth()
-            .verifyIdToken(req.headers.authorization)
-            .then((decodedToken) => {
-                const uid = decodedToken.uid;
-                if (req.params.pid) {
-                    projectFunctions.getProject(req.params.pid, uid).then(response => {
-                        res.send(response)
-                    })
-
-
-                }
-
-
-            })
-            .catch((error) => {
-                // Handle error
-            });
-
-    }
-
-*/
-
 })
 
 

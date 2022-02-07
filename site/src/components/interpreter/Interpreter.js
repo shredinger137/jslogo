@@ -1874,6 +1874,7 @@ prims['show-plot'] = { nargs: 0, fcn: function (n) { this.initPlot() } }
 
 prims['break'] = { nargs: 0, fcn: function (n) { this.break() } }
 
+prims['..'] = { nargs: 0, flow: true, fcn: function () { this.procOutput(this); } }
 prims['.'] = { nargs: 0, flow: true, fcn: function () { this.procOutput(this); } }
 prims['stop'] = { nargs: 0, flow: true, fcn: function () { this.procOutput(this); } }
 prims['output'] = { nargs: 1, flow: true, fcn: function (x) { return this.procOutput(this, x); } }
@@ -1925,12 +1926,6 @@ prims['quotiant'] = { nargs: 2, fcn: function (a, b) { return a / b; } }
 prims['ln'] = { nargs: 1, fcn: function (a) { return Math.log(this.getnum(a)) } }
 prims['power'] = { nargs: 2, fcn: function (a, b) { return Math.pow(this.getnum(a), this.getnum(b)) } }
 prims['exp'] = { nargs: 1, fcn: function (a) { return Math.pow(2.71828, this.getnum(a)) } }
-
-
-
-
-
-
 
 
 prims['se'] = { nargs: 2, fcn: function (a, b) { return [].concat(a, b); } }

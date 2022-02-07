@@ -42,22 +42,53 @@ function UserMenu(props) {
         });
     }
 
+
     return (
         <div style={menuStyle}>
 
-                <h4 onClick={signOut} style={textStyle}>Sign Out</h4>
-                {
-                    projectList.map((project) =>
-                        <div className="project" key={project.title} style={{marginTop: "5px", padding: "5px"}}>
-                            <span key={`${project.title}span`} onClick={() => { props.getSingleProject(project.projectId) }} style={{ marginRight: "10px" }}>{project.title}</span><br />
-                            <span key={`${project.title}del`} style={{ marginRight: "10px", fontSize: "1rem" }} onClick={() => { props.deleteProject(project.projectId) }}>[delete]</span>
-                            <span key={`${project.title}copy`} style={{ fontSize: "1rem" }} onClick={() => { copyProjectLink(`${project.projectId}`) }}>[copy link]</span>
-                        </div>
+            <h4 onClick={signOut} style={textStyle}>Sign Out</h4>
+            {
+                projectList.map((project) =>
+                    <div className="project" key={project.title} style={{ marginTop: "5px", padding: "5px" }}>
+                        <span key={`${project.title}span`} onClick={() => { props.getSingleProject(project.projectId) }} style={{ marginRight: "10px" }}>{project.title}</span><br />
+                        <span key={`${project.title}del`} style={{ marginRight: "10px", fontSize: "1rem" }} onClick={() => { props.deleteProject(project.projectId) }}>[delete]</span>
+                        <span key={`${project.title}copy`} style={{ fontSize: "1rem", marginRight: '10px' }} onClick={() => { copyProjectLink(`${project.projectId}`) }}>[copy link]</span>
+                        {project.dataIndex ?
+                            <span key={`${project.title}data`} style={{ fontSize: "1rem" }}>[data]</span>
+                            :
+                            null
+                        }
 
-                    )
+                        {project.dataIndex ?
+                            <>
+                                {
+                                    project.dataIndex.map((dataEntry) =>
 
-                }
-            </div>
+                                        <div className='user-menu-data block'>
+                                            <p><strong>Saved Data</strong></p>
+                                            <ul style={{ padding: '10px' }}>
+                                                <span>{new Date(dataEntry).toLocaleString().split(',')[0]}</span>
+                                                <br />
+                                            </ul>
+                                        </div>
+
+
+                                    )
+
+                                }
+                            </>
+
+                            :
+                            null
+
+                        }
+
+                    </div>
+
+                )
+
+            }
+        </div>
 
     )
 

@@ -16,6 +16,7 @@ import DataTable from './components/DataTable';
 import Terminal from './components/Terminal';
 import 'firebase/auth';
 
+
 let interpreter, projects;
 
 const App = () => {
