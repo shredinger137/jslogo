@@ -16,41 +16,23 @@ function DataTable(props) {
 
     function importData() {
 
-        //Parse a file made up of lines of space delineated text, create a 2d array for mapping
-
-        //So far this doesn't create values that can be referenced or used for playback
-
-        //Also doesn't necessarily cover all packet types. I'm making some assumptions about file structure here.
-
-        //Note that we may need to support different 'types' later, but that's a discussion.
+        //In the current version of packets we expect 9 columns - Type, Time, ADC 0 - 5, Checksum. Even if all the sensors aren't used,
+        //this is what we're looking for. CSV is comma deli... comma is used to separate the columns.
 
         var parsedFile = [];
-        var typed = false;
 
         const input = document.getElementById("loadData");
         const file = input.files[0];
         var fileReader = new FileReader();
 
         fileReader.onload = function (fileLoadedEvent, context) {
-
             var textFromFileLoaded = fileLoadedEvent.target.result;
-            if (textFromFileLoaded.charAt(0) == "T" && textFromFileLoaded.charAt(0) != 'i') {
-                console.log("T");
-                typed = true;
-            }
-
             var textInLines = textFromFileLoaded.split("\n"); //create an array of lines
+            textInLines.shift(); //remove header; we assume it exists but should probably check
 
             for (var line of textInLines) {
-                var lineData = line.split(" ");
-                if (typed) {
-                    lineData.splice(2, 2);
-                    lineData.shift();
-                    lineData.pop();
-                }
-
-                parsedFile.push(lineData);
-
+                var lineData = line.split(",");
+                    parsedFile.push(lineData);           
             }
 
             props.setTableData(parsedFile);
