@@ -1,4 +1,8 @@
 /* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off", no-use-before-define: "off" */
+//NEXT TODO: Either use a new function or check something in ticker if it runs constantly as the name implies. When 'startreading' has been done,
+//check all sensors every half second and update a state variable. Display that in semi-realtime. Later, allow the bitrate to be changed. Assuming
+//doing it in the first place doesn't screw performance.
+
 
 import Tokenizer from './Tokenizer';
 import turtleMath from './turtleMath';
@@ -45,7 +49,6 @@ export default class Interpreter {
         this.ticker = this.ticker.bind(this);
         this.isDone = this.isDone.bind(this);
 
-        this.addToChart = props.addToChart;
         this.pushToTable = props.pushToTable;
 
         this.cnvWidth = 1000;
@@ -1722,6 +1725,7 @@ export default class Interpreter {
         }
     }
 
+
     //TODO: There's no error handling for disconnect/reconnect events. This assumes everything works perfectly.
     //Add a state to track if the connection is live. 
 
@@ -1766,7 +1770,7 @@ export default class Interpreter {
 
                 // var string = new TextDecoder("utf-8").decode(value);
                 //   console.log(string);
-
+                var convertedValue = Array.from(new Uint8Array(value));
                 this.handleReceiveData(value);
 
                 //I guess I didn't need this part? Is it for the packet example above?
@@ -1858,6 +1862,7 @@ prims['limits'] = {
 
 prims['calibrate-list'] = { nargs: 3, fcn: function (a, b, c) { return this.calibrateList(a, b, c) } }
 prims['logData'] = { nargs: 1, fcn: function (a) { this.pushToTable(a) } }
+prims['save-data'] = { nargs: 1, fcn: function (a) { this.pushToTable(a) } }
 prims['clear-data'] = {nargs: 0, fcn: function(){this.pushToTable(false)}}
 prims['repeat'] = { nargs: 2, flow: true, fcn: function (a, b) { this.repeat(a, b); } }
 prims['forever'] = { nargs: 1, flow: true, fcn: function (a) { this.loop(a); } }
@@ -1869,6 +1874,7 @@ prims['show-plot'] = { nargs: 0, fcn: function (n) { this.initPlot() } }
 
 prims['break'] = { nargs: 0, fcn: function (n) { this.break() } }
 
+prims['..'] = { nargs: 0, flow: true, fcn: function () { this.procOutput(this); } }
 prims['.'] = { nargs: 0, flow: true, fcn: function () { this.procOutput(this); } }
 prims['stop'] = { nargs: 0, flow: true, fcn: function () { this.procOutput(this); } }
 prims['output'] = { nargs: 1, flow: true, fcn: function (x) { return this.procOutput(this, x); } }
@@ -1920,12 +1926,6 @@ prims['quotiant'] = { nargs: 2, fcn: function (a, b) { return a / b; } }
 prims['ln'] = { nargs: 1, fcn: function (a) { return Math.log(this.getnum(a)) } }
 prims['power'] = { nargs: 2, fcn: function (a, b) { return Math.pow(this.getnum(a), this.getnum(b)) } }
 prims['exp'] = { nargs: 1, fcn: function (a) { return Math.pow(2.71828, this.getnum(a)) } }
-
-
-
-
-
-
 
 
 prims['se'] = { nargs: 2, fcn: function (a, b) { return [].concat(a, b); } }
@@ -2015,6 +2015,7 @@ prims['drawsnap'] = { nargs: 1, fcn: function (n) { this.hold = true; this.loadi
 prims['flushtime'] = { nargs: 1, fcn: function (n) { flushtime = this.getnum(n); } }
 
 prims['( '] = { nargs: 1, fcn: function (x) { this.evline.shift(); return x; } }
+
 prims['se '] = { nargs: 'ipm', fcn: function () { return this.ipm_se(arguments); } }
 
 prims['now'] = { nargs: 0, fcn: function () { return Math.floor(Date.now() / 1000) } }

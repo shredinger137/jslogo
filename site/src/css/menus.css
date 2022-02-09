@@ -59,3 +59,17 @@
   #go-button {
       margin-right: 15px;
   }
+
+
+.user-menu-data {
+    top: 10px;
+    background-color: #1AA38F;
+    position: absolute;
+    left: calc(100%);
+    min-height: 100px;
+    display: none;
+}
+
+.block {
+    display: block;
+}
