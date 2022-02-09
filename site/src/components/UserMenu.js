@@ -15,11 +15,15 @@ function UserMenu(props) {
 
     const menuStyle = {
         minWidth: '200px',
+        maxHeight: '90vh',
+        minHeight: 'calc(100vh - 50px)',
         paddingRight: '35px',
         paddingLeft: '5px',
         fontSize: "1.2rem",
         cursor: "pointer",
-        zIndex: 999
+        zIndex: 999,
+        overflowY: 'auto',
+        paddingBottom: '25px'
     }
 
     const textStyle = {
@@ -46,20 +50,21 @@ function UserMenu(props) {
     return (
         <div style={menuStyle}>
 
-            <h4 onClick={signOut} style={textStyle}>Sign Out</h4>
-            {
-                projectList.map((project) =>
-                    <div className="project" key={project.title} style={{ marginTop: "5px", padding: "5px" }}>
-                        <span key={`${project.title}span`} onClick={() => { props.getSingleProject(project.projectId) }} style={{ marginRight: "10px" }}>{project.title}</span><br />
-                        <span key={`${project.title}del`} style={{ marginRight: "10px", fontSize: "1rem" }} onClick={() => { props.deleteProject(project.projectId) }}>[delete]</span>
-                        <span key={`${project.title}copy`} style={{ fontSize: "1rem", marginRight: '10px' }} onClick={() => { copyProjectLink(`${project.projectId}`) }}>[copy link]</span>
+                <h4 onClick={signOut} style={textStyle}>Sign Out</h4>
+                {
+                    projectList.map((project) =>
+                        <div className="project" key={project.title} style={{ marginTop: "5px", padding: "5px" }}>
+                            <span key={`${project.title}span`} onClick={() => { props.getSingleProject(project.projectId) }} style={{ marginRight: "10px" }}>{project.title}</span><br />
+                            <span key={`${project.title}del`} style={{ marginRight: "10px", fontSize: "1rem" }} onClick={() => { props.deleteProject(project.projectId) }}>[delete]</span>
+                            <span key={`${project.title}copy`} style={{ fontSize: "1rem", marginRight: '10px' }} onClick={() => { copyProjectLink(`${project.projectId}`) }}>[copy link]</span>
 
 
-                    </div>
+                        </div>
 
-                )
+                    )
 
-            }
+                }
+
         </div>
 
     )

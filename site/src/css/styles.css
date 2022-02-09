@@ -97,7 +97,7 @@
 	.menu {
     padding-right: 20px;
     padding-left: 5px;
-    position: absolute;
+    position: fixed;
     top: 45px;
     left: 0;
     background-color: black;
@@ -111,7 +111,7 @@
   }
 
   .userMenu {
-    height: 100vh;
+    
     background-color: #1A74A3;
     position: absolute;
     left: 0;
