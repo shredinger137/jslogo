@@ -153,7 +153,7 @@ end`,);
       return
     }
     if (chartType == "bottom") {
-      setChartOptionsBottom(newData);
+      setChartDataBottom(newData);
       return;
     }
 
