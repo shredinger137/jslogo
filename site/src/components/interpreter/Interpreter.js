@@ -1760,6 +1760,13 @@ export default class Interpreter {
 
     async startReading() {
 
+        //send a handshake of sorts; read ADC0, then discard the result
+        //this fixes a bug where the first read is often something like 19279, junk data
+
+        var message = new Uint8Array([0xc00])
+        const writer = outputStream.getWriter();
+        writer.write(message);
+        writer.releaseLock();
 
         while (true) {
             const { value, done } = await reader.read();

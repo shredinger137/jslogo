@@ -13,13 +13,13 @@ export const includes =
 
         let "i 0
         make '_last-packet' :_packet-type
-       ; make "_last-packet se :_last-packet :_packet-type
         make "_last-packet se :_last-packet now
 
-        repeat :_packet-length [
-            make "_last-packet se :_last-packet ( readADC :i )
+        repeat ( :_packet-length ) [
+            let "_adc-holder readADC :i
+            make "_last-packet se :_last-packet ( :_adc-holder )
             let 'i' :i + 1
-            make "_checksum :_checksum + (readADC :i)
+            make "_checksum :_checksum + (:_adc-holder)
         ]
 
         make "_last-packet se :_last-packet :_checksum

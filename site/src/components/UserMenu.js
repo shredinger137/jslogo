@@ -54,7 +54,7 @@ function UserMenu(props) {
                 {
                     projectList.map((project) =>
                         <div className="project" key={project.title} style={{ marginTop: "5px", padding: "5px" }}>
-                            <span key={`${project.title}span`} onClick={() => { props.getSingleProject(project.projectId) }} style={{ marginRight: "10px" }}>{project.title}</span><br />
+                            <span key={`${project.title}span`} onClick={() => { console.log('got click'); props.getSingleProject(project.projectId) }} style={{ marginRight: "10px" }}>{project.title}</span><br />
                             <span key={`${project.title}del`} style={{ marginRight: "10px", fontSize: "1rem" }} onClick={() => { props.deleteProject(project.projectId) }}>[delete]</span>
                             <span key={`${project.title}copy`} style={{ fontSize: "1rem", marginRight: '10px' }} onClick={() => { copyProjectLink(`${project.projectId}`) }}>[copy link]</span>
 
