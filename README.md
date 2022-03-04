@@ -1,5 +1,5 @@
 # Learning by Making JSLogo
-A [Logo](https://en.wikipedia.org/wiki/Logo_(programming_language) interpreter build for the browser.
+A [Logo](https://en.wikipedia.org/wiki/Logo_(programming_language)) interpreter build for the browser.
 
 ## About
 The Learning by Making app is a product of EdEon at Sonoma State University. Development of the app was funded primarily by the U.S. Department of Education. The source code is licensed with the Creative Commons Non-Commerical Share-Alike 4.0 license. The live version can be seen at [app.lbym.org](https://app.lbym.org). The project homepage is located at [lbym.sonoma.edu](https://lbym.sonoma.edu) and contains, among other things, links to the classroom curriculum. 
