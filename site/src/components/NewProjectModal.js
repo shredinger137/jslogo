@@ -29,35 +29,56 @@ export default class NewProjectModal extends Component {
 
     loadCodeFromProject(projectName) {
         var scopedUpdateCode = this.props.updateCode;
- 
 
-                for (var project of this.state.projectsAvailable) {
-                    if (project.name === projectName) {
-                        if (project.fileLocation) {
-                            var request = new XMLHttpRequest();
-                            request.open('GET', project.fileLocation, true);
-                            request.send(null);
-                            request.onreadystatechange = function () {
-                                if (request.readyState === 4 && request.status === 200) {
-                                    scopedUpdateCode(request.responseText);
-                                    document.getElementById("projectTitle").value = "Untitled"
 
-                                    //TODO: This is a hack. We shouldn't do it. Look at how data flows and fix it.
-                                    
-                                    document.getElementById("dummyClickToClearPid").click();
-                                    document.getElementById('dummyClickToClearAuthor').click();
-                                }
-                            }
-                        } else {
-                            console.log("error: no filename specified");
+        for (var project of this.state.projectsAvailable) {
+            if (project.name === projectName) {
+                if (project.code) {
+                    scopedUpdateCode(project.code);
+                    var request = new XMLHttpRequest();
+                    request.open('GET', project.code, true);
+                    request.send(null);
+                    request.onreadystatechange = function () {
+                        if (request.readyState === 4 && request.status === 200) {
+                            scopedUpdateCode(request.responseText);
+                            document.getElementById("projectTitle").value = "Untitled"
+
+                            //TODO: This is a hack. We shouldn't do it. Look at how data flows and fix it.
+
+                            document.getElementById("dummyClickToClearPid").click();
+                            document.getElementById('dummyClickToClearAuthor').click();
                         }
                     }
-                    this.props.toggleModal();
+
+
+                    
                 }
+
+                else if (project.fileLocation) {
+                    var request = new XMLHttpRequest();
+                    request.open('GET', project.fileLocation, true);
+                    request.send(null);
+                    request.onreadystatechange = function () {
+                        if (request.readyState === 4 && request.status === 200) {
+                            scopedUpdateCode(request.responseText);
+                            document.getElementById("projectTitle").value = "Untitled"
+
+                            //TODO: This is a hack. We shouldn't do it. Look at how data flows and fix it.
+
+                            document.getElementById("dummyClickToClearPid").click();
+                            document.getElementById('dummyClickToClearAuthor').click();
+                        }
+                    }
+                } else {
+                    console.log("error: no filename specified");
+                }
+            }
+            this.props.toggleModal();
+        }
     }
 
 
-    stopProp(e){
+    stopProp(e) {
         e.stopPropagation();
     }
 
@@ -71,7 +92,7 @@ export default class NewProjectModal extends Component {
                     <div>
                         {this.state.projectsAvailable.map(project => (
                             <div key={project.name + "div"}>
-                                <span style={{cursor: "pointer"}}  onClick={() => { this.loadCodeFromProject(project.name) }} key={project.name}>{project.name}</span><br />
+                                <span style={{ cursor: "pointer" }} onClick={() => { this.loadCodeFromProject(project.name) }} key={project.name}>{project.name}</span><br />
                             </div>
                         )
                         )
