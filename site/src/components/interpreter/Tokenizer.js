@@ -2,7 +2,7 @@
 
 export default class Tokenizer {
     constructor(stringToEvaluate) {
-        this.stringToEvaluate = stringToEvaluate;
+        this.stringToEvaluate = stringToEvaluate.replace('//', ';');
         this.offset = 0;
     }
 

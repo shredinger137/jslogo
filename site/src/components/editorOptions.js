@@ -134,6 +134,7 @@ export const languageDef = {
       [/\s+/, "white"],
       [/;.*$/, 'comment'],
       [/;.*$/, 'comment'],
+      [/\/\/.*$/, 'comment']
     ],
     numbers: [
       [/[0-9]/, "number"],
