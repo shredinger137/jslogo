@@ -6,7 +6,7 @@ The Learning by Making app is a product of EdEon at Sonoma State University. Dev
 
 
 ## Running Locally
-This project contains folders for each component. The API is a Node.js process and handles cloud save features, logging and things like that. It isn't critical and can be skipped. If you do run it, you'll need NodeJS and MongoDB. These two components can be run together use concurrently with the start script 'dev' in /site. Note that each component has it's own package.json file.
+This project contains folders for each component. The API is a Node.js process and handles cloud save features, logging and things like that. It isn't critical and can be skipped. If you do run it, you'll need NodeJS and MongoDB. These two components can be run together using concurrently with the start script `dev` in `/site`. Note that each component has it's own package.json file.
 
 To run the API and frontend for the first time:
 
@@ -20,4 +20,4 @@ npm run dev
 ```
 
 ## Experiment Files
-The LbyM curriculum uses templates for student projects, referred to as 'experiments'. In the source code these can be found in site/src/experiments and the index can be found in site/src/data/experiments.js. To modify one, edit the .logo file in the first folder. To add a new one, create a .logo file, then add it to the experiments.js list following the pattern of the others. Import it at the top, include that import as the code item.
+The LbyM curriculum uses templates for student projects, referred to as 'experiments'. In the source code these can be found in `site/src/experiments` and the index can be found in `site/src/data/experiments.js`. To modify one, edit the .logo file in the first folder. To add a new one, create a .logo file, then add it to the experiments.js list following the pattern of the others. Import it at the top, include that import as the code item.

@@ -34,7 +34,6 @@ export default class NewProjectModal extends Component {
         for (var project of this.state.projectsAvailable) {
             if (project.name === projectName) {
                 if (project.code) {
-                    scopedUpdateCode(project.code);
                     var request = new XMLHttpRequest();
                     request.open('GET', project.code, true);
                     request.send(null);
