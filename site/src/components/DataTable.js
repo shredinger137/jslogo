@@ -88,6 +88,7 @@ function DataTable(props) {
                     <tr>
                         <th>Type</th>
                         <th>Time</th>
+                        <th>Count</th>
                         <th>ADC0</th>
                         <th>ADC1</th>
                         <th>ADC2</th>
@@ -106,33 +107,34 @@ function DataTable(props) {
                                 <td key={`${dataLine[0]}${row}type`} >{dataLine[0]}</td>
                                 <td key={`${dataLine[0]}${row}time`} >{dataLine[1]}</td>
                                 <td key={`${dataLine[0]}${row}1`}>{dataLine[2]}</td>
-                                {
-                                    dataLine.length > 4 ?
-                                        <td key={`${dataLine[0]}${row}2`}>{dataLine[3]}</td>
-                                        :
-                                        <td></td>
-                                }
+                                <td key={`${dataLine[0]}${row}count`}>{dataLine[3]}</td>
                                 {
                                     dataLine.length > 5 ?
-                                        <td key={`${dataLine[0]}${row}3`}>{dataLine[4]}</td>
+                                        <td key={`${dataLine[0]}${row}2`}>{dataLine[4]}</td>
                                         :
                                         <td></td>
                                 }
                                 {
                                     dataLine.length > 6 ?
-                                        <td key={`${dataLine[0]}${row}4`}>{dataLine[5]}</td>
+                                        <td key={`${dataLine[0]}${row}3`}>{dataLine[5]}</td>
                                         :
                                         <td></td>
                                 }
                                 {
                                     dataLine.length > 7 ?
-                                        <td key={`${dataLine[0]}${row}5`}>{dataLine[6]}</td>
+                                        <td key={`${dataLine[0]}${row}4`}>{dataLine[6]}</td>
                                         :
                                         <td></td>
                                 }
                                 {
                                     dataLine.length > 8 ?
-                                        <td key={`${dataLine[0]}${row}6`}>{dataLine[7]}</td>
+                                        <td key={`${dataLine[0]}${row}5`}>{dataLine[7]}</td>
+                                        :
+                                        <td></td>
+                                }
+                                {
+                                    dataLine.length > 9 ?
+                                        <td key={`${dataLine[0]}${row}6`}>{dataLine[8]}</td>
                                         :
                                         <td></td>
                                 }

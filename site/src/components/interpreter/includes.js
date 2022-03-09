@@ -14,6 +14,7 @@ export const includes =
         let "i 0
         make '_last-packet' :_packet-type
         make "_last-packet se :_last-packet now
+        make "_last-packet se :_last-packet :_packet-length
 
         repeat ( :_packet-length ) [
             let "_adc-holder readADC :i
