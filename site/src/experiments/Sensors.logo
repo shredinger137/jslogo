@@ -1,0 +1,144 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;; Sensors  Version ;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;this is our primary point of entry into the code
+to go  
+
+	;Takes the average of 5 measurements and prints it.
+	;We make a variable, suml, and add light measurements to it five times
+	;After that we'll divide out the five (to get an average) and print it
+
+	ob1on
+	wait 10
+	ob1off
+    let "suml 0
+    let "sumt0 0
+    let "sumt1 0
+	repeat 5 [
+		let "light readLightSensor 
+        let "suml ( :suml + :light )
+	]
+    print 'Average Light Value: ' + (:suml / 5)
+    
+	; repeat 5 [
+    ;    let "sumt0 ( :sumt0 + readTempSensor0 )
+    ; ]
+    ; print 'Average Temp0 Value: ' + (:sumt0 / 5)
+    ; repeat 5 [
+    ;     let "sumt1 ( :sumt1 + readTempSensor1 )
+    ; ]
+    ; print 'Average Temp1 Value: ' + (:sumt1 / 5)
+
+end
+
+to run-forever
+	ob1on
+	wait 10
+	ob1off	
+
+    loop [
+        let "light readLightSensor
+		print :light
+		wait 10
+	]
+end
+
+to run-once-3TMP
+
+    ob1on
+	wait 10
+	ob1off
+    let "sumt2 0
+    let "sumt0 0
+    let "sumt1 0
+	
+    
+	repeat 5 [
+       let "sumt0 ( :sumt0 + readTempSensor0 )
+    ]
+    print 'Average Temp0 Value: ' + ( :sumt0 / 5 )
+    repeat 5 [
+         let "sumt1 ( :sumt1 + readTempSensor1 )
+     ]
+    print 'Average Temp1 Value: ' + (:sumt1 / 5)
+
+    repeat 5 [
+        let "sumt2 (:sumt2 + readTempSensor2)
+	]
+    print 'Average Temp2 Value: ' + (:sumt2 / 5)
+
+end
+
+to run-3temp  :ntimes  :nwait
+    ob1on
+	wait 10
+	ob1off
+    make "temp2 []
+    make "temp1 []
+    make "temp0 []
+    make "time-list []
+    let "ic 0
+	
+    repeat :ntimes [
+        make "temp0 ( se :temp0 readTempSensor0 ) 
+        print :ic 
+        make  "temp1 ( se :temp1  readTempSensor1 ) 
+        make "temp2 ( se :temp2  readTempSensor2 ) 
+        wait :nwait 
+        make "time-list ( se :time-list :ic * :nwait / 10 )
+        let "ic ( :ic + 1 )
+    ]
+    
+    print 'temp0 values: ' + :temp0
+    print 'temp1 values: ' + :temp1
+    print 'temp2 values: ' + :temp2
+    print 'times: ' + :time-list
+
+end
+
+
+
+to run-cal :coldADU :coldT :warmADU :warmT
+    
+    make "temp0-list [] ;temperature calibration data
+    make "temp1-list [] ;temperature calibration data 
+    let "icount 0
+
+    ;initialize plots; these will update as the data changes
+    init-plot-temp0
+    init-plot-temp1
+
+    ;we use the line equation to set up our calibration
+    make "slope  ( ( :coldT - :warmT ) / (:coldADU - :warmADU ) )
+    make "yintercept ( :coldT - :slope * :coldADU )
+    print 'y = ' + :slope + ' x + ' + :yintercept
+
+    ;repeat the calibration for as many items as there are in temp0, which should be the same as temp1
+    repeat (count :temp0) [
+        make "temp1-list ( se :temp1-list ( :slope * ( nth :icount :temp1 ) ) + :yintercept )
+        make "temp0-list ( se :temp0-list ( :slope * ( nth :icount :temp0 ) ) + :yintercept )
+        let "icount ( :icount + 1 )
+    ]
+
+end
+
+to readTempSensor2
+    return readADC2
+end
+
+to init-plot-temp0
+    top-plot
+	plot-title 'Temp 0' 
+	x-data "time-list   ; xdata is time
+	y-data "temp0-list  ; ydata is temp2
+	show-plot
+end
+
+to init-plot-temp1
+    bottom-plot
+	plot-title 'Temp 1' 
+	x-data "time-list   ; xdata is time
+	y-data "temp1-list  ; ydata is temp2
+	show-plot
+end

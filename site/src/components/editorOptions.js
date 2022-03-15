@@ -17,7 +17,7 @@ export const languageDef = {
   defaultToken: "",
   number: /\d+(\.\d+)?/,
   keywords: [
-    'receive',
+    'receive-packet',
     'packet',
     "read",
     "ir",
@@ -134,6 +134,7 @@ export const languageDef = {
       [/\s+/, "white"],
       [/;.*$/, 'comment'],
       [/;.*$/, 'comment'],
+      [/\/\/.*$/, 'comment']
     ],
     numbers: [
       [/[0-9]/, "number"],

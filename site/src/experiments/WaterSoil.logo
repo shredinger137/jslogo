@@ -1,0 +1,177 @@
+;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;; Water Soil ;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;
+
+;this is our primary point of entry into the code
+to run-once-soil    
+    make "playback false
+    make "time-length 0
+    make "experiment-type 0
+    init ;set the experiment into a state where it is running and collecting data
+    loop [ ;main program loop
+    	if (elapsedTime > ( 60 * 20 )) [ stop ] ;run this for 20 minutes and then stop
+	dp4on
+	receive-packet  ;waits until a packet is available, and then returns it so we can process it
+    dp4off
+	wait 100	    ;waits for ~10 seconds
+end
+
+to run-forever-soil
+    make "playback false
+    make "time-length 1
+    make "experiment-type 0
+    init ;set the experiment into a state where it is running and collecting data
+    loop [ ;main program loop
+    	if (elapsedTime > ( 60 * 60 * 24 )) [ stop ] ;run this for 24 hours and then stop
+	dp4on
+	receive-packet  ;waits until a packet is available, and then returns it so we can process it
+    dp4off
+	wait 6000	    ;waits for ~10 minutes
+end
+ 
+to run-once-evap 
+	make "playback false 
+	make "experiment-type 1  
+	init ;set the experiment into a state where it is running and collecting data
+	loop [ ;main program loop
+		if (elapsedTime > ( 60 * 20 )) [ stop ] ;run this for 20 minutes, and then stop.  
+		receive-packet ;waits until a packet is available, and then returns it so we can process it    
+		wait 100	;waits for ~10 seconds
+	]
+end
+
+to run-forever-evap 
+	make "playback false   
+	make "experiment-type 1
+	init ;set the experiment into a state where it is running and collecting data
+	loop [ ;main program loop
+		  
+		receive-packet ;waits until a packet is available, and then returns it so we can process it    
+		wait 6000	;waits for ~10 minutes
+	]
+end
+
+;initializes jlogo
+to init
+    make "type 13
+    print (se "|Starting | :project-name) ;print an init message
+    init-jlogo ;initialize jLogo
+end
+
+;makes the need calibration lists
+to init-calibration
+    make "moisture_cal [] 		    ;the calibration list of the moisture sensor
+    make "temp0_cal []				;the calibration list of the temperature0 sensor
+    make "temp1_cal [] 			    ;the calibration list of the temperature1 sensor
+    make "hour_cal [ 0 0 3600 1 ] 	;the calibration list of seconds to hours
+    make "divided-list []           ;list for normalized moisture values
+end
+
+;handles a packet after it has been received
+to process-data-packet
+    if not (:type = 13) [ stop ] ;check to make sure we have the right packet type, if not, stop
+
+    if (:experiment-type = 0) [
+    calibrate-list "moisture-list :p13-word00 :moisture_cal ] ;calibrate list of ADU into list of % humidity
+    if (:experiment-type = 1) [
+    calibrate-list "temp0-list :p13-word00 :temp0_cal ]		;calibrate list of ADU into list of deg_C
+
+    calibrate-list "temp1-list :p13-word01 :temp1_cal          ;calibrate list of ADU into list of deg_C
+    calibrate-list "hour-list :time-list :hour_cal            ;calibrate list of seconds into hours
+
+    make "temp1-value (last :p13-word01)
+    make "moisture-value (last :p13-word00)
+
+    make "divided-list se :divided-list (:moisture-value * 10) / :temp1-value
+
+    if (:experiment-type = 0) [
+    plot-moisture
+    wait 10
+    plot-temperature ]
+
+    if (:experiment-type = 1) [
+    plot-temperature0
+    wait 10
+    plot-temperature1 ]
+end
+
+to plot-moisture
+    plot-title "|Moisture|			; every plot must start with a title
+    top-plot					    ; one plot on top right
+    						        ; other options are one-plot and bottom-plot
+
+    if (:time-length = 0) [ x-data "|Elapsed_Time_(seconds)| :time-list ]	; xdata is time in seconds
+    if (:time-length = 1) [ x-data "|Elapsed _Time_(hours)| :hour-list ]    ; xdata is time in hours
+
+    y-data "|Moisture_(ADU)| :moisture-list	; ydata is moisture
+    select-all					            ; select all times
+    limits xlower xupper ylower yupper		; auto scale both x and y axis
+    x-tick 10 5					            ; 10 major ticks 5 minor ticks per major tick
+    y-tick 5 4					            ; 5 major ticks 4 minor ticks per major tick
+
+    show-plot
+end
+
+to plot-temperature
+    plot-title "|Temperature |			; every plot must start with a title
+    bottom-plot					        ; one plot on bottom right
+    						            ; other options are one-plot and top-plot
+
+    if (:time-length = 0) [ x-data "|Elapsed_Time_(seconds)| :time-list	]   ; xdata is time in seconds
+    if (:time-length = 1) [ x-data "|Elapsed _Time_(hours)| :hour-list  ]   ; xdata is time in hours
+
+    y-data "|Temp_(ADU)| :temp1-list	    ; ydata is temperature
+    select-all					            ; select all times
+    limits xlower xupper ylower yupper		; auto scale both x and y axis
+    x-tick 10 5					            ; 10 major ticks 5 minor ticks per major tick
+    y-tick 5 4					            ; 5 major ticks 4 minor ticks per major tick
+
+    show-plot
+end
+
+to plot-temperature0
+    plot-title "|Temperature 0|			; every plot must start with a title
+    top-plot					        ; one plot on top right
+    						            ; other options are one-plot and top-plot
+
+	x-data "|Elapsed_Time_(seconds)| :time-list   ; xdata is time in seconds
+    y-data "|Temp_0_(deg_C)| :temp0-list	; ydata is temperature
+    select-all					            ; select all times
+    limits xlower xupper ylower yupper		; auto scale both x and y axis
+    x-tick 10 5					            ; 10 major ticks 5 minor ticks per major tick
+    y-tick 5 4					            ; 5 major ticks 4 minor ticks per major tick
+
+    show-plot
+end
+
+to plot-temperature1
+    plot-title "|Temperature 1|			; every plot must start with a title
+    bottom-plot					        ; one plot on bottom right
+    						            ; other options are one-plot and top-plot
+
+    x-data "|Elapsed_Time_(seconds)| :time-list   ; xdata is time in seconds
+    y-data "|Temp_1_(deg_C)| :temp1-list	; ydata is temperature
+    select-all					            ; select all times
+    limits xlower xupper ylower yupper		; auto scale both x and y axis
+    x-tick 10 5					            ; 10 major ticks 5 minor ticks per major tick
+    y-tick 5 4					            ; 5 major ticks 4 minor ticks per major tick
+
+    show-plot
+end
+
+to plot-moisture-div
+    plot-title "|Moisture Normalized|	; every plot must start with a title
+    bottom-plot					        ; one plot on bottom right
+    						            ; other options are one-plot and top-plot
+
+    if (:time-length = 0) [ x-data "|Elapsed_Time_(seconds)| :time-list	]   ; xdata is time in seconds
+    if (:time-length = 1) [ x-data "|Elapsed _Time_(hours)| :hour-list  ]   ; xdata is time in hours
+
+    y-data "|Moisture| :divided-list	; ydata is temperature
+    select-all					        ; select all times
+    limits xlower xupper ylower yupper	; auto scale both x and y axis
+    x-tick 10 5                          ; 5 major ticks 4 minor ticks per major tick
+    y-tick 5 4					        ; 5 major ticks 4 minor ticks per major tick
+
+    show-plot
+end

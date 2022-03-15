@@ -15,9 +15,12 @@ import Chart from './components/Chart';
 import DataTable from './components/DataTable';
 import Terminal from './components/Terminal';
 import 'firebase/auth';
+//import WorkerBuilder from './components/worker-builder';
+//import Worker from './components/logoWorker';
 
 
 let interpreter, projects;
+//let instance = new WorkerBuilder(Worker);
 
 const App = () => {
 
@@ -63,6 +66,16 @@ end`,);
 
 
   const setup = () => {
+
+    /*
+    Web worker experiment
+    *****
+    instance.onmessage = (message) => {
+      if (message) {
+        console.log("Message from worker", message.data);
+      }
+    };
+    */
 
     console.log("Serial API Check:", checkIfSerialCapable());
 
@@ -176,7 +189,7 @@ end`,);
     }
 
     setDataTable(DataTable => [...DataTable, newDataLine]);
-    
+
   }
 
   const updateCode = (newCode) => {
