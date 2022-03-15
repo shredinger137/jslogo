@@ -84,7 +84,7 @@ function DataTable(props) {
             <span onClick={pickFile} style={{ marginLeft: "20px" }}>Import</span>
             <span style={{ marginLeft: "20px" }}>{props.pid ? 'Save' : null}</span>
             <table style={{ width: "80%" }}>
-                <thead style={{ textAlign: "left" }}>
+                <thead style={{ textAlign: "center" }}>
                     <tr>
                         <th>Type</th>
                         <th>Time</th>
@@ -98,7 +98,7 @@ function DataTable(props) {
                         <th>CHCK</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody style={{textAlign: 'center'}}>
                     {props.tableData.map(dataLine => {
                         //hack to stop getting warnings about matchine keys when time is the same (less than a second)
                         row++;

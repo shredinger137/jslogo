@@ -59,8 +59,8 @@ end
 to process-data-packet :packet
 
     ;add readings from 1st and 2nd pins to lists
-    make "temp0-data se (:temp0-data) (nth 2 :packet) 
-    make "temp1-data se (:temp1-data) (nth 3 :packet)
+    make "temp0-data se (:temp0-data) (nth 3 :packet) 
+    make "temp1-data se (:temp1-data) (nth 4 :packet)
     make "time-list se (:time-list) (now - :startTime) 
 
     ;calibrate list of ADU into list of Deg C
