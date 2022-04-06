@@ -33,8 +33,11 @@ export default class NewProjectModal extends Component {
 
         for (var project of this.state.projectsAvailable) {
             if (project.name === projectName) {
+
+                var request = new XMLHttpRequest();
+
                 if (project.code) {
-                    var request = new XMLHttpRequest();
+
                     request.open('GET', project.code, true);
                     request.send(null);
                     request.onreadystatechange = function () {
@@ -54,7 +57,7 @@ export default class NewProjectModal extends Component {
                 }
 
                 else if (project.fileLocation) {
-                    var request = new XMLHttpRequest();
+
                     request.open('GET', project.fileLocation, true);
                     request.send(null);
                     request.onreadystatechange = function () {

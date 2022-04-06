@@ -1266,7 +1266,7 @@ export default class Interpreter {
     updateChartData(chartType) {
         var t = this;
         var chartData = [];
-        var counter = 1;
+        var counter = 0;
         var xDataArray = [];
         var yDataArray = [];
 
@@ -1295,10 +1295,9 @@ export default class Interpreter {
 
         if (xDataArray) {
             if (yDataArray) {
-                for (var xValue of xDataArray) {
-                    if (yDataArray[counter]) {
-                        chartData.push({ x: xValue, y: yDataArray[counter] });
-                        counter++;
+                for (let count = 0; count <= xDataArray.length; count++) {
+                    if (yDataArray[count]) {
+                        chartData.push({ x: xDataArray[count], y: yDataArray[count] });
                     }
                 }
             }
@@ -1778,7 +1777,7 @@ export default class Interpreter {
 
                 // var string = new TextDecoder("utf-8").decode(value);
                 //   console.log(string);
-                var convertedValue = Array.from(new Uint8Array(value));
+                //var convertedValue = Array.from(new Uint8Array(value));
                 this.handleReceiveData(value);
 
                 //I guess I didn't need this part? Is it for the packet example above?

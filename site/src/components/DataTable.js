@@ -45,7 +45,7 @@ function DataTable(props) {
 
     function exportData() {
         var filename = "data.csv";
-        var textToSave = "Time,ADC0,ADC1,ADC2,ADC3,ADC4,ADC5\n";
+        var textToSave = "Type,Time,Count,ADC0,ADC1,ADC2,ADC3,ADC4,ADC5,CHCK\n";
         console.log(props.tableData);
         if (props.tableData) {
             for (var dataLine of props.tableData) {

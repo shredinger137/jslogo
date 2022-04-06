@@ -34,6 +34,7 @@ end`,);
   let pid = null;
   var editor = null;
 
+  const [projectId, setProjectId] = useState(null);
   const [horizontalOffset, setHorizontalOffset] = useState(0);
   const [chartType, setChartType] = useState('');
   const [chartDataSingle, setChartDataSingle] = useState([]);
@@ -218,9 +219,11 @@ end`,);
       inherit: true,
       rules: [
         { token: 'custom-words', foreground: 'FF7F7F' },
-        { token: 'numbers-custom', foreground: 'FFFD8A' }
+        { token: 'numbers-custom', foreground: 'FFFD8A' },
+        { token: 'compound-keywords', foreground: '569cd6' }
       ],
       colors: {
+        keywords: 'yellow'
       },
     });
 
