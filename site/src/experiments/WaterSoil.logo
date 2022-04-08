@@ -116,9 +116,9 @@ to init
     make "moisture-data []
 
     ;calibration numbers for moisture sensor and two temp sensors
-    make "moisture-cal []
-    make "temp0-cal []
-    make "temp1-cal []
+    make "moisture-cal [870 100 750 50]
+    make "temp0-cal [116 0 161 26]
+    make "temp1-cal [116 0 161 26]
 
     ;lists of calibrated data for plotting
     make "temp0-calibrated []

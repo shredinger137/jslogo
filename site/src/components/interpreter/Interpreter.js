@@ -1917,6 +1917,8 @@ prims['and'] = { nargs: 2, priority: -1, fcn: function (a, b) { if (a == true &&
 prims['remainder'] = { nargs: 2, fcn: function (a, b) { return this.getnum(a).mod(this.getnum(b)); } }
 prims['round'] = { nargs: 1, fcn: function (a) { return Math.round(this.getnum(a)); } }
 prims['int'] = { nargs: 1, fcn: function (a) { return Math.floor(this.getnum(a)); } }
+prims['floor'] = { nargs: 1, fcn: function (a) { return Math.floor(this.getnum(a)); } }
+prims['ceil'] = { nargs: 1, fcn: function (a) { return Math.ceil(this.getnum(a)); } }
 prims['minus'] = { nargs: 1, fcn: function (a) { return -a; } }
 prims['sin'] = { nargs: 1, fcn: function (a) { return turtleMath.sindeg(this.getnum(a)); } }
 prims['cos'] = { nargs: 1, fcn: function (a) { return turtleMath.cosdeg(this.getnum(a)); } }

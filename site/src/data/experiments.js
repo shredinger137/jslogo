@@ -42,7 +42,7 @@ export const experimentsList = [
         code: packets
     },
     {
-        name: "Evaporation",
+        name: "Temperatures",
         fileLocation: "/experiments/Evaporation.logo",
         code: evaporation
 

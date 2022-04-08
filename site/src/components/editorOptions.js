@@ -94,7 +94,7 @@ export const languageDef = {
   tokenizer: {
     root: [
       [/y-label|x-label|bottom-plot|top-plot|one-plot|y-data|x-data|plot-title|x-ticks|y-ticks/, "compound-keywords"],
-      [/readADC[0-9]|receive-packet|init-ir|read-visible|hide-turtle|show-plot|set-packet-save|set-packet-type|set-packet-count/, "compound-keywords"],
+      [/readADC[0-9]|receive-packet|init-ir|read-visible|hide-turtle|show-plot|set-packet-save|set-packet-type|set-packet-count|calibrate-list/, "compound-keywords"],
       [/to\s[a-zA-Z0-9\-_re]*|\bend\b/, "custom-words"],      
       { include: "@whitespace" },
       { include: "@numbers" },

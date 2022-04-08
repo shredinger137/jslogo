@@ -1,5 +1,5 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; Evaporation 2022    ;;;;
+;;;; Tmperatures 2022    ;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 to go
@@ -41,16 +41,17 @@ end
 
 to init-plot
     top-plot
-    plot-title 'Temp 0 (evap)'
+    plot-title 'Temp 0'
     x-data "time-list
     y-data "temp0-data-calibrated
-    x-label "Numbers
+    x-label 'Time'
     show-plot
 
     bottom-plot
-    plot-title 'Temp 1 (room)'
+    plot-title 'Temp 1'
     x-data "time-list
     y-data "temp1-data-calibrated
+    x-label 'Time'
     show-plot
 
 end
