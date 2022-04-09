@@ -142,10 +142,6 @@ to process-soil-packet :packet
     make "temp1-value (nth 4 :packet)
     make "moisture-value (nth 3 :packet)
     make "divided-list se :divided-list (:moisture-value * 10) / :temp1-value
-    print :time-list
-    print :moisture-calibrated
-    print :moisture-data
-
 end
 
 to process-evap-packet :packet
