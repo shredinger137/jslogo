@@ -1926,6 +1926,7 @@ prims['sqrt'] = { nargs: 1, fcn: function (a) { return Math.sqrt(this.getnum(a))
 prims['random'] = { nargs: 1, fcn: function (a) { return this.getRandom(a); } }
 prims['oneof'] = { nargs: 2, fcn: function (a, b) { return this.nextRandomDouble() < .5 ? a : b; } }
 prims['tan'] = { nargs: 1, fcn: function (a) { return Math.tan(this.getnum(a)) } }
+prims['abs'] = { nargs: 1, fcn: function(a) {return Math.abs(this.getnum(a))}};
 
 
 prims['sum'] = { nargs: 2, fcn: function (a, b) { return a + b; } }
