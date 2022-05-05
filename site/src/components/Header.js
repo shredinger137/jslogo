@@ -190,36 +190,6 @@ function Header(props) {
         [],
     )
 
-
-    function tempSaveData() {
-
-
-        if (user) {
-
-            firebase.auth().currentUser.getIdToken(false).then(idToken => {
-
-                if (!projectId) {
-
-                    //error handling - shouldn't be clickable without an ID, but just in
-
-
-                } else {
-                    //not the first time - update an existing
-
-                    axios.post(`${config.apiUrl}/data/${projectId}`, {
-                        authorization: idToken,
-                        data: [0, 1, 2],
-                    }).then((response) => {
-                        console.log(response)
-                    }).catch((err) => { console.log(err) })
-
-
-                }
-            })
-
-        }
-    }
-
     function loadFile() {
         document.getElementById("load").click();
         document.getElementById("procs").focus();
@@ -281,6 +251,9 @@ function Header(props) {
                         //in the future you'll want to add error handling here, or at least validation
                         //TODO
 
+                        //TODO: We're lifting up state instead of keeping it here, but there will be 
+                        //repetition until this is done.
+                        props.setProjectId(response.data);
                         setProjectId(response.data);;
                         getUserProjects();
                     })
@@ -360,6 +333,7 @@ function Header(props) {
                             titleElement.value = response.data.title;
                         }
                         setProjectId(response.data.projectId);
+                        props.setProjectId(response.data.projectId);
                         if (response.data.ownerDisplayName) {
                             setProjectAuthor(response.data.ownerDisplayName);
                         } else {

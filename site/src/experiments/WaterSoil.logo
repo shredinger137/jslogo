@@ -7,7 +7,7 @@ to run-once-soil
     init
 
     ;set options for packets
-    set-packet-count 3
+    set-packet-count 2
     set-packet-save true
     clear-data
 
@@ -20,12 +20,13 @@ to run-once-soil
             stop
         ]
         dp4on
+        wait 5
         receive-packet
-        wait 10
+        wait 5
         dp4off
-        make "time-list se (:time-list) (now - :startTime) 
+        make "time-list se (:time-list) (now - :startTime)
         process-soil-packet :_last-packet
-        wait 150   ;waits for 15 seconds
+        wait 50   ;waits for 15 seconds
     ]
 
 end
@@ -35,7 +36,7 @@ to run-forever-soil
     init
 
     ;set options for packets
-    set-packet-count 3
+    set-packet-count 2
     set-packet-save true
     clear-data
 
@@ -48,8 +49,9 @@ to run-forever-soil
             stop
         ]
         dp4on
+        wait 5
         receive-packet
-        wait 10
+        wait 5
         dp4off
 
         ;time-list in hours with two decimal places
@@ -60,7 +62,7 @@ to run-forever-soil
 
 end
  
-to run-once-evap 
+to run-once-evap
     ;initalize variables
     init
 
@@ -72,17 +74,17 @@ to run-once-evap
     ;setup plots
     init-plot-evap
 
-	loop [ 
+    loop [
         ;run this for 20 minutes, and then stop.  
-		if ((now - :startTime) > ( 60 * 20 )) [ stop ] 
-		receive-packet
-		process-evap-packet :_last-packet
-        make "time-list se (:time-list) (now - :startTime) 
-        wait 100	;wait for 10 seconds
-	]
+        if ((now - :startTime) > ( 60 * 20 )) [ stop ]
+        receive-packet
+        process-evap-packet :_last-packet
+        make "time-list se (:time-list) (now - :startTime)
+        wait 100 ;wait for 10 seconds
+    ]
 end
 
-to run-forever-evap 
+to run-forever-evap
     ;initalize variables
     init
 
@@ -94,13 +96,13 @@ to run-forever-evap
     ;setup plots
     init-plot-evap
 
-	loop [ 
+    loop [
         ;run until manually stopped
-		receive-packet
-		process-evap-packet :_last-packet
+        receive-packet
+        process-evap-packet :_last-packet
         make "time-list se (:time-list) (round ((now - :startTime)  * (100 / 3600 )) / 100)
-        wait 6000	;wait for 10 minutes
-	]
+        wait 6000 ;wait for 10 minutes
+    ]
 end
 
 to init
@@ -116,7 +118,7 @@ to init
     make "moisture-data []
 
     ;calibration numbers for moisture sensor and two temp sensors
-    make "moisture-cal [870 100 750 50]
+    make "moisture-cal []
     make "temp0-cal [116 0 161 26]
     make "temp1-cal [116 0 161 26]
 
@@ -125,23 +127,18 @@ to init
     make "temp1-calibrated []
     make "moisture-calibrated []
 
-    ;normalized moisture data list (requires a correction after calibration)
-    make "divided-list []
-
 end
 
 ;handles a packet after it has been received
-
 to process-soil-packet :packet
+    
+    ;Read packet information, add time and data to lists,
+    ;calibrate for display
+
     make "moisture-data se (:moisture-data) (nth 3 :packet)
     make "temp1-data se (:temp1-data) (nth 4 :packet)
-
-    calibrate-list "moisture-calibrated :moisture-data :moisture-cal 
-    calibrate-list "temp1-calibrated :temp1-data :temp1-cal 
-
-    make "temp1-value (nth 4 :packet)
-    make "moisture-value (nth 3 :packet)
-    make "divided-list se :divided-list (:moisture-value * 10) / :temp1-value
+    make "moisture-calibrated :moisture-data 
+    calibrate-list "temp1-calibrated :temp1-data :temp1-cal
 end
 
 to process-evap-packet :packet
@@ -150,7 +147,7 @@ to process-evap-packet :packet
     make "temp1-data se (:temp1-data) (nth 4 :packet)
 
     calibrate-list "temp0-calibrated :temp0-data :temp0-cal
-    calibrate-list "temp1-calibrated :temp1-data :temp1-cal 
+    calibrate-list "temp1-calibrated :temp1-data :temp1-cal
 end
 
 to init-plot-soil
@@ -158,6 +155,19 @@ to init-plot-soil
     plot-title 'Soil Moisture'
     x-data "time-list
     y-data "moisture-calibrated
+
+    ;limits-y 620 900 
+        ; Use limits and set the values as needed.
+        ; Might be needed if autoscale doesn't return
+        ; a usable plot with enough detail or zoom out
+        ; if there is too much scatter to see trends.
+        ; If the soil is very dry a lower limit value
+        ; of 620 will work. The moisture sensor doesn't
+        ; report much above 890. A value of 900 is
+        ; reasonable as a good upper limit. If the soil
+        ; has some moisture in it, values of 820 - 900
+        ; are reasonable.
+    
     x-label 'Time'
     show-plot
 
@@ -165,6 +175,7 @@ to init-plot-soil
     plot-title 'Temp'
     x-data "time-list
     y-data "temp1-calibrated
+    limits-y 10 40
     x-label 'Time'
     show-plot
 
@@ -186,4 +197,32 @@ to init-plot-evap
     x-label 'Time'
     limits-y 5 30
     show-plot
+end
+
+ 
+
+to cal-moisture-sensor :m_val :t_val
+
+    ; Let's define constant and temperature adu corresponding to
+    ; room temp.
+    let "c_not 1.8 ; Constant is an average moisture adu / temp adu
+                   ; under various soil and moisture conditions.
+                   ; The number 5.3 is a reasonable value if the
+                   ; the assumption is soil has some moisture
+                   ; content in it. If including averages with
+                   ; drier soil samples, the value can be closer
+                   ; to 5.1. TODO: examine calculation of c_not
+                   ; more closely. The moisture adu swings are
+                   ; too wide. The constant might actually be
+                   ; a smaller number.
+
+    let "t_env 150 ; Average temperature adu for room temp (20*C).
+
+    ; Apply our differental equation resultant formula to the
+    ; input values.
+    let "m_final :m_val + (:c_not * (:t_env - :t_val))
+   
+    ; Output the value.
+    output round :m_final
+
 end

@@ -1,8 +1,19 @@
 /* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off", no-use-before-define: "off" */
 
 import React from 'react';
+import { useAuth, useUser } from 'reactfire';
+import firebase from 'firebase/app';
+//we need firebase because we're saving data files to the cloud, and we want to authorize people
+import axios from 'axios';
+import { config } from '../config';
+
+
 
 function DataTable(props) {
+
+    const auth = useAuth();
+
+
 
 
     function pickFile() {
@@ -32,7 +43,7 @@ function DataTable(props) {
 
             for (var line of textInLines) {
                 var lineData = line.split(",");
-                    parsedFile.push(lineData);           
+                parsedFile.push(lineData);
             }
 
             props.setTableData(parsedFile);
@@ -75,6 +86,20 @@ function DataTable(props) {
 
     }
 
+    const saveToCloud = () => {
+        firebase.auth().currentUser.getIdToken(false).then(idToken => {
+
+            axios.post(`${config.apiUrl}/data/${props.projectId}`, {
+                authorization: idToken,
+                data: props.tableData,
+            }).then((response) => {
+                console.log(response)
+            }).catch((err) => { console.log(err) })
+
+
+        })
+    }
+
 
     let row = 0;
     return (
@@ -82,6 +107,18 @@ function DataTable(props) {
             <span onClick={exportData.bind(this)}>Export</span>
             <input id="loadData" type="file" accept=".csv, .pac" onChange={() => importData()} style={{ display: "none" }} />
             <span onClick={pickFile} style={{ marginLeft: "20px" }}>Import</span>
+            {props.projectId && props.tableData ?
+                <>
+                    <span onClick={saveToCloud} style={{ marginLeft: "20px" }}>Save</span>
+                    <span onClick={() => {}} style={{ marginLeft: "20px" }}>Open</span>
+                </>
+                :
+                <>
+                    <span style={{ marginLeft: "20px", color: 'gray' }}>Save</span>
+                    <span style={{ marginLeft: "20px", color: 'gray' }}>Open</span>
+                </>
+            }
+
             <span style={{ marginLeft: "20px" }}>{props.pid ? 'Save' : null}</span>
             <table style={{ width: "80%" }}>
                 <thead style={{ textAlign: "center" }}>
@@ -98,7 +135,7 @@ function DataTable(props) {
                         <th>CHCK</th>
                     </tr>
                 </thead>
-                <tbody style={{textAlign: 'center'}}>
+                <tbody style={{ textAlign: 'center' }}>
                     {props.tableData.map(dataLine => {
                         //hack to stop getting warnings about matchine keys when time is the same (less than a second)
                         row++;

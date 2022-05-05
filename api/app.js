@@ -235,6 +235,32 @@ app.post("/data/:pid", function (req, res) {
 
 })
 
+app.get("/data/:pid", async function (req, res) {
+
+    let results = null;
+
+    try {
+        results = await dbConnection.collection('projects').findOne({ projectId: req.params.pid }, { projection: { _id: 0, dataIndex: 1 } });
+    }
+
+    catch {
+        console.log(err);
+        return false;
+    }
+
+    finally {
+        res.send(results.dataIndex)
+    }
+
+
+})
+
+app.get("/data/:pid/:index", function (req, res) {
+    //get single data instance
+
+
+})
+
 
 
 

@@ -15,6 +15,7 @@ import Chart from './components/Chart';
 import DataTable from './components/DataTable';
 import Terminal from './components/Terminal';
 import 'firebase/auth';
+import { useAuth, useUser } from 'reactfire';
 //import WorkerBuilder from './components/worker-builder';
 //import Worker from './components/logoWorker';
 
@@ -24,6 +25,8 @@ let interpreter, projects;
 
 const App = () => {
 
+  
+  const { data: user } = useUser();
   const [showNewProjectModal, setShowNewProjectModal] = useState(false);
   const [view, setView] = useState('main');
   const [tableData, setTableData] = useState([]);
@@ -41,6 +44,7 @@ end`,);
   const [chartDataTop, setChartDataTop] = useState([]);
   const [chartDataBottom, setChartDataBottom] = useState([]);
   const [chartOptionsTop, setChartOptionsTop] = useState({
+
 
     responsive: true,
     maintainAspectRatio: false,
@@ -115,7 +119,6 @@ end`,);
 
   const dragToResize = (e) => {
 
-    let context = this;
     e.preventDefault();
 
     function handleDrag(e) {
@@ -203,6 +206,12 @@ end`,);
   }
 
 
+  
+  const saveData = () => {
+    
+}
+
+
   const editorWillMount = monaco => {
     editor = monaco
     if (!monaco.languages.getLanguages().some(({ id }) => id === 'jslogo')) {
@@ -250,6 +259,7 @@ end`,);
         toggleNewProjectModal={toggleShowNewProjectModal}
         interpreter={interpreter}
         updateCode={updateCode}
+        setProjectId={setProjectId}
       />
       <div style={{ height: "20px" }}></div>
       <div className="main">
@@ -319,6 +329,7 @@ end`,);
           </div>
           <div id="dataFrame" className={view == "data" ? null : "hide"} style={{ height: "100%", width: "100%" }}>
             <DataTable
+              projectId={projectId}
               pid={pid}
               tableData={tableData}
               setTableData={setDataTable}
