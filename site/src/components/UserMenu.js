@@ -66,31 +66,6 @@ function UserMenu(props) {
                             :
                             null
                         }
-
-                        {project.dataIndex ?
-                            <>
-                                {
-                                    project.dataIndex.map((dataEntry) =>
-
-                                        <div className='user-menu-data'>
-                                            <p><strong>Saved Data</strong></p>
-                                            <ul style={{ padding: '10px' }}>
-                                                <span>{new Date(dataEntry).toLocaleString().split(',')[0]}</span>
-                                                <br />
-                                            </ul>
-                                        </div>
-
-
-                                    )
-
-                                }
-                            </>
-
-                            :
-                            null
-
-                        }
-
                     </div>
 
                 )
@@ -104,37 +79,3 @@ function UserMenu(props) {
 }
 
 export default UserMenu;
-
-
-
-/*
-                        {project.dataIndex ?
-                            <span key={`${project.title}data`} style={{ fontSize: "1rem" }}>[data]</span>
-                            :
-                            null
-                        }
-
-                        {project.dataIndex ?
-                            <>
-                                {
-                                    project.dataIndex.map((dataEntry) =>
-
-                                        <div className='user-menu-data'>
-                                            <p><strong>Saved Data</strong></p>
-                                            <ul style={{ padding: '10px' }}>
-                                                <span>{new Date(dataEntry).toLocaleString().split(',')[0]}</span>
-                                                <br />
-                                            </ul>
-                                        </div>
-
-
-                                    )
-
-                                }
-                            </>
-
-                            :
-                            null
-
-                        }
-*/

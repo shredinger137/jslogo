@@ -1266,7 +1266,6 @@ export default class Interpreter {
     updateChartData(chartType) {
         var t = this;
         var chartData = [];
-        var counter = 0;
         var xDataArray = [];
         var yDataArray = [];
 

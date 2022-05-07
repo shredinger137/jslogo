@@ -1,19 +1,24 @@
 /* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off", no-use-before-define: "off" */
 
-import React from 'react';
-import { useAuth, useUser } from 'reactfire';
+import React, {useState} from 'react';
+import { useAuth } from 'reactfire';
 import firebase from 'firebase/app';
 //we need firebase because we're saving data files to the cloud, and we want to authorize people
 import axios from 'axios';
 import { config } from '../config';
+import OpenDataModal from './OpenDataModal';
 
 
 
 function DataTable(props) {
 
     const auth = useAuth();
+    
+    const [dataModalOpen, setDataModalOpen] = useState(false);
 
-
+    const toggleModal = () => {
+        setDataModalOpen(!dataModalOpen);
+    }
 
 
     function pickFile() {
@@ -104,13 +109,14 @@ function DataTable(props) {
     let row = 0;
     return (
         <div style={{ overflow: "scroll", height: "100%", width: "100%" }}>
-            <span onClick={exportData.bind(this)}>Export</span>
+            {dataModalOpen ? <OpenDataModal toggleModal={toggleModal} pid={props.projectId} setTableData={props.setTableData}/> : null}
+            <span onClick={exportData.bind(this)} style={{cursor: 'pointer'}}>Export</span>
             <input id="loadData" type="file" accept=".csv, .pac" onChange={() => importData()} style={{ display: "none" }} />
-            <span onClick={pickFile} style={{ marginLeft: "20px" }}>Import</span>
+            <span onClick={pickFile} style={{ marginLeft: "20px", cursor: 'pointer' }}>Import</span>
             {props.projectId && props.tableData ?
                 <>
-                    <span onClick={saveToCloud} style={{ marginLeft: "20px" }}>Save</span>
-                    <span onClick={() => {}} style={{ marginLeft: "20px" }}>Open</span>
+                    <span onClick={saveToCloud} style={{ marginLeft: "20px", cursor: 'pointer' }}>Save</span>
+                    <span onClick={() => {toggleModal()}} style={{ marginLeft: "20px", cursor: 'pointer' }}>Open</span>
                 </>
                 :
                 <>
@@ -137,7 +143,7 @@ function DataTable(props) {
                 </thead>
                 <tbody style={{ textAlign: 'center' }}>
                     {props.tableData.map(dataLine => {
-                        //hack to stop getting warnings about matchine keys when time is the same (less than a second)
+                        //hack to stop getting warnings about matching keys when time is the same (less than a second)
                         row++;
                         return (
                             <tr key={`${dataLine[0]}row${row}`}>

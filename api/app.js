@@ -235,10 +235,51 @@ app.post("/data/:pid", function (req, res) {
 
 })
 
+
+app.get("/data/:pid/:index", async function (req, res) {
+
+    //TODO: This is bad structure. We want to convert this to objects, not arrays, so that we can search by index.
+    //It might be better to create a 'data' collection rather than nest it in projects, and have data objects belong
+    //to projects via a table instead. This will work well when we switch to a relational database.
+
+    //get single data instance
+    let results = null;
+    console.log('single')
+
+    try {
+        results = await dbConnection.collection('projects').findOne({ projectId: req.params.pid }, { projection: { _id: 0, collectedData: 1 } });
+    }
+
+    catch {
+        console.log(err);
+        return false;
+    }
+
+    //todo: put return after finally (as above so below)
+
+    finally {
+        let data = null;
+
+        if(results && results.collectedData && Array.isArray(results.collectedData)){
+            for(let entry of results.collectedData){
+                if(entry.date == req.params.index && entry.data){
+                    data = entry.data;
+                }
+            }
+        res.send(data)
+    } else {
+        res.send(false);
+    }
+    }
+
+
+})
+
 app.get("/data/:pid", async function (req, res) {
 
-    let results = null;
+    console.log('all')
 
+    let results = null;
     try {
         results = await dbConnection.collection('projects').findOne({ projectId: req.params.pid }, { projection: { _id: 0, dataIndex: 1 } });
     }
@@ -249,18 +290,15 @@ app.get("/data/:pid", async function (req, res) {
     }
 
     finally {
+        if(results && results.dataIndex){
         res.send(results.dataIndex)
+    } else {
+        res.send(false);
+    }
     }
 
 
 })
-
-app.get("/data/:pid/:index", function (req, res) {
-    //get single data instance
-
-
-})
-
 
 
 

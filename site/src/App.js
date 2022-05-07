@@ -33,7 +33,7 @@ const App = () => {
   const [code, setCode] = useState(`to go
 print 'Hello World'
 end`,);
-  //pid is a placeholder; this needs to be put into global state
+  //pid is a placeholder
   let pid = null;
   var editor = null;
 
