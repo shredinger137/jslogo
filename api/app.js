@@ -244,8 +244,6 @@ app.get("/data/:pid/:index", async function (req, res) {
 
     //get single data instance
     let results = null;
-    console.log('single')
-
     try {
         results = await dbConnection.collection('projects').findOne({ projectId: req.params.pid }, { projection: { _id: 0, collectedData: 1 } });
     }
@@ -277,7 +275,6 @@ app.get("/data/:pid/:index", async function (req, res) {
 
 app.get("/data/:pid", async function (req, res) {
 
-    console.log('all')
 
     let results = null;
     try {
