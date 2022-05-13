@@ -55,8 +55,8 @@ const OpenDataModal = (props) => {
                 <br />
                 <div>
                     {availableData.map(item => (
-                        <div key={item} onClick={() => { getData(item) }}>
-                            {convertDate(item)}<br /><br />
+                        <div style={{marginBottom: '10px', cursor: 'pointer'}} key={item} onClick={() => { getData(item) }}>
+                            {convertDate(item)}<br />
                         </div>
                     ))}
                 </div>
