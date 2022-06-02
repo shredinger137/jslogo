@@ -57,7 +57,7 @@ export const experimentsList = [
         code: waterSoil
     },
     {
-        name: 'Microbial Fuel Cell',
+        name: 'Fuel Cell',
         fileLocation: "/experiments/MFC.logo",
         code: MFC
     }
