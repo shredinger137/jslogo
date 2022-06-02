@@ -1,0 +1,98 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; Microbial Fuel Cell ;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;this is our primary point of entry into the code
+to go  
+    ;initiatlize variables
+    init
+
+    ;set packet options
+    set-packet-count 3
+    set-packet-save true
+    clear-data
+    clear ;clear text on the console
+
+    ;main program loop
+	loop [ 
+        ;run this for 60 minutes, and the stop.  
+		if ((now - :startTime) > ( 3600 )) [ stop ] 
+
+		receive-packet
+        process-packet :_last-packet
+		wait 10
+	]
+end
+
+to go-forever
+	init 
+	loop [ 
+		receive-packet 
+        process-packet :_last-packet
+		wait 6000      ;waits ~600 seconds, about 10 minutes
+	]
+end
+
+;initializes both jLogo and uLogo and start the experiment running
+to init
+    print 'Starting Project'
+    make "startTime now
+    
+    make "time-list []
+
+    make "temp0-cal [116 0 161 26]
+    make "temp1-cal [116 0 161 26]
+
+    make "temp0-data []
+    make "temp1-data []
+    make "temp0-data-calibrated []
+    make "temp1-data-calibrated []
+
+    make "mwatts []
+
+    make "resistor 100
+    make "test [0 1 2]
+
+    init-plot
+end
+
+;handles a packet after it has been received
+to process-packet :packet
+
+    ;add new data to raw data list
+    make "temp0-data se :temp0-data (nth 3 :packet)
+    make "temp1-data se :temp1-data (nth 4 :packet)
+    make "time-list se :time-list (((nth 1 :packet) - :startTime))
+
+    ;calibrate list of ADU into list of Deg C
+   	calibrate-list "temp0-data-calibrated :temp0-data :temp0-cal 
+   	calibrate-list "temp1-data-calibrated :temp1-data :temp1-cal
+
+    ;calculate wattage passing through the pin; first, get voltage
+    let "voltage ((nth 5 :packet) * (4.8 / 1023)  )
+
+    ;next, convert this, with a knonw resistor, to power in mW
+    ;we use the math function power to calculate v^2, don't confuse that with the
+    ;variables
+
+    let "converted-power (((power :voltage 2 ) / (:resistor)) * 1000) 
+
+    make "mwatts se :mwatts :converted-power
+			
+end
+
+to init-plot
+    top-plot
+    plot-title 'Power'
+    x-data "time-list
+    y-data "mwatts
+    x-label 'Time'
+    show-plot
+
+    bottom-plot
+    plot-title 'Temp 1'
+    x-data "time-list
+    y-data "temp1-data-calibrated
+    x-label 'Time'
+    show-plot
+end

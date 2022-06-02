@@ -60,12 +60,6 @@ function UserMenu(props) {
                         <span key={`${project.title}del`} style={{ marginRight: "10px", fontSize: "1rem" }} onClick={() => { props.deleteProject(project.projectId) }}>[delete]</span>
                         <span key={`${project.title}copy`} style={{ fontSize: "1rem", marginRight: '10px' }} onClick={() => { copyProjectLink(`${project.projectId}`) }}>[copy link]</span>
                         
-                        
-                        {project.dataIndex ?
-                            <span key={`${project.title}data`} style={{ fontSize: "1rem" }}>[data]</span>
-                            :
-                            null
-                        }
                     </div>
 
                 )
