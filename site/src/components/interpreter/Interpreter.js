@@ -706,6 +706,7 @@ export default class Interpreter {
         } else {
             if (this.outOfBounds == true) {
                 this.element.style.visibility = "visible";
+                this.outOfBounds = false;
             }
         }
     }
@@ -1320,7 +1321,7 @@ export default class Interpreter {
         t.priority = t.stack.pop();
         t.arglist = t.stack.pop();
         t.cfun = t.stack.pop();
-        //t.locals.shift();
+        t.locals.shift();
         t.pushResult(x);
     }
 

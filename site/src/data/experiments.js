@@ -6,6 +6,10 @@ import sensors from '../experiments/Sensors.logo';
 import turtleLogo from '../experiments/TurtleLogo.logo';
 import waterSoil from '../experiments/WaterSoil.logo';
 import evaporation from '../experiments/Evaporation.logo';
+import MFC from '../experiments/MFC.logo';
+
+//there's a good chance 'fileLocation' is outdated now, but check the file loader to make sure it's gone from everywhere
+//(including the experiment as an import instead of referencing the file means it gets included in the offline PWA)
 
 export const experimentsList = [
     {
@@ -51,6 +55,11 @@ export const experimentsList = [
         name: "Water Soil",
         fileLocation: "/experiments/WaterSoil.logo",
         code: waterSoil
+    },
+    {
+        name: 'Fuel Cell',
+        fileLocation: "/experiments/MFC.logo",
+        code: MFC
     }
 ];
 
