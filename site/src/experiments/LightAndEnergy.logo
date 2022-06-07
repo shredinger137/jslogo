@@ -1,0 +1,135 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; Light and Energy 2022    ;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+to go
+    print 'Starting Project'
+    make "startTime now
+
+    ;initialize all variables
+
+    ;the calibration list for an average of 10 readings from tempsensor0
+    make "temp0_cal [116 0 161 26]
+
+    ;the calibration list for an average of 10 readings from tempsensor1
+    make "temp1_cal [116 0 161 26]
+
+    ;lists for temperature data and time to be plotted
+
+    make "time-list []
+    make "temp0-data []
+    make "temp1-data []
+    make "temp0-data-calibrated []
+    make "temp1-data-calibrated []
+
+    ;setup plotting options
+    init-plot
+
+    ;set options for packets - 2 sensors, save data = true, clear old data
+    set-packet-count 2
+    set-packet-save true
+    clear-data
+   
+    ;Get first reading from sensor and store in a global variable
+    make "temp0-first calibrate-value :temp0_cal (readADC 0)
+    make "temp1-first calibrate-value :temp1_cal (readADC 1)
+
+    ;While running, receive a packet and process the data
+    ;Do this for approximately 15 minutes.
+    loop [
+if ((now - :startTime) > ( 60 * 15 )) [
+    print 'done!'
+             stop
+        ]
+        receive-packet
+        wait 40
+        process-data-packet :_last-packet
+    ]
+
+ 
+
+end
+
+ 
+
+to init-plot
+    top-plot
+    plot-title 'Temp 0'
+    x-data "time-list
+    y-data "temp0-data-calibrated
+    x-label 'Time'
+    show-plot
+
+    bottom-plot
+    plot-title 'Temp 1'
+    x-data "time-list
+    y-data "temp1-data-calibrated
+    x-label 'Time'
+    show-plot
+
+end
+
+ 
+
+to process-data-packet :packet
+
+    ;Add calibrated readings from 1st and 2nd pins in *C and subtract
+    ;out the initial temp in *C. The final value is placed in lists.
+
+    make "temp0-data se (:temp0-data) ((calibrate-value :temp0_cal (nth 3 :packet)) -  :temp0-first)
+    make "temp1-data se (:temp1-data) ((calibrate-value :temp1_cal (nth 4 :packet)) -  :temp1-first)
+    make "time-list se (:time-list) (now - :startTime)
+
+    ;Take the temp list and make them part of the calibrated list.
+    make "temp0-data-calibrated :temp0-data
+    make "temp1-data-calibrated :temp1-data
+
+    ;Calculate the delta temp *C between Temp0 and Temp1
+    let "i_count (count :temp0-data) ;Find the last item in the list.
+    if :i_count = 1 [let "Delta (:temp0-data-calibrated - :temp1-data-calibrated)]
+    if :i_count > 1 [
+                     let "i_count (:i_count - 1)
+                     let "Delta (nth :i_count :temp0-data-calibrated) - (nth :i_count :temp1-data-calibrated)
+    ]
+
+    ;print ∆ temp in console
+    print '∆ temp *C = ' + abs :Delta
+
+end
+
+ 
+
+to calibrate-value :in_list :n_val
+    ;If there is only one thing in the array, the output should be
+    ;the value.
+    if (count :in_list) = 0  [output :n_val]
+   
+    ;Assign temp values to values in the array so we can calculate
+    ;the slope.
+    let "adc_i nth 0 :in_list
+    let "adc_f nth 2 :in_list
+    let "temp_i nth 1 :in_list
+    let "temp_f nth 3 :in_list
+   
+    ;Calculate the slope and assign the value to a value called
+    ;slope.
+    let "slope (:temp_f - :temp_i) / (:adc_f - :adc_i)
+
+    ;Calculate the calibration and output the value.
+    output :temp_i + ((:n_val - :adc_i) * :slope)
+end
+
+ 
+
+to abs :n_val
+    ; Calculate the absolute value of a number;
+    ; including negative numbers as inputs. This
+    ; is done by squaring the number and taking
+    ; the square root.
+
+    let "val sqrt (:n_val * :n_val)
+
+    ; Output the value
+    output :val
+
+end
