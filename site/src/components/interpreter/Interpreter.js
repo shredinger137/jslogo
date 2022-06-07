@@ -706,6 +706,7 @@ export default class Interpreter {
         } else {
             if (this.outOfBounds == true) {
                 this.element.style.visibility = "visible";
+                this.outOfBounds = false;
             }
         }
     }
