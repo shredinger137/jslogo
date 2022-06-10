@@ -81,8 +81,8 @@ export const languageDef = {
     'label',
     'title',
     'se',
-    'seth'
-
+    'seth',
+    'clear'
   ],
   operators: [
     '=', '>', '<', '!', '~', '?', ':', '==', '<=', '>=', '!=',

@@ -1924,6 +1924,7 @@ prims['sin'] = { nargs: 1, fcn: function (a) { return turtleMath.sindeg(this.get
 prims['cos'] = { nargs: 1, fcn: function (a) { return turtleMath.cosdeg(this.getnum(a)); } }
 prims['sqrt'] = { nargs: 1, fcn: function (a) { return Math.sqrt(this.getnum(a)); } }
 prims['random'] = { nargs: 1, fcn: function (a) { return this.getRandom(a); } }
+prims['random2'] = { nargs: 2, fcn: function (a, b) { return this.getRandom([a, b]); } }
 prims['oneof'] = { nargs: 2, fcn: function (a, b) { return this.nextRandomDouble() < .5 ? a : b; } }
 prims['tan'] = { nargs: 1, fcn: function (a) { return Math.tan(this.getnum(a)) } }
 prims['abs'] = { nargs: 1, fcn: function(a) {return Math.abs(this.getnum(a))}};

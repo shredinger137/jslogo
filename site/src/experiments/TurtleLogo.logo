@@ -97,8 +97,7 @@ to sea
     setcolor 55
     penup
     repeat 300 [
-        setxy random2 "-55vw "55vw
-        random2 "-55vh "-35vh
+        setxy ( random2 -500 500 ) (random2 -300 -100)
         pendown
         seth random2 40 50
         setpensize random2 5 10
@@ -117,8 +116,7 @@ to land
     setcolor 12
     penup
     repeat 600 [
-        setxy random2 "-55vw "55vw
-        random2 "-35vh "50vh
+        setxy ( random2 -500 500 ) (random [-100 300]) 
         pendown
         setpensize random2 20 25
         setshade random2 90 100
