@@ -1302,6 +1302,7 @@ export default class Interpreter {
                 }
             }
             t.pushNewChartData(chartType, chartData);
+            console.log(chartData)
         }
 
 

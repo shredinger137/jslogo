@@ -1,0 +1,76 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; Light and Energy    ;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;This version was published during and for the
+;2022 summer training
+
+to go
+    print 'Starting Project'
+    make "startTime now
+
+    ;initialize all variables
+
+    ;the calibration list for an average of 10 readings from tempsensor0
+    make "temp0_cal [116 0 161 26] 
+
+    ;the calibration list for an average of 10 readings from tempsensor1
+	make "temp1_cal [116 0 161 26] 
+
+    ;lists for temperature data and time to be plotted
+    make "temp0-data []
+    make "temp1-data []
+    make "time-list []
+    make "temp0-data-calibrated []
+    make "temp1-data-calibrated []
+
+    ;setup plotting options
+    init-plot
+
+    ;set options for packets - 2 sensors, save data = true, clear old data
+    set-packet-count 2
+    set-packet-save true
+    clear-data
+
+    ;while running, receive a packet and process the data
+    loop [
+        receive-packet
+        wait 10
+        process-data-packet :_last-packet
+    ]
+
+end
+
+
+to init-plot
+    top-plot
+    plot-title 'Temp 0'
+    x-data "time-list
+    y-data "temp0-data-calibrated
+    x-label 'Time'
+    show-plot
+
+    bottom-plot
+    plot-title 'Temp 1'
+    x-data "time-list
+    y-data "temp1-data-calibrated
+    x-label 'Time'
+    show-plot
+
+end
+
+
+to process-data-packet :packet
+
+    ;add readings from 1st and 2nd pins to lists
+    make "temp0-data se (:temp0-data) (nth 3 :packet) 
+    make "temp1-data se (:temp1-data) (nth 4 :packet)
+    make "time-list se (:time-list) (now - :startTime) 
+
+    ;calibrate list of ADU into list of Deg C
+    calibrate-list "temp0-data-calibrated :temp0-data :temp0_cal 
+    calibrate-list "temp1-data-calibrated :temp1-data :temp1_cal
+    print 'temp0: ' + last :temp0-data-calibrated
+    print 'temp1: ' + last :temp1-data-calibrated
+
+end
