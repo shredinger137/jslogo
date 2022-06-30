@@ -99,7 +99,6 @@ export default class Interpreter {
         //TODO: this doesn't actually seem to work... is it not applied anywhere?
         function handleKeyDown(e) {
             if (e.ctrlKey) {
-                console.log(e)
                 if (e.keyCode == 70) { e.preventDefault(); e.stopPropagation(); this.focus(); }
                 if (e.keyCode == 71) { e.preventDefault(); e.stopPropagation(); t.readProcs(); this.runLine('go'); }
                 if (e.keyCode == 190) { this.insert('stopped!\n'); this.reset([]); }
@@ -152,6 +151,11 @@ export default class Interpreter {
             document.getElementById('turtleimage').src = 'turtleMage.svg'
             return;
         }
+        
+        else if (name == "bard") {
+            document.getElementById('turtleimage').src = 'bard.png'
+            return;
+        }
 
         else if (name == "ranger") {
             document.getElementById('turtleimage').src = 'turtleRanger.svg'
@@ -168,6 +172,10 @@ export default class Interpreter {
 
         else if (name == "mage") {
             return 'Gifted turtles train in the arcane arts, manipulating energy and the very forces of natural through willpower. These mages seek knowledge of the world and the arcane arts, though some seek power of their own. Mages use intelligence as their primary stat.'
+        }
+
+        else if (name == "bard") {
+            return 'What good are heroic deeds with no voices to sing of them? Bards have devoted themselves to telling the stories of the land and sea. Their magically enhanced songs can embolden allies and strike fear in enemies. Bards focus on charisma as a primary stat.'
         }
 
         else if (name == "ranger") {
@@ -1296,13 +1304,12 @@ export default class Interpreter {
         if (xDataArray) {
             if (yDataArray) {
                 for (let count = 0; count <= xDataArray.length; count++) {
-                    if (yDataArray[count]) {
+                    if (typeof yDataArray[count] !== 'undefined') {
                         chartData.push({ x: xDataArray[count], y: yDataArray[count] });
                     }
                 }
             }
             t.pushNewChartData(chartType, chartData);
-            console.log(chartData)
         }
 
 
