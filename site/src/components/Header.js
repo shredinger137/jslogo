@@ -309,7 +309,7 @@ function Header(props) {
 
         projects.writePidToStorage(openPid);
 
-        toggleUserMenu();
+        setUserMenuShow(false);
 
         if (true
             //user && user.uid - check temporarily disabled
@@ -444,6 +444,7 @@ function Header(props) {
 
                         <UserMenu
                             projects={projects}
+                            setUserMenuShow={setUserMenuShow}
                             toggleUserMenu={toggleUserMenu.bind(this)}
                             getSingleProject={getSingleProject.bind(this)}
                             deleteProject={deleteProject.bind(this)}
