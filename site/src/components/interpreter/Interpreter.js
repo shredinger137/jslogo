@@ -138,51 +138,51 @@ export default class Interpreter {
      */
 
     setclass(name) {
-        if (name == "warrior") {
-            document.getElementById('turtleimage').src = 'turtleWarrior.svg'
-            return;
-        }
-        else if (name == "none") {
-            document.getElementById('turtleimage').src = 'turtle.svg'
-            return;
+
+        switch (name) {
+            case "warrior":
+                document.getElementById('turtleimage').src = 'turtleWarrior.svg'
+                return;
+            case "none":
+                document.getElementById('turtleimage').src = 'turtle.svg'
+                return;
+
+            case "mage":
+                document.getElementById('turtleimage').src = 'turtleMage.svg'
+                return;
+
+            case "bard":
+                document.getElementById('turtleimage').src = 'bard.png'
+                return;
+
+            case "ranger":
+                document.getElementById('turtleimage').src = 'turtleRanger.svg'
+                return;
+
         }
 
-        else if (name == "mage") {
-            document.getElementById('turtleimage').src = 'turtleMage.svg'
-            return;
-        }
-        
-        else if (name == "bard") {
-            document.getElementById('turtleimage').src = 'bard.png'
-            return;
-        }
-
-        else if (name == "ranger") {
-            document.getElementById('turtleimage').src = 'turtleRanger.svg'
-            return;
-        } else {
-            this.printToConsole("Invalid class: expected warrior, mage, ranger or none.")
-        }
+        this.printToConsole("Invalid class: expected warrior, mage, ranger, bard or none.")
+        return;
     }
 
     aboutClass(name) {
-        if (name == "warrior") {
-            return `These turtles hail from the seas of the North, where hatchlings hone themselves on sea monsters and protect trade routes. The turtles of Turtlaheim have migrated into the world, seeking fortune and often finding their way as sellswords. Warriors excel at the use of melee weapons and use strength as their primary stat.`
-        }
 
-        else if (name == "mage") {
-            return 'Gifted turtles train in the arcane arts, manipulating energy and the very forces of natural through willpower. These mages seek knowledge of the world and the arcane arts, though some seek power of their own. Mages use intelligence as their primary stat.'
-        }
+        switch (name) {
+            case "warrior":
+                return `These turtles hail from the seas of the North, where hatchlings hone themselves on sea monsters and protect trade routes. The turtles of Turtlaheim have migrated into the world, seeking fortune and often finding their way as sellswords. Warriors excel at the use of melee weapons and use strength as their primary stat.`
 
-        else if (name == "bard") {
-            return 'What good are heroic deeds with no voices to sing of them? Bards have devoted themselves to telling the stories of the land and sea. Their magically enhanced songs can embolden allies and strike fear in enemies. Bards focus on charisma as a primary stat.'
-        }
+            case "mage":
+                return 'Gifted turtles train in the arcane arts, manipulating energy and the very forces of natural through willpower. These mages seek knowledge of the world and the arcane arts, though some seek power of their own. Mages use intelligence as their primary stat.'
 
-        else if (name == "ranger") {
-            return 'The undersea forests are a place bandits fear to roam, for the rangers are known to dispatch foes silently and unseen. These expert archers have dexterity as a primary stat and excel at the use of bows, crossbows and javalins.'
-        } else {
-            return 'Invalid class: expected warrior, mage or ranger.'
+            case "bard":
+                return 'What good are heroic deeds with no voices to sing of them? Bards have devoted themselves to telling the stories of the land and sea. Their magically enhanced songs can embolden allies and strike fear in enemies. Bards focus on charisma as a primary stat.'
+
+            case "ranger":
+                return 'The undersea forests are a place bandits fear to roam, for the rangers are known to dispatch foes silently and unseen. These expert archers have dexterity as a primary stat and excel at the use of bows, crossbows and javalins.'
+
         }
+        return 'Invalid class: expected warrior, mage, ranger or bard.'
+
     }
 
 
@@ -1935,7 +1935,7 @@ prims['random'] = { nargs: 1, fcn: function (a) { return this.getRandom(a); } }
 prims['random2'] = { nargs: 2, fcn: function (a, b) { return this.getRandom([a, b]); } }
 prims['oneof'] = { nargs: 2, fcn: function (a, b) { return this.nextRandomDouble() < .5 ? a : b; } }
 prims['tan'] = { nargs: 1, fcn: function (a) { return Math.tan(this.getnum(a)) } }
-prims['abs'] = { nargs: 1, fcn: function(a) {return Math.abs(this.getnum(a))}};
+prims['abs'] = { nargs: 1, fcn: function (a) { return Math.abs(this.getnum(a)) } };
 
 
 prims['sum'] = { nargs: 2, fcn: function (a, b) { return a + b; } }
@@ -1954,6 +1954,7 @@ prims['butfirst'] = { nargs: 1, fcn: function (a) { return this.butfirst(a); } }
 prims['bf'] = { nargs: 1, fcn: function (a) { return this.butfirst(a); } }
 prims['last'] = { nargs: 1, fcn: function (a) { return this.last(a); } }
 prims['bl'] = { nargs: 1, fcn: function (a) { return this.butlast(a); } }
+prims['butlast'] = { nargs: 1, fcn: function (a) { return this.butlast(a); } }
 prims['fput'] = {
     nargs: 2, fcn: function (a, b) {
         var res = [].concat(this.getlist(b));

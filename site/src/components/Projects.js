@@ -1,6 +1,6 @@
 import Dexie from 'dexie';
 
-var localDatabase = new Dexie();
+var localDatabase = new Dexie('lbym');
 
 export default class Projects {
 
@@ -14,6 +14,8 @@ export default class Projects {
       projects: '++id, name, code, projectId'
     })
   }
+
+
 
   save() {
 
@@ -49,6 +51,11 @@ export default class Projects {
 
   }
 
+  //There's a delete method, but it was giving me trouble. For now I just added null data.
+  async clearDatabase(){
+    this.writeLastCodeToLocalStorage(null);
+    this.writePidToStorage(null);
+  }
 
   async writePidToStorage(pid) {
     var context = this;

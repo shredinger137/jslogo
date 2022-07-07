@@ -34,7 +34,8 @@ function UserMenu(props) {
     }
 
     const signOut = () => {
-        firebase.auth().signOut();
+        props.projects.clearDatabase().then(() => {firebase.auth().signOut();});
+
     }
 
 

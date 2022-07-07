@@ -97,6 +97,7 @@ function Header(props) {
 
     useEffect(() => {
 
+
         if (window.location.pathname.substring(1) && window.location.pathname.substring(1, 3) === "pr") {
             setProjectId(window.location.pathname.substring(3));
 
@@ -120,7 +121,30 @@ function Header(props) {
 
     //run getUserProjects if user changes; meaning, we want to wait until the login loads
     useEffect(() => {
+
         getUserProjects();
+        projects.getRecoverEntry().then(recoveryProject => {
+
+            //make sure we're not at a project URL
+            if (!window.location.pathname.substr(1) || window.location.pathname.substr(1, 2) !== "pr") {
+                if (recoveryProject && recoveryProject[0]) {
+                    //if there is a user (we don't care who at this time, but that might be a TODO) and a saved PID, open the PID
+                    if (user && recoveryProject[0].projectId) {
+                        //This item is cleared on signing out, so it's unlikely to open someone else's project. Not impossible though.
+                        getSingleProject(recoveryProject[0]['projectId']);
+                    }
+
+                    if (recoveryProject[0]['code']) {
+                        props.updateCode(recoveryProject[0]['code'])
+                        props.updateCode(recoveryProject[0]['code'])
+                        document.getElementById("projectTitle").value = "Recovered"
+                    }
+                }
+                    //note: this runs on user change, which includes signing out, so it switches to 'recovery' mode. Which is a little weird.
+                    //Maybe TODO - add a transition listener of some sort?
+            }
+        });
+
     },
         [user]
     );
@@ -152,33 +176,6 @@ function Header(props) {
 
 
 
-        projects.getRecoverEntry().then(recoveryProject => {
-            if (!window.location.pathname.substr(1) || window.location.pathname.substr(1, 2) !== "pr") {
-                if (recoveryProject && recoveryProject[0] && recoveryProject[0]['code']) {
-                    props.updateCode(recoveryProject[0]['code'])
-                    props.updateCode(recoveryProject[0]['code'])
-                    document.getElementById("projectTitle").value = "Recovered"
-
-                    if (false) {
-                        console.log("project")
-                        //this is not a robust solution - it assumes that we're connected, that the correct user is the one on the computer,
-                        //and that we get a good response and don't need to fallback to code. Obviously all of that is wrong and we 
-                        //need to be more robust in the future.
-                        getSingleProject(recoveryProject[0]['projectId']);
-                    } else {
-
-                        props.updateCode(recoveryProject[0]['code'])
-
-                        document.getElementById("projectTitle").value = "Recovered"
-                    }
-                }
-
-
-                //this is a little weird with cloud saves; we're just going to change the title to 'recovered', and hope that makes it clear
-                //the problem is if you go in and it already has the project you were working on you might not realize it's different
-
-            }
-        });
 
         setInterval(() => {
 
@@ -308,16 +305,14 @@ function Header(props) {
     }
 
 
-    const getSingleProject = (openPid, userObject) => {
-        //during this process we're passing userObject when getting it from a recovery entry, since it's unreliable to get it through state unless state triggers the function
-        //this is an issue entirely because we're using two different methods of getting user, and it might not exist in both... so... think about that.
+    const getSingleProject = (openPid) => {
 
         projects.writePidToStorage(openPid);
 
         toggleUserMenu();
 
         if (true
-            //user && user.uid - check temporarily disabled during troubleshooting
+            //user && user.uid - check temporarily disabled
         ) {
 
             firebase.auth().currentUser.getIdToken(false).then(idToken => {
@@ -421,7 +416,7 @@ function Header(props) {
                 <img src={uploadIcon} alt="Upload icon"></img>
                 <span tabIndex={0}>Open</span>
             </div>
-            <div tabIndex={0} className="buttonDiv"
+            <div tabIndex={0} className={user ? "buttonDiv" : "buttonDiv disabled"}
                 onClick={() => saveToCloud()} onKeyDown={(e) => { if (e.key == "Enter") { saveToCloud() } }}>
                 <img src={saveIcon} alt="Save"></img>
                 <span>Save</span>
@@ -448,6 +443,7 @@ function Header(props) {
                     <div id="userMenuWrapper" className={userMenuShow ? "userMenu userMenuShow" : "userMenu"} onClick={(e) => { e.stopPropagation() }} tabIndex={0}>
 
                         <UserMenu
+                            projects={projects}
                             toggleUserMenu={toggleUserMenu.bind(this)}
                             getSingleProject={getSingleProject.bind(this)}
                             deleteProject={deleteProject.bind(this)}
