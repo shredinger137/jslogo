@@ -1,7 +1,6 @@
 /* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off", no-use-before-define: "off" */
 
 import React, {useState} from 'react';
-import { useAuth } from 'reactfire';
 import firebase from 'firebase/app';
 //we need firebase because we're saving data files to the cloud, and we want to authorize people
 import axios from 'axios';
@@ -12,8 +11,6 @@ import OpenDataModal from './OpenDataModal';
 
 function DataTable(props) {
 
-    const auth = useAuth();
-    
     const [dataModalOpen, setDataModalOpen] = useState(false);
 
     const toggleModal = () => {

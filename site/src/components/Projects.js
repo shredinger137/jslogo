@@ -10,8 +10,8 @@ export default class Projects {
   }
 
   async initializeDatabase() {
-    localDatabase.version(2).stores({
-      projects: '++id, name, code, projectId'
+    localDatabase.version(3).stores({
+      projects: '++id, name, code, projectId, date'
     })
   }
 
@@ -34,28 +34,21 @@ export default class Projects {
         var recoveryId = entries[0]["id"];
         await localDatabase.projects.update(recoveryId, {
           name: "recover",
-          code: code
+          code: code,
+          date: Date.now()
         })
       } else {
         await localDatabase.projects.add({
           name: 'recover',
-          code: code
+          code: code,
+          date: Date.now()
         })
-        //if a recover entry doesn't exist, create it
-
-        //TODO
-
       }
 
     })
 
   }
 
-  //There's a delete method, but it was giving me trouble. For now I just added null data.
-  async clearDatabase(){
-    this.writeLastCodeToLocalStorage(null);
-    this.writePidToStorage(null);
-  }
 
   async writePidToStorage(pid) {
     var context = this;

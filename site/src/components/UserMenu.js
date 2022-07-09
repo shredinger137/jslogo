@@ -5,6 +5,7 @@ import '../css/menus.css'
 
 function UserMenu(props) {
 
+
     const [projectList, setProjectList] = useState(props.projectList);
 
 
@@ -34,8 +35,9 @@ function UserMenu(props) {
     }
 
     const signOut = () => {
-        props.projects.clearDatabase().then(() => {firebase.auth().signOut();});
-
+        props.projects.writePidToStorage(false);
+        props.projects.writeLastCodeToLocalStorage(false)
+        firebase.auth().signOut();
     }
 
 
@@ -47,24 +49,41 @@ function UserMenu(props) {
         });
     }
 
+    const convertDate = (dateString) => {
+        let date = new Date(dateString);
+        return `${date.getMonth() + 1}-${date.getDate()}-${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}`
+    }
+    
+
 
     return (
         <div style={menuStyle}>
 
             <h4 onClick={signOut} style={textStyle}>Sign Out</h4>
             {
-                projectList.map((project) =>
+                projectList.reverse().map((project) =>
                     <div className="project" key={project.title} style={{ marginTop: "5px", padding: "5px" }}>
                         <span key={`${project.title}span`}
-                            onClick={() => { console.log('got click'); props.getSingleProject(project.projectId) }}
+                            onClick={() => { props.getSingleProject(project.projectId) }}
                             style={{ marginRight: "10px" }}>{project.title}</span><br />
                         <span key={`${project.title}del`} style={{ marginRight: "10px", fontSize: "1rem" }} onClick={() => { props.deleteProject(project.projectId) }}>[delete]</span>
                         <span key={`${project.title}copy`} style={{ fontSize: "1rem", marginRight: '10px' }} onClick={() => { copyProjectLink(`${project.projectId}`) }}>[copy link]</span>
-                        
+
                     </div>
 
                 )
+            }
 
+            {
+                props.recoveryEntry ?
+                    <div className="project" key='recovery' style={{ marginTop: "5px", padding: "5px" }}>
+                        <span key='recoverytitle'
+                            onClick={() => { props.loadRecoveredCode() }}
+                            style={{ marginRight: "10px" }}>Recovered Code</span><br />
+                            <span style={{fontSize: '.6em'}}>{convertDate(props.recoveryEntry.date)}</span>
+                    </div>
+                    :
+                    null
             }
 
         </div>

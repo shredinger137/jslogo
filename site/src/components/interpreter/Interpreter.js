@@ -158,11 +158,13 @@ export default class Interpreter {
             case "ranger":
                 document.getElementById('turtleimage').src = 'turtleRanger.svg'
                 return;
+            default:
+                this.printToConsole("Invalid class: expected warrior, mage, ranger, bard or none.")
+                return;
 
         }
 
-        this.printToConsole("Invalid class: expected warrior, mage, ranger, bard or none.")
-        return;
+
     }
 
     aboutClass(name) {
@@ -179,9 +181,10 @@ export default class Interpreter {
 
             case "ranger":
                 return 'The undersea forests are a place bandits fear to roam, for the rangers are known to dispatch foes silently and unseen. These expert archers have dexterity as a primary stat and excel at the use of bows, crossbows and javalins.'
-
+            default:
+                return 'Invalid class: expected warrior, mage, ranger or bard.'
         }
-        return 'Invalid class: expected warrior, mage, ranger or bard.'
+
 
     }
 
