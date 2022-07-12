@@ -7,7 +7,9 @@
     height: 20px;
 }
 
-
+.disabled {
+    color: gray;
+}
 
 .top-buttons ul {
     cursor: pointer;

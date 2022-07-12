@@ -1,6 +1,8 @@
 /* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off", no-use-before-define: "off", react-hooks/exhaustive-deps: off */
 
-//Bit of a misnomer. Header also handles cloud saves. The user menu is connected to cloud loads. Oops.
+//This has turned into a bit of a mess as more authentication and project management got created and shoved in here. 
+//Good practice would be to move all of the non-rendering things into helper function files (project management, user management)
+//to properly isolate this. There's also a lot of prop dependency going on with UserMenu which can be moved out.
 
 
 import React, { useEffect, useState } from 'react';
@@ -21,10 +23,6 @@ import newWindowIcon from '../images/new-window.png';
 import newProjectIcon from '../images/newProject.png';
 import uploadIcon from '../images/upload.png';
 
-
-
-
-//alright, latest issue is using 'user' in different ways. Stick to one.
 
 function Header(props) {
 
@@ -71,28 +69,23 @@ function Header(props) {
 
     }
 
-    //TODO: Validating log in is rather slow
-    //consider using the native firebase stuff
-
     const { data: user } = useUser();
     const reactAuth = useAuth();
 
-
-
-
-    //in progress: change toggleUserMenu to use this state instead
 
     const [projectList, setProjectList] = useState([]);
     const [saveState, setSaveState] = useState("");
     const [projectId, setProjectId] = useState(null);
     const [userMenuShow, setUserMenuShow] = useState(false);
     const [projectAuthor, setProjectAuthor] = useState(null);
+    const [recoveryEntry, setRecoveryEntry] = useState(false);
 
     //On mount, check to see if a project is defined in the URL.
     //All links have the format /pr${projectId}, so we check if 'pr' is the start of it and take the rest.
     //This way you can still use URLs like /settings or whatever in the future, you just can't start them with pr.
 
     //Also start the process that will check if we're online or not.
+
 
 
     useEffect(() => {
@@ -118,9 +111,54 @@ function Header(props) {
         []
     )
 
+    useEffect(() => {
+        projects.writePidToStorage(projectId)
+    }, [projectId])
+
     //run getUserProjects if user changes; meaning, we want to wait until the login loads
+    //this is also where we check for recovery files
     useEffect(() => {
         getUserProjects();
+        projects.getRecoverEntry().then(recoveryProject => {
+
+
+            //make sure we're not at a project URL
+            if (!window.location.pathname.substr(1) || window.location.pathname.substr(1, 2) !== "pr") {
+                if (recoveryProject && recoveryProject[0]) {
+
+                    //if there is a user (we don't care who at this time, but that might be a TODO) and a saved PID, open the PID
+                    if (user && recoveryProject[0].projectId) {
+                        //This item is cleared on signing out, so it's unlikely to open someone else's project. Not impossible though.
+                        getSingleProject(recoveryProject[0]['projectId']);
+
+                        //if code has been saved, provide it in the menu
+                        if (recoveryProject[0]['code']) {
+                            setRecoveryEntry(recoveryProject[0]);
+                        }
+
+                    }
+
+                    //if user isn't logged in and code exists, open it
+                    if (!user && recoveryProject[0]['code']) {
+                        props.updateCode(recoveryProject[0]['code'])
+                        props.updateCode(recoveryProject[0]['code'])
+                        document.getElementById("projectTitle").value = "Recovered"
+                    }
+
+                    //if user is logged in, code exists, but cloud project wasn't open, load the code
+                    if (user && recoveryProject[0]['code'] && !recoveryProject[0]['projectId']) {
+                        props.updateCode(recoveryProject[0]['code'])
+                        props.updateCode(recoveryProject[0]['code'])
+                        document.getElementById("projectTitle").value = "Recovered"
+                    }
+
+
+                }
+                //note: this runs on user change, which includes signing out, so it switches to 'recovery' mode. Which is a little weird.
+                //Maybe TODO
+            }
+        });
+
     },
         [user]
     );
@@ -129,56 +167,6 @@ function Header(props) {
     useEffect(() => {
 
         projects.initializeDatabase();
-
-        /*
-        This is how we should handle opening the previous project, if we choose to do that 
-        firebase.auth().onAuthStateChanged(function (user) {
-            projects.getRecoverEntry().then(recoveryProject => {
-                console.log(recoveryProject)
-                console.log(user)
-                if (user && recoveryProject[0] && recoveryProject[0].projectId) {
-                    console.log("open" + recoveryProject[0].projectId)
-                    getSingleProject(recoveryProject[0].projectId, user);
-                } else if (recoveryProject[0].code) {
-                    //restore code
-                }
-            }
-
-
-            )
-        });
-
-        */
-
-
-
-        projects.getRecoverEntry().then(recoveryProject => {
-            if (!window.location.pathname.substr(1) || window.location.pathname.substr(1, 2) !== "pr") {
-                if (recoveryProject && recoveryProject[0] && recoveryProject[0]['code']) {
-                    props.updateCode(recoveryProject[0]['code'])
-                    props.updateCode(recoveryProject[0]['code'])
-                    document.getElementById("projectTitle").value = "Recovered"
-
-                    if (false) {
-                        console.log("project")
-                        //this is not a robust solution - it assumes that we're connected, that the correct user is the one on the computer,
-                        //and that we get a good response and don't need to fallback to code. Obviously all of that is wrong and we 
-                        //need to be more robust in the future.
-                        getSingleProject(recoveryProject[0]['projectId']);
-                    } else {
-
-                        props.updateCode(recoveryProject[0]['code'])
-
-                        document.getElementById("projectTitle").value = "Recovered"
-                    }
-                }
-
-
-                //this is a little weird with cloud saves; we're just going to change the title to 'recovered', and hope that makes it clear
-                //the problem is if you go in and it already has the project you were working on you might not realize it's different
-
-            }
-        });
 
         setInterval(() => {
 
@@ -307,17 +295,23 @@ function Header(props) {
         }
     }
 
+    const loadRecoveredCode = () => {
+        if (recoveryEntry.code) {
+            props.updateCode(recoveryEntry.code);
+            setUserMenuShow(false);
+            setRecoveryEntry(false);
 
-    const getSingleProject = (openPid, userObject) => {
-        //during this process we're passing userObject when getting it from a recovery entry, since it's unreliable to get it through state unless state triggers the function
-        //this is an issue entirely because we're using two different methods of getting user, and it might not exist in both... so... think about that.
+        }
+    }
+
+    const getSingleProject = (openPid) => {
 
         projects.writePidToStorage(openPid);
 
-        toggleUserMenu();
+        setUserMenuShow(false);
 
         if (true
-            //user && user.uid - check temporarily disabled during troubleshooting
+            //user && user.uid - check temporarily disabled
         ) {
 
             firebase.auth().currentUser.getIdToken(false).then(idToken => {
@@ -347,8 +341,6 @@ function Header(props) {
 
             })
 
-        } else {
-            console.log("conditional error")
         }
     }
 
@@ -384,7 +376,9 @@ function Header(props) {
     return (
         <header className="header">
             <span style={{ width: "20px" }}></span>
+
             {user && user.displayName ?
+
                 <div onClick={toggleUserMenu} tabIndex="0" onKeyDown={(e) => { if (e.key == "Enter") { toggleUserMenu() } }} className="" style={userLogoStyle}>
                     <p>{user.displayName.substr(0, 1)}</p>
                 </div>
@@ -409,6 +403,7 @@ function Header(props) {
                 <span style={{ fontSize: ".8em" }}>{saveState}</span>
             </div>
 
+
             <div className="buttonDiv" onClick={() => toggleNewProject()} onKeyDown={(e) => { if (e.key == "Enter") { toggleNewProject() } }}>
                 <img src={newProjectIcon} alt="New project icon"></img>
                 <span tabIndex={0}>New</span>
@@ -419,9 +414,9 @@ function Header(props) {
             </div>
             <div className="buttonDiv" onClick={() => loadFile()} onKeyDown={(e) => { if (e.key == "Enter") { loadFile() } }}>
                 <img src={uploadIcon} alt="Upload icon"></img>
-                <span tabIndex={0}>Open</span>
+                <span tabIndex={0}>Upload</span>
             </div>
-            <div tabIndex={0} className="buttonDiv"
+            <div tabIndex={0} className={user ? "buttonDiv" : "buttonDiv disabled"}
                 onClick={() => saveToCloud()} onKeyDown={(e) => { if (e.key == "Enter") { saveToCloud() } }}>
                 <img src={saveIcon} alt="Save"></img>
                 <span>Save</span>
@@ -448,6 +443,10 @@ function Header(props) {
                     <div id="userMenuWrapper" className={userMenuShow ? "userMenu userMenuShow" : "userMenu"} onClick={(e) => { e.stopPropagation() }} tabIndex={0}>
 
                         <UserMenu
+                            loadRecoveredCode={loadRecoveredCode.bind(this)}
+                            recoveryEntry={recoveryEntry}
+                            projects={projects}
+                            setUserMenuShow={setUserMenuShow}
                             toggleUserMenu={toggleUserMenu.bind(this)}
                             getSingleProject={getSingleProject.bind(this)}
                             deleteProject={deleteProject.bind(this)}

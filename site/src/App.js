@@ -15,7 +15,7 @@ import Chart from './components/Chart';
 import DataTable from './components/DataTable';
 import Terminal from './components/Terminal';
 import 'firebase/auth';
-import { useAuth, useUser } from 'reactfire';
+//import { useUser } from 'reactfire';
 //import WorkerBuilder from './components/worker-builder';
 //import Worker from './components/logoWorker';
 
@@ -26,7 +26,7 @@ let interpreter, projects;
 const App = () => {
 
   
-  const { data: user } = useUser();
+  //const { data: user } = useUser();
   const [showNewProjectModal, setShowNewProjectModal] = useState(false);
   const [view, setView] = useState('main');
   const [tableData, setTableData] = useState([]);

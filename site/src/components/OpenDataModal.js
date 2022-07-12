@@ -1,3 +1,5 @@
+/* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off", no-use-before-define: "off", react-hooks/exhaustive-deps: off */
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { config } from '../config';
@@ -40,8 +42,6 @@ const OpenDataModal = (props) => {
         }
 
         let date = new Date(unixtime);
-        let minutes = twoDigit(date.getMinutes());
-        let month = date.getMonth() + 1;
         let converted = `${twoDigit(date.getMonth())}-${twoDigit(date.getDate())}-${date.getFullYear()} ${twoDigit(date.getHours())}:${twoDigit(date.getMinutes())}:${twoDigit(date.getSeconds())}`;
         return converted;
     }

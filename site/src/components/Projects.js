@@ -1,6 +1,6 @@
 import Dexie from 'dexie';
 
-var localDatabase = new Dexie();
+var localDatabase = new Dexie('lbym');
 
 export default class Projects {
 
@@ -10,10 +10,12 @@ export default class Projects {
   }
 
   async initializeDatabase() {
-    localDatabase.version(2).stores({
-      projects: '++id, name, code, projectId'
+    localDatabase.version(3).stores({
+      projects: '++id, name, code, projectId, date'
     })
   }
+
+
 
   save() {
 
@@ -32,17 +34,15 @@ export default class Projects {
         var recoveryId = entries[0]["id"];
         await localDatabase.projects.update(recoveryId, {
           name: "recover",
-          code: code
+          code: code,
+          date: Date.now()
         })
       } else {
         await localDatabase.projects.add({
           name: 'recover',
-          code: code
+          code: code,
+          date: Date.now()
         })
-        //if a recover entry doesn't exist, create it
-
-        //TODO
-
       }
 
     })
