@@ -414,7 +414,7 @@ function Header(props) {
             </div>
             <div className="buttonDiv" onClick={() => loadFile()} onKeyDown={(e) => { if (e.key == "Enter") { loadFile() } }}>
                 <img src={uploadIcon} alt="Upload icon"></img>
-                <span tabIndex={0}>Open</span>
+                <span tabIndex={0}>Upload</span>
             </div>
             <div tabIndex={0} className={user ? "buttonDiv" : "buttonDiv disabled"}
                 onClick={() => saveToCloud()} onKeyDown={(e) => { if (e.key == "Enter") { saveToCloud() } }}>
