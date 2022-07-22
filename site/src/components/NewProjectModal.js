@@ -1,15 +1,9 @@
 /* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off", no-use-before-define: "off", react-hooks/exhaustive-deps: off */
 
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { config } from '../config';
 import { experimentsList } from '../data/experiments.js';
 
 const OpenDataModal = (props) => {
-
-    const [availableProjects, setAvailableProjects] = useState([]);
-
-
 
     const loadNewTemplate = (code) => {
 

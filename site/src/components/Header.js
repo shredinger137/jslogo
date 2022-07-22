@@ -216,7 +216,7 @@ function Header(props) {
     const convertDate = (dateString) => {
         if (dateString == undefined) { return false }
         let date = new Date(dateString);
-        return `${date.getMonth() + 1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}`
+        return `${date.getMonth() + 1}-${date.getDate()} ${date.getHours()<10?'0':''}${date.getHours()}:${date.getMinutes()<10?'0':''}${date.getMinutes()}`
     }
 
 
@@ -398,7 +398,7 @@ function Header(props) {
 
             }
 
-            <span id="dummyClickToClearPid" style={{ display: 'none' }} onClick={() => { setProjectId(null) }} ></span>
+            <span id="dummyClickToClearPid" style={{ display: 'none' }} onClick={() => { setProjectId(null); setProjectLastSaved(null) }} ></span>
             <span id="dummyClickToClearAuthor" style={{ display: 'none' }} onClick={() => { setProjectAuthor(null) }}></span>
             <div style={titleStyle}>
                 <input type="text" id="projectTitle" defaultValue="Untitled" style={titleInputStyle} maxLength="22"></input>
