@@ -1,107 +1,57 @@
-/* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off", no-use-before-define: "off", no-loop-func: "off" */
+/* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off", no-use-before-define: "off", react-hooks/exhaustive-deps: off */
 
-import React, { Component } from 'react';
-import '../css/styles.css';
-import '../css/layout.css';
-import { experimentsList } from '../data/experiments.js'
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { config } from '../config';
+import { experimentsList } from '../data/experiments.js';
 
-export default class NewProjectModal extends Component {
+const OpenDataModal = (props) => {
 
-    state = {
-        projectsAvailable: []
-    };
-
-    componentDidMount() {
-        this.getAvailableProjects();
-    }
-
-    componentDidUpdate() {
-
-    }
-
-    getAvailableProjects() {
-        if (experimentsList) {
-            this.setState({
-                projectsAvailable: experimentsList
-            })
-        }
-    }
-
-    loadCodeFromProject(projectName) {
-        var scopedUpdateCode = this.props.updateCode;
+    const [availableProjects, setAvailableProjects] = useState([]);
 
 
-        for (var project of this.state.projectsAvailable) {
-            if (project.name === projectName) {
 
-                var request = new XMLHttpRequest();
+    const loadNewTemplate = (code) => {
 
-                if (project.code) {
+        //the code is a static file, so we need to load the content and apply it
+        var request = new XMLHttpRequest();
+        request.open('GET', code, true);
+        request.send(null);
+        request.onreadystatechange = function () {
+            if (request.readyState === 4 && request.status === 200) {
+                props.updateCode(request.responseText);
+                document.getElementById("projectTitle").value = "Untitled"
 
-                    request.open('GET', project.code, true);
-                    request.send(null);
-                    request.onreadystatechange = function () {
-                        if (request.readyState === 4 && request.status === 200) {
-                            scopedUpdateCode(request.responseText);
-                            document.getElementById("projectTitle").value = "Untitled"
+                //TODO: This is a hack. We shouldn't do it. Look at how data flows and fix it.
 
-                            //TODO: This is a hack. We shouldn't do it. Look at how data flows and fix it.
-
-                            document.getElementById("dummyClickToClearPid").click();
-                            document.getElementById('dummyClickToClearAuthor').click();
-                        }
-                    }
-
-
-                    
-                }
-
-                else if (project.fileLocation) {
-
-                    request.open('GET', project.fileLocation, true);
-                    request.send(null);
-                    request.onreadystatechange = function () {
-                        if (request.readyState === 4 && request.status === 200) {
-                            scopedUpdateCode(request.responseText);
-                            document.getElementById("projectTitle").value = "Untitled"
-
-                            //TODO: This is a hack. We shouldn't do it. Look at how data flows and fix it.
-
-                            document.getElementById("dummyClickToClearPid").click();
-                            document.getElementById('dummyClickToClearAuthor').click();
-                        }
-                    }
-                } else {
-                    console.log("error: no filename specified");
-                }
+                document.getElementById("dummyClickToClearPid").click();
+                document.getElementById('dummyClickToClearAuthor').click();
+                props.toggleModal();
             }
-            this.props.toggleModal();
         }
     }
 
-
-    stopProp(e) {
-        e.stopPropagation();
-    }
-
-    render() {
-        return (
-            <div id="newProjectModal" className="modal" onClick={() => this.props.toggleModal()}>
-                <div className="modalContent" onClick={(e) => this.stopProp(e)}>
-                    <span className="close" onClick={() => this.props.toggleModal()}>&times;</span>
-                    <h3>New Project</h3>
-                    <br />
-                    <div>
-                        {this.state.projectsAvailable.map(project => (
-                            <div key={project.name + "div"}>
-                                <span style={{ cursor: "pointer" }} onClick={() => { this.loadCodeFromProject(project.name) }} key={project.name}>{project.name}</span><br />
-                            </div>
-                        )
-                        )
-                        }
-                    </div>
+    return (
+        <div id="dataModal" className="modal" onClick={() => props.toggleModal()}>
+            <div className="modalContent" onClick={(e) => e.stopPropagation()}>
+                <span className="close" onClick={() => props.toggleModal()}>&times;</span>
+                <h3>New Project</h3>
+                <br />
+                <div>
+                    {experimentsList.map(item => (
+                        <div
+                            style={{ cursor: 'pointer' }}
+                            key={item}
+                            onClick={() => { loadNewTemplate(item.code) }}>
+                            {item.name}
+                        </div>
+                    ))}
                 </div>
             </div>
-        );
-    }
+        </div>
+    )
+
 }
+
+
+export default OpenDataModal;

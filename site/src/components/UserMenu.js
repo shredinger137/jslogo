@@ -50,10 +50,11 @@ function UserMenu(props) {
     }
 
     const convertDate = (dateString) => {
+        if (dateString == undefined) { return false }
         let date = new Date(dateString);
         return `${date.getMonth() + 1}-${date.getDate()}-${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}`
     }
-    
+
 
 
     return (
@@ -61,11 +62,12 @@ function UserMenu(props) {
 
             <h4 onClick={signOut} style={textStyle}>Sign Out</h4>
             {
-                projectList.reverse().map((project) =>
+                projectList.map((project) =>
                     <div className="project" key={project.title} style={{ marginTop: "5px", padding: "5px" }}>
                         <span key={`${project.title}span`}
                             onClick={() => { props.getSingleProject(project.projectId) }}
                             style={{ marginRight: "10px" }}>{project.title}</span><br />
+
                         <span key={`${project.title}del`} style={{ marginRight: "10px", fontSize: "1rem" }} onClick={() => { props.deleteProject(project.projectId) }}>[delete]</span>
                         <span key={`${project.title}copy`} style={{ fontSize: "1rem", marginRight: '10px' }} onClick={() => { copyProjectLink(`${project.projectId}`) }}>[copy link]</span>
 
@@ -80,7 +82,7 @@ function UserMenu(props) {
                         <span key='recoverytitle'
                             onClick={() => { props.loadRecoveredCode() }}
                             style={{ marginRight: "10px" }}>Recovered Code</span><br />
-                            <span style={{fontSize: '.6em'}}>{convertDate(props.recoveryEntry.date)}</span>
+                        <span style={{ fontSize: '.6em' }}>{convertDate(props.recoveryEntry.date)}</span>
                     </div>
                     :
                     null

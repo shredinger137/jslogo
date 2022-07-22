@@ -119,7 +119,7 @@ module.exports = {
     getUserProjects: async (uid) => {
         if (dbConnection) {
             try {
-                var userProjects = await dbConnection.collection("projects").find({ owner: uid }, { projection: { _id: 0, title: 1, projectId: 1, dataIndex: 1} }).toArray();
+                var userProjects = await dbConnection.collection("projects").find({ owner: uid }, { projection: { _id: 0, title: 1, projectId: 1, dataIndex: 1, saved: 1} }).toArray();
             }
 
             catch {

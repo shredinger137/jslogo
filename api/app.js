@@ -94,6 +94,7 @@ app.post("/login/:id", function (req, res) {
 
 //TODO: We should make sure the required parameters exist
 //Also there's no error handling; should send status
+//Also TODO: Make sure there's a unique ID
 
 app.post("/project", function (req, res) {
     admin
@@ -108,7 +109,8 @@ app.post("/project", function (req, res) {
                     projectId: newProjectId,
                     owner: uid,
                     title: req.body.title,
-                    code: req.body.code
+                    code: req.body.code,
+                    saved: Date.now()
                 }).then(response => {
                     console.log(response)
                     res.send(newProjectId)
@@ -134,7 +136,8 @@ app.patch("/project/:pid", function (req, res) {
                 projectFunctions.updateProjectEntry(
                     {
                         title: req.body.title,
-                        code: req.body.code
+                        code: req.body.code,
+                        saved: Date.now()
                     },
                     req.params.pid
                 ).then(response => {

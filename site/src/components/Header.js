@@ -79,6 +79,7 @@ function Header(props) {
     const [userMenuShow, setUserMenuShow] = useState(false);
     const [projectAuthor, setProjectAuthor] = useState(null);
     const [recoveryEntry, setRecoveryEntry] = useState(false);
+    const [projectLastSaved, setProjectLastSaved] = useState(false);
 
     //On mount, check to see if a project is defined in the URL.
     //All links have the format /pr${projectId}, so we check if 'pr' is the start of it and take the rest.
@@ -212,6 +213,11 @@ function Header(props) {
         });
     };
 
+    const convertDate = (dateString) => {
+        if (dateString == undefined) { return false }
+        let date = new Date(dateString);
+        return `${date.getMonth() + 1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}`
+    }
 
 
     const saveToCloud = () => {
@@ -241,6 +247,7 @@ function Header(props) {
 
                         //TODO: We're lifting up state instead of keeping it here, but there will be 
                         //repetition until this is done.
+                        setProjectLastSaved(convertDate(Date.now()))
                         props.setProjectId(response.data);
                         setProjectId(response.data);;
                         getUserProjects();
@@ -260,6 +267,7 @@ function Header(props) {
 
                         if (response.status == 200) {
                             setSaveState("Project Saved");
+                            setProjectLastSaved(convertDate(Date.now()))
                         } else {
                             setSaveState("Error Saving")
                         }
@@ -326,6 +334,7 @@ function Header(props) {
                         if (titleElement !== null) {
                             titleElement.value = response.data.title;
                         }
+                        setProjectLastSaved(convertDate(response.data.saved) || null)
                         setProjectId(response.data.projectId);
                         props.setProjectId(response.data.projectId);
                         if (response.data.ownerDisplayName) {
@@ -400,7 +409,7 @@ function Header(props) {
                     fontSize: ".6em",
                     pointerEvents: 'none'
                 }}>{projectAuthor && user && projectAuthor !== user.displayName ? `By ${projectAuthor}` : null}</span>
-                <span style={{ fontSize: ".8em" }}>{saveState}</span>
+                <span style={{ fontSize: ".8em" }}>{projectLastSaved ? `Saved ${projectLastSaved}` : null}</span>
             </div>
 
 
@@ -447,6 +456,7 @@ function Header(props) {
                             recoveryEntry={recoveryEntry}
                             projects={projects}
                             setUserMenuShow={setUserMenuShow}
+                            setProjectLastSaved={setProjectLastSaved.bind(this)}
                             toggleUserMenu={toggleUserMenu.bind(this)}
                             getSingleProject={getSingleProject.bind(this)}
                             deleteProject={deleteProject.bind(this)}

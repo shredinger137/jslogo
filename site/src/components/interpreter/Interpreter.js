@@ -191,6 +191,8 @@ export default class Interpreter {
 
     setup() {
 
+
+
         let t = this;
         this.element = document.getElementById('turtle')
         document.getElementById('cnvframe').appendChild(t.element);
@@ -1313,6 +1315,8 @@ export default class Interpreter {
                 }
             }
             t.pushNewChartData(chartType, chartData);
+
+
         }
 
 
