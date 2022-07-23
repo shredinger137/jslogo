@@ -25,6 +25,10 @@ let interpreter, projects;
 
 const App = () => {
 
+  const clickSound = new Audio ('/click.mp3');
+
+
+
   
   //const { data: user } = useUser();
   const [showNewProjectModal, setShowNewProjectModal] = useState(false);
@@ -185,6 +189,8 @@ end`,);
   }
 
   const pushToDataTable = (newDataLine) => {
+
+    clickSound.play();
 
 
     if (newDataLine == false) {
