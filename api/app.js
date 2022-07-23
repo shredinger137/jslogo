@@ -110,7 +110,8 @@ app.post("/project", function (req, res) {
                     owner: uid,
                     title: req.body.title,
                     code: req.body.code,
-                    saved: Date.now()
+                    saved: Date.now(),
+                    created: Date.now()
                 }).then(response => {
                     console.log(response)
                     res.send(newProjectId)

@@ -45,7 +45,7 @@ module.exports = {
     //create a project entry and associate it with the user
     //associate it by adding a 'ownedProjects' property to the user - doesn't exist here yet
 
-    //no error handling - this returns true regardless of truthiness
+    //TODO: no error handling - this returns true regardless of truthiness
 
     //Also we don't check if the ID already exists.
 
@@ -55,6 +55,7 @@ module.exports = {
             if (err) throw err;
             else {
 
+                //TODO: This isn't a relational database so stop treating it like one.
                 dbConnection.collection("users").updateOne({ uid: projectObject.owner }, { $push: { ownedProjects: projectObject.projectId } }, { upsert: true })
                 if (err) throw err;
                 return true;
@@ -119,7 +120,7 @@ module.exports = {
     getUserProjects: async (uid) => {
         if (dbConnection) {
             try {
-                var userProjects = await dbConnection.collection("projects").find({ owner: uid }, { projection: { _id: 0, title: 1, projectId: 1, dataIndex: 1, saved: 1} }).toArray();
+                var userProjects = await dbConnection.collection("projects").find({ owner: uid }, { projection: { _id: 0, title: 1, projectId: 1, dataIndex: 1, saved: 1 } }).sort({ created: -1 }).toArray();
             }
 
             catch {
@@ -140,7 +141,7 @@ module.exports = {
                 var projectData = await dbConnection.collection("projects").findOne({ projectId: projectId }, { projection: { _id: 0 } });
             }
 
-            catch {
+            catch (err) {
                 console.log(err);
                 return false;
             }
@@ -151,7 +152,7 @@ module.exports = {
                     var projectUser = await dbConnection.collection("users").findOne({ uid: projectData.owner });
                 }
 
-                catch {
+                catch (err) {
                     console.log(err);
                     return false;
                 }
@@ -177,19 +178,19 @@ const syncSaveDataIndex = (pid) => {
 
         dbConnection.collection("projects").findOne({ projectId: pid }, { projection: { _id: 0, collectedData: 1 } }, function (err, result) {
             if (err) throw err;
-            if(result && typeof result == 'object' && result.collectedData){
+            if (result && typeof result == 'object' && result.collectedData) {
                 let dataIndex = [];
-                for(let entry of result.collectedData){
-                    if(entry && entry.date){
+                for (let entry of result.collectedData) {
+                    if (entry && entry.date) {
                         dataIndex.push(entry.date);
                     }
                 }
 
-                dbConnection.collection("projects").updateOne({projectId: pid}, {$set: {dataIndex: dataIndex}}, function (err, result) {
-                    if(err) throw err;
+                dbConnection.collection("projects").updateOne({ projectId: pid }, { $set: { dataIndex: dataIndex } }, function (err, result) {
+                    if (err) throw err;
                 })
 
-            }        
+            }
         })
     }
 }
