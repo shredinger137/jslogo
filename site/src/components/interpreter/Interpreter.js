@@ -7,6 +7,8 @@
 import Tokenizer from './Tokenizer';
 import turtleMath from './turtleMath';
 import { includes } from './includes';
+import {store} from '../../redux/store';
+import {selectData, clear, add} from '../../redux/reducers/packetDataSlice';
 
 //built in modulus is weird, so we redefine it to one that works better... negatives, I think, are the main issue
 Number.prototype.mod = function (n) { return ((this % n) + n) % n; }
@@ -22,6 +24,8 @@ let constants = {
 export default class Interpreter {
 
     constructor(props) {
+
+        this.store = store;
 
         this.instantiatedObjects = {};
 
@@ -48,8 +52,6 @@ export default class Interpreter {
 
         this.ticker = this.ticker.bind(this);
         this.isDone = this.isDone.bind(this);
-
-        this.pushToTable = props.pushToTable;
 
         this.cnvWidth = 1000;
         this.cnvHeight = 600;
@@ -1883,9 +1885,9 @@ prims['limits'] = {
 
 
 prims['calibrate-list'] = { nargs: 3, fcn: function (a, b, c) { return this.calibrateList(a, b, c) } }
-prims['logData'] = { nargs: 1, fcn: function (a) { this.pushToTable(a) } }
-prims['save-data'] = { nargs: 1, fcn: function (a) { this.pushToTable(a) } }
-prims['clear-data'] = { nargs: 0, fcn: function () { this.pushToTable(false) } }
+prims['logData'] = { nargs: 1, fcn: function (a) { this.store.dispatch(add(a)) } }
+prims['save-data'] = { nargs: 1, fcn: function (a) { this.store.dispatch(add(a)) } }
+prims['clear-data'] = { nargs: 0, fcn: function () { this.store.dispatch(clear()) } }
 prims['repeat'] = { nargs: 2, flow: true, fcn: function (a, b) { this.repeat(a, b); } }
 prims['forever'] = { nargs: 1, flow: true, fcn: function (a) { this.loop(a); } }
 prims['loop'] = { nargs: 1, flow: true, fcn: function (a) { this.loop(a); } }
@@ -2085,7 +2087,6 @@ prims['dp9off'] = { nargs: 0, fcn: function () { this.pinOff(9); this.mwait(1); 
 prims['dp10on'] = { nargs: 0, fcn: function () { this.pinOn(10); this.mwait(1); } }
 prims['dp10off'] = { nargs: 0, fcn: function () { this.pinOff(10); this.mwait(1); } }
 prims['send'] = { nargs: 1, fnc: function (a) { this.sendl(a); this.mwait(1) } }
-
 
 prims['readADC0'] = { nargs: 0, fcn: function () { this.readSensor(0); return this.cfun; } }
 prims['readADC1'] = { nargs: 0, fcn: function () { this.readSensor(1); return this.cfun; } }

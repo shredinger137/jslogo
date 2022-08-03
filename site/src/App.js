@@ -24,22 +24,16 @@ let interpreter, projects;
 //let instance = new WorkerBuilder(Worker);
 
 const App = () => {
-
-  const clickSound = new Audio ('/click.mp3');
-
-
-
   
   //const { data: user } = useUser();
   const [showNewProjectModal, setShowNewProjectModal] = useState(false);
   const [view, setView] = useState('main');
-  const [tableData, setTableData] = useState([]);
   const [code, setCode] = useState(`to go
 print 'Hello World'
 end`,);
   //pid is a placeholder
   let pid = null;
-  var editor = null;
+  let editor = null;
 
   const [projectId, setProjectId] = useState(null);
   const [horizontalOffset, setHorizontalOffset] = useState(0);
@@ -95,7 +89,6 @@ end`,);
         updateChartOptions: updateChartOptions,
         updateChartType: updateChartType,
         pushNewChartData: pushChartData,
-        pushToTable: pushToDataTable,
       }
     );
 
@@ -139,10 +132,6 @@ end`,);
     document.addEventListener('mousemove', handleDrag)
   }
 
-
-  const setDataTable = (newData) => {
-    setTableData(newData);
-  }
 
   const updateChartType = (newType) => {
     setChartType(newType);
@@ -188,19 +177,6 @@ end`,);
     }
   }
 
-  const pushToDataTable = (newDataLine) => {
-
-    clickSound.play();
-
-
-    if (newDataLine == false) {
-      setTableData([[]])
-      return;
-    }
-
-    setDataTable(DataTable => [...DataTable, newDataLine]);
-
-  }
 
   const updateCode = (newCode) => {
     setCode(newCode);
@@ -210,12 +186,6 @@ end`,);
   const toggleShowNewProjectModal = () => {
     setShowNewProjectModal(!showNewProjectModal);
   }
-
-
-  
-  const saveData = () => {
-    
-}
 
 
   const editorWillMount = monaco => {
@@ -337,8 +307,6 @@ end`,);
             <DataTable
               projectId={projectId}
               pid={pid}
-              tableData={tableData}
-              setTableData={setDataTable}
             />
           </div>
         </div>

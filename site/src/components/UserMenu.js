@@ -50,7 +50,7 @@ function UserMenu(props) {
     }
 
     const convertDate = (dateString) => {
-        if (dateString == undefined) { return false }
+        if (dateString === undefined) { return false }
         let date = new Date(dateString);
         return `${date.getMonth() + 1}-${date.getDate()}-${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}`
     }

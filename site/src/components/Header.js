@@ -74,7 +74,6 @@ function Header(props) {
 
 
     const [projectList, setProjectList] = useState([]);
-    const [saveState, setSaveState] = useState("");
     const [projectId, setProjectId] = useState(null);
     const [userMenuShow, setUserMenuShow] = useState(false);
     const [projectAuthor, setProjectAuthor] = useState(null);
@@ -171,7 +170,11 @@ function Header(props) {
 
         setInterval(() => {
 
-            projects.writeLastCodeToLocalStorage(document.getElementById("procs").value);
+            let codeElement = document.getElementById('procs');
+            if (codeElement != null) {
+                projects.writeLastCodeToLocalStorage(codeElement.value);
+            }
+
         }, 1000);
 
 
@@ -216,7 +219,7 @@ function Header(props) {
     const convertDate = (dateString) => {
         if (dateString == undefined) { return false }
         let date = new Date(dateString);
-        return `${date.getMonth() + 1}-${date.getDate()} ${date.getHours()<10?'0':''}${date.getHours()}:${date.getMinutes()<10?'0':''}${date.getMinutes()}`
+        return `${date.getMonth() + 1}-${date.getDate()} ${date.getHours() < 10 ? '0' : ''}${date.getHours()}:${date.getMinutes() < 10 ? '0' : ''}${date.getMinutes()}`
     }
 
 
@@ -247,7 +250,7 @@ function Header(props) {
 
                         //TODO: We're lifting up state instead of keeping it here, but there will be 
                         //repetition until this is done.
-                        setProjectLastSaved(convertDate(Date.now()))
+                        setProjectLastSaved('Saved ' + convertDate(Date.now()))
                         props.setProjectId(response.data);
                         setProjectId(response.data);;
                         getUserProjects();
@@ -255,6 +258,7 @@ function Header(props) {
 
 
                 } else {
+                    console.log('first');
                     //not the first time - update an existing
 
                     axios.patch(`${config.apiUrl}/project/${projectId}`, {
@@ -264,19 +268,18 @@ function Header(props) {
                         projectId: projectId,
                         authorization: idToken
                     }).then((response) => {
+                        console.log(response.status);
 
                         if (response.status == 200) {
-                            setSaveState("Project Saved");
-                            setProjectLastSaved(convertDate(Date.now()))
+                            setProjectLastSaved('Saved ' + convertDate(Date.now()))
                         } else {
-                            setSaveState("Error Saving")
+                            console.log('conf')
+                            setProjectLastSaved('Error saving')
                         }
 
-                        setTimeout(function () {
-                            setSaveState("");
-                        }, 3000);
-
                         getUserProjects();
+                    }).catch((error) => {
+                        setProjectLastSaved('Error saving');
                     })
 
 
@@ -334,7 +337,7 @@ function Header(props) {
                         if (titleElement !== null) {
                             titleElement.value = response.data.title;
                         }
-                        setProjectLastSaved(convertDate(response.data.saved) || null)
+                        setProjectLastSaved('Saved ' + convertDate(response.data.saved) || null)
                         setProjectId(response.data.projectId);
                         props.setProjectId(response.data.projectId);
                         if (response.data.ownerDisplayName) {
@@ -409,7 +412,7 @@ function Header(props) {
                     fontSize: ".6em",
                     pointerEvents: 'none'
                 }}>{projectAuthor && user && projectAuthor !== user.displayName ? `By ${projectAuthor}` : null}</span>
-                <span style={{ fontSize: ".8em" }}>{projectLastSaved ? `Saved ${projectLastSaved}` : null}</span>
+                <span style={{ fontSize: ".8em" }}>{projectLastSaved ? projectLastSaved : null}</span>
             </div>
 
 

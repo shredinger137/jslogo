@@ -1,6 +1,6 @@
 /* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off", no-use-before-define: "off", react-hooks/exhaustive-deps: off */
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { experimentsList } from '../data/experiments.js';
 
 const OpenDataModal = (props) => {
@@ -35,7 +35,7 @@ const OpenDataModal = (props) => {
                     {experimentsList.map(item => (
                         <div
                             style={{ cursor: 'pointer' }}
-                            key={item}
+                            key={item.name}
                             onClick={() => { loadNewTemplate(item.code) }}>
                             {item.name}
                         </div>
