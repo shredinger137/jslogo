@@ -1777,13 +1777,17 @@ export default class Interpreter {
 
     async startReading() {
 
+        console.log(Date.now());
+
         //send a handshake of sorts; read ADC0, then discard the result
         //this fixes a bug where the first read is often something like 19279, junk data
 
-        var message = new Uint8Array([0xc00])
-        const writer = outputStream.getWriter();
-        writer.write(message);
-        writer.releaseLock();
+        //didn't work
+
+      //  var message = new Uint8Array([0xc00])
+      //  const writer = outputStream.getWriter();
+      //  writer.write(message);
+      //  writer.releaseLock();
 
         while (true) {
             const { value, done } = await reader.read();
@@ -1819,10 +1823,13 @@ export default class Interpreter {
 
     handleReceiveData(receivedValue) {
         var value = Array.from(new Uint8Array(receivedValue));
+        console.log(Date.now());
         for (var i in value) {
             this.gotChar(value[i]);
         }
     }
+
+
 
     gotChar(c) {
         if (this.respCount == 0) return;
@@ -1835,6 +1842,15 @@ export default class Interpreter {
                 this.resp = [];
             }
         }
+    }
+
+    convert(Uint8Arr) {
+        var length = Uint8Arr.length;
+    
+        let buffer = Buffer.from(Uint8Arr);
+        var result = buffer.readUIntBE(0, length);
+    
+        return result;
     }
 
     pushToArray(variable, value) {
@@ -1946,6 +1962,8 @@ prims['oneof'] = { nargs: 2, fcn: function (a, b) { return this.nextRandomDouble
 prims['tan'] = { nargs: 1, fcn: function (a) { return Math.tan(this.getnum(a)) } }
 prims['abs'] = { nargs: 1, fcn: function (a) { return Math.abs(this.getnum(a)) } };
 
+prims['test'] = { nargs: 0, fcn: function() { console.log(store.getState().packetData.value)}}
+ 
 
 prims['sum'] = { nargs: 2, fcn: function (a, b) { return a + b; } }
 prims['difference'] = { nargs: 2, fcn: function (a, b) { return a - b; } }
