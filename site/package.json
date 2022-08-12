@@ -26,7 +26,7 @@
     "chart.js": "^2.9.4",
     "chartjs": "^0.3.24",
     "concurrently": "^7.0.0",
-    "core-js": "^3.21.1",
+    "core-js": "^3.24.1",
     "css-loader": "3.4.2",
     "dexie": "^3.0.3",
     "dotenv": "8.2.0",
