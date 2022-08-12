@@ -128,28 +128,31 @@ app.post("/project", function (req, res) {
 })
 
 app.patch("/project/:pid", function (req, res) {
+
+
     admin
         .auth()
         .verifyIdToken(req.body.authorization)
         .then((decodedToken) => {
             const uid = decodedToken.uid;
-            if (req.body.userId == uid && req.params.pid) {
-                projectFunctions.updateProjectEntry(
-                    {
-                        title: req.body.title,
-                        code: req.body.code,
-                        saved: Date.now()
-                    },
-                    req.params.pid
-                ).then(response => {
-                    res.sendStatus(200);
+            projectFunctions.doesUserHavePermission(uid, req.params.pid, 'write').then((permissions) => {
+                if (permissions == true) {
 
-                })
-            }
-            else {
-                console.log("token mismatch")
-                res.sendStatus(500)
-            }
+                    projectFunctions.updateProjectEntry(
+                        {
+                            title: req.body.title,
+                            code: req.body.code,
+                            saved: Date.now()
+                        },
+                        req.params.pid
+                    ).then(response => {
+                        res.sendStatus(200);
+                    })
+                }
+                else {
+                    res.sendStatus(210)
+                }
+            })
         })
         .catch((error) => {
             res.sendStatus(500);
@@ -262,16 +265,16 @@ app.get("/data/:pid/:index", async function (req, res) {
     finally {
         let data = null;
 
-        if(results && results.collectedData && Array.isArray(results.collectedData)){
-            for(let entry of results.collectedData){
-                if(entry.date == req.params.index && entry.data){
+        if (results && results.collectedData && Array.isArray(results.collectedData)) {
+            for (let entry of results.collectedData) {
+                if (entry.date == req.params.index && entry.data) {
                     data = entry.data;
                 }
             }
-        res.send(data)
-    } else {
-        res.send(false);
-    }
+            res.send(data)
+        } else {
+            res.send(false);
+        }
     }
 
 
@@ -291,11 +294,11 @@ app.get("/data/:pid", async function (req, res) {
     }
 
     finally {
-        if(results && results.dataIndex){
-        res.send(results.dataIndex)
-    } else {
-        res.send(false);
-    }
+        if (results && results.dataIndex) {
+            res.send(results.dataIndex)
+        } else {
+            res.send(false);
+        }
     }
 
 

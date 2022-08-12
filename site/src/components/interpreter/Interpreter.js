@@ -7,8 +7,8 @@
 import Tokenizer from './Tokenizer';
 import turtleMath from './turtleMath';
 import { includes } from './includes';
-import {store} from '../../redux/store';
-import {selectData, clear, add} from '../../redux/reducers/packetDataSlice';
+import { store } from '../../redux/store';
+import { selectData, clear, add } from '../../redux/reducers/packetDataSlice';
 
 //built in modulus is weird, so we redefine it to one that works better... negatives, I think, are the main issue
 Number.prototype.mod = function (n) { return ((this % n) + n) % n; }
@@ -1629,6 +1629,39 @@ export default class Interpreter {
     //comms js
 
 
+    getPacketColumn(column) {
+
+        let colNum;
+        let columnData = [];
+
+        switch (column) {
+            case 'type': colNum = 0; break;
+            case 'time': colNum = 1; break;
+            case 'count': colNum = 2; break;
+            case 'adc0': colNum = 3; break;
+            case 'adc1': colNum = 4; break;
+            case 'adc2': colNum = 5; break;
+            case 'adc3': colNum = 6; break;
+            case 'adc4': colNum = 7; break;
+            case 'adc5': colNum = 8; break;
+        }
+
+        let packetData = store.getState().packetData.value;
+        if (packetData && Array.isArray(packetData)) {
+            for (let packet of packetData) {
+                if (packet[colNum]) {
+                    columnData.push(packet[colNum]);
+                }
+            }
+
+        }
+
+        return columnData;
+
+
+    }
+
+
     readSensor(n) {
         this.hold = true;
         this.sendReceive([0xc0 + n], 2, this.gotsensor);
@@ -1751,6 +1784,7 @@ export default class Interpreter {
         await port.open({ baudRate: 115200 });
         reader = port.readable.getReader();
         outputStream = port.writable;
+        
         document.getElementById("connectButton").style.display = "none";
         document.getElementById("disconnectButton").style.display = "inline-block";
         this.startReading();
@@ -1778,17 +1812,6 @@ export default class Interpreter {
     async startReading() {
 
         console.log(Date.now());
-
-        //send a handshake of sorts; read ADC0, then discard the result
-        //this fixes a bug where the first read is often something like 19279, junk data
-
-        //didn't work
-
-      //  var message = new Uint8Array([0xc00])
-      //  const writer = outputStream.getWriter();
-      //  writer.write(message);
-      //  writer.releaseLock();
-
         while (true) {
             const { value, done } = await reader.read();
             if (value) {
@@ -1846,10 +1869,10 @@ export default class Interpreter {
 
     convert(Uint8Arr) {
         var length = Uint8Arr.length;
-    
+
         let buffer = Buffer.from(Uint8Arr);
         var result = buffer.readUIntBE(0, length);
-    
+
         return result;
     }
 
@@ -1864,6 +1887,10 @@ export default class Interpreter {
         }
     }
 }
+
+
+
+
 
 /************************************************************
  * 
@@ -1962,8 +1989,9 @@ prims['oneof'] = { nargs: 2, fcn: function (a, b) { return this.nextRandomDouble
 prims['tan'] = { nargs: 1, fcn: function (a) { return Math.tan(this.getnum(a)) } }
 prims['abs'] = { nargs: 1, fcn: function (a) { return Math.abs(this.getnum(a)) } };
 
-prims['test'] = { nargs: 0, fcn: function() { console.log(store.getState().packetData.value)}}
- 
+prims['get-packet-data'] = { nargs: 0, fcn: function () { return store.getState().packetData.value } }
+prims['get-packet-col'] = {nargs: 1, fcn: function (a) {return this.getPacketColumn(a)}}
+
 
 prims['sum'] = { nargs: 2, fcn: function (a, b) { return a + b; } }
 prims['difference'] = { nargs: 2, fcn: function (a, b) { return a - b; } }

@@ -189,6 +189,10 @@ end`,);
 
 
   const editorWillMount = monaco => {
+
+
+
+
     editor = monaco
     if (!monaco.languages.getLanguages().some(({ id }) => id === 'jslogo')) {
       // Register a new language
@@ -197,7 +201,11 @@ end`,);
       monaco.languages.setMonarchTokensProvider('jslogo', languageDef)
       // Set the editing configuration for the language
       monaco.languages.setLanguageConfiguration('jslogo', configuration)
+
+
     }
+
+
 
     monaco.editor.defineTheme('jslogo', {
       base: 'vs-dark',
@@ -215,13 +223,25 @@ end`,);
 
   }
 
+
+  
+
   const editorDidMount = (editor, monaco) => {
+
+
+
     editor.focus();
   }
 
 
   const options = {
-    quickSuggestions: false,
+    brackets: [
+      ["{", "}"], ["[", "]"], ["(", ")",]
+    ],
+    comments: {
+      lineComment: ";",
+    },
+    quickSuggestionsDelay: 500,
     selectOnLineNumbers: true,
     automaticLayout: true,
     minimap: {
@@ -238,7 +258,7 @@ end`,);
         setProjectId={setProjectId}
       />
       <div style={{ height: "20px" }}></div>
-      <div className="main">
+      <div className="main-container">
         {showNewProjectModal ?
           <NewProjectModal
             toggleModal={toggleShowNewProjectModal}

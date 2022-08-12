@@ -258,9 +258,8 @@ function Header(props) {
 
 
                 } else {
-                    console.log('first');
-                    //not the first time - update an existing
 
+                    //not the first time - update an existing
                     axios.patch(`${config.apiUrl}/project/${projectId}`, {
                         userId: user.uid,
                         title: projectTitle,
@@ -268,12 +267,9 @@ function Header(props) {
                         projectId: projectId,
                         authorization: idToken
                     }).then((response) => {
-                        console.log(response.status);
-
                         if (response.status == 200) {
                             setProjectLastSaved('Saved ' + convertDate(Date.now()))
                         } else {
-                            console.log('conf')
                             setProjectLastSaved('Error saving')
                         }
 
