@@ -25,6 +25,8 @@ function Chart(props) {
 
     }
 
+    console.log(props.chartDataSingle)
+
     return (
         <div style={{ height: "100%", width: "100%" }}>
             {props.chartType == "single" ?
@@ -33,12 +35,12 @@ function Chart(props) {
                     <Scatter
                         data={{
                             datasets:
-                                [
-                                    {
-                                        data: props.chartDataSingle
-                                    }
+                                
+                                    
+                                        props.chartDataSingle
+                                    
 
-                                ]
+                                
                         }}
 
 

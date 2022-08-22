@@ -21,6 +21,8 @@ let constants = {
     e: 2.71828,
 }
 
+const chartPointColors = ["black", "red", "blue", "yellow", "green", "teal", "purple", "orange"];
+
 export default class Interpreter {
 
     constructor(props) {
@@ -477,31 +479,45 @@ export default class Interpreter {
     setChartListener(axis, variable) {
 
         var t = this;
-        //maybe make these objects, instead of a bunch of string? Might help when we expand this to be general.
+
+        //variable can be passed as a string or array; we want to treat it as an array
+        //so that we can accept multiple data sources
+
+        if (!Array.isArray(variable)) {
+            variable = [variable.replace(/'|"/, '')];
+        }
+
+        //Logo has a peculiarity where array contents are not evaluated, so we have to replace the quotes that 
+        //come around strings directly
+
+        const listenerVariables = variable.map(x => x.replace(/'|"/, ''));
+
+
+
 
         if (t.getValue("_chartType")) {
             if (axis == "x") {
                 //if axis is x, figure out which chart this is
                 if (t.getValue("_chartType") == "single") {
-                    t.singleChartXVariable = variable;
+                    t.singleChartXVariable = listenerVariables;
                 }
                 if (t.getValue("_chartType") == "bottom") {
-                    t.bottomChartXVariable = variable;
+                    t.bottomChartXVariable = listenerVariables;
                 }
                 if (t.getValue("_chartType") == "top") {
-                    t.topChartXVariable = variable;
+                    t.topChartXVariable = listenerVariables;
                 }
             } else {
                 //if axis isn't x, we assume it's y and check which chart this is 
                 if (t.getValue("_chartType") == "single") {
-                    t.singleChartYVariable = variable;
+                    t.singleChartYVariable = listenerVariables;
                 }
                 if (t.getValue("_chartType") == "top") {
-                    t.topChartYVariable = variable;
+                    t.topChartYVariable = listenerVariables;
 
                 }
                 if (t.getValue("_chartType") == "bottom") {
-                    t.bottomChartYVariable = variable;
+                    t.bottomChartYVariable = listenerVariables;
                 }
             }
 
@@ -1221,21 +1237,22 @@ export default class Interpreter {
 
 
     setValue(name, value) {
+
         var updateChart = false;
         var t = this;
         var chartType = [];
 
-        if (name == this.singleChartXVariable || name == this.singleChartYVariable) {
+        if (this.singleChartXVariable.includes(name) || this.singleChartYVariable.includes(name)) {
             updateChart = true;
             chartType.push("single");
         }
 
-        if (name == this.topChartXVariable || name == this.topChartYVariable) {
+        if (this.topChartXVariable.includes(name) || this.topChartYVariable.includes(name)) {
             updateChart = true;
             chartType.push("top");
         }
 
-        if (name == this.bottomChartXVariable || name == this.bottomChartYVariable) {
+        if (this.bottomChartXVariable.includes(name) || this.bottomChartYVariable.includes(name)) {
             updateChart = true;
             chartType.push("bottom");
         }
@@ -1285,19 +1302,34 @@ export default class Interpreter {
         var xDataArray = [];
         var yDataArray = [];
 
+        //each listener variable holds an array of source variables
+
+        //TODO: Add typechecking; we need valid arrays for this to work
+
         if (chartType == "single") {
-            xDataArray = t.getValueInternal(this.singleChartXVariable);
-            yDataArray = t.getValueInternal(this.singleChartYVariable);
+            console.log(this.singleChartXVariable[0])
+            console.log(t.getValueInternal(this.singleChartXVariable[0]))
+
+            for (let variable of this.singleChartXVariable) {
+                xDataArray.push(t.getValueInternal(variable));
+            }
+
+            for (let variable of this.singleChartYVariable) {
+                yDataArray.push(t.getValueInternal(variable))
+            }
+
+            console.log(yDataArray);
+
         }
         if (chartType == "top") {
 
-            xDataArray = this.getValueInternal(this.topChartXVariable);
-            yDataArray = this.getValueInternal(this.topChartYVariable);
+            xDataArray = this.getValueInternal(this.topChartXVariable[0]);
+            yDataArray = this.getValueInternal(this.topChartYVariable[0]);
 
         }
         if (chartType == "bottom") {
-            xDataArray = this.getValueInternal(this.bottomChartXVariable);
-            yDataArray = this.getValueInternal(this.bottomChartYVariable);
+            xDataArray = this.getValueInternal(this.bottomChartXVariable[0]);
+            yDataArray = this.getValueInternal(this.bottomChartYVariable[0]);
         }
 
         if (!xDataArray) {
@@ -1310,12 +1342,21 @@ export default class Interpreter {
 
         if (xDataArray) {
             if (yDataArray) {
-                for (let count = 0; count <= xDataArray.length; count++) {
-                    if (typeof yDataArray[count] !== 'undefined') {
-                        chartData.push({ x: xDataArray[count], y: yDataArray[count] });
+                for (let varCount in xDataArray) {
+
+                    let dataHolder = [];
+
+
+                    for (let count = 0; count <= xDataArray[varCount].length; count++) {
+                        if (typeof yDataArray[varCount] && yDataArray[varCount][count] !== 'undefined') {
+                            dataHolder.push({ x: xDataArray[varCount][count], y: yDataArray[varCount][count] });
+                        }
                     }
+                    console.log(chartPointColors[varCount])
+                    chartData.push({data: dataHolder, pointBackgroundColor: chartPointColors[varCount]});
                 }
             }
+            console.log(chartData);
             t.pushNewChartData(chartType, chartData);
 
 
@@ -1784,7 +1825,7 @@ export default class Interpreter {
         await port.open({ baudRate: 115200 });
         reader = port.readable.getReader();
         outputStream = port.writable;
-        
+
         document.getElementById("connectButton").style.display = "none";
         document.getElementById("disconnectButton").style.display = "inline-block";
         this.startReading();
@@ -1990,7 +2031,7 @@ prims['tan'] = { nargs: 1, fcn: function (a) { return Math.tan(this.getnum(a)) }
 prims['abs'] = { nargs: 1, fcn: function (a) { return Math.abs(this.getnum(a)) } };
 
 prims['get-packet-data'] = { nargs: 0, fcn: function () { return store.getState().packetData.value } }
-prims['get-packet-col'] = {nargs: 1, fcn: function (a) {return this.getPacketColumn(a)}}
+prims['get-packet-col'] = { nargs: 1, fcn: function (a) { return this.getPacketColumn(a) } }
 
 
 prims['sum'] = { nargs: 2, fcn: function (a, b) { return a + b; } }
