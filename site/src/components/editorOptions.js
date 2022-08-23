@@ -1,6 +1,5 @@
 /* eslint eqeqeq: "off", no-useless-escape: "off", no-throw-literal: "off", no-use-before-define: "off" */
 
-//KNOWN ISSUE: The syntax highlighter will not process keywords with dashes in them.
 
 export const options = {
   lineNumbers: false,
@@ -10,7 +9,7 @@ export const options = {
 }
 
 // This config defines how the language is displayed in the editor.
-//Note: hyphens aren't valid as keywords, they need to be added below
+//Note: hyphens aren't valid as keywords, they need to be added below that
 
 
 //For the sake of auto-complete we're leaving the hyphenated ones under keywords

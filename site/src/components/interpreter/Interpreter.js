@@ -42,13 +42,13 @@ export default class Interpreter {
 
         this.turtleScale = 1;
 
-        this.singleChartXVariable = "";
-        this.topChartXVariable = "";
-        this.bottomChartXVariable = "";
+        this.singleChartXVariable = [];
+        this.topChartXVariable = [];
+        this.bottomChartXVariable = [];
 
-        this.singleChartYVariable = "";
-        this.topChartYVariable = "";
-        this.bottomChartYVariable = "";
+        this.singleChartYVariable = [];
+        this.topChartYVariable = [];
+        this.bottomChartYVariable = [];
 
         this.pushNewChartData = props.pushNewChartData;
 
@@ -484,7 +484,7 @@ export default class Interpreter {
         //so that we can accept multiple data sources
 
         if (!Array.isArray(variable)) {
-            variable = [variable.replace(/'|"/, '')];
+            variable = [variable.replace(/'|"/g, '')];
         }
 
         //Logo has a peculiarity where array contents are not evaluated, so we have to replace the quotes that 
@@ -1082,7 +1082,7 @@ export default class Interpreter {
 
             TODO: The following commented code allows JSLogo to function without using : and " before variables. It also allow implicit delcaration
             of the form x = 5. These would be a huge asset to the program, but it was requested that we not allow the functionality. So it's sitting here,
-            commented out, until management can be convinced otherwise.
+            commented out.
 
 
             //no type declaration, no value, no current function, but followed by = - implicit declaration
@@ -1306,57 +1306,57 @@ export default class Interpreter {
 
         //TODO: Add typechecking; we need valid arrays for this to work
 
-        if (chartType == "single") {
-            console.log(this.singleChartXVariable[0])
-            console.log(t.getValueInternal(this.singleChartXVariable[0]))
-
-            for (let variable of this.singleChartXVariable) {
-                xDataArray.push(t.getValueInternal(variable));
-            }
-
-            for (let variable of this.singleChartYVariable) {
-                yDataArray.push(t.getValueInternal(variable))
-            }
-
-            console.log(yDataArray);
-
-        }
-        if (chartType == "top") {
-
-            xDataArray = this.getValueInternal(this.topChartXVariable[0]);
-            yDataArray = this.getValueInternal(this.topChartYVariable[0]);
-
-        }
-        if (chartType == "bottom") {
-            xDataArray = this.getValueInternal(this.bottomChartXVariable[0]);
-            yDataArray = this.getValueInternal(this.bottomChartYVariable[0]);
-        }
-
-        if (!xDataArray) {
-            xDataArray = [];
-        }
-
-        if (!yDataArray) {
-            yDataArray = [];
-        }
-
-        if (xDataArray) {
-            if (yDataArray) {
-                for (let varCount in xDataArray) {
-
-                    let dataHolder = [];
-
-
-                    for (let count = 0; count <= xDataArray[varCount].length; count++) {
-                        if (typeof yDataArray[varCount] && yDataArray[varCount][count] !== 'undefined') {
-                            dataHolder.push({ x: xDataArray[varCount][count], y: yDataArray[varCount][count] });
-                        }
-                    }
-                    console.log(chartPointColors[varCount])
-                    chartData.push({data: dataHolder, pointBackgroundColor: chartPointColors[varCount]});
+        switch (chartType) {
+            case 'single':
+                for (let variable of this.singleChartXVariable) {
+                    xDataArray.push(t.getValueInternal(variable));
                 }
+
+                for (let variable of this.singleChartYVariable) {
+                    yDataArray.push(t.getValueInternal(variable))
+                }
+                break;
+
+            case 'top':
+                for (let variable of this.topChartXVariable) {
+                    xDataArray.push(t.getValueInternal(variable));
+                }
+
+                for (let variable of this.topChartYVariable) {
+                    yDataArray.push(t.getValueInternal(variable))
+                }
+                break;
+
+            case 'bottom':
+                for (let variable of this.bottomChartXVariable) {
+                    xDataArray.push(t.getValueInternal(variable));
+                }
+
+                for (let variable of this.bottomChartYVariable) {
+                    yDataArray.push(t.getValueInternal(variable))
+                }
+                break;
+
+            default:
+                xDataArray = [];
+                yDataArray = [];
+                break;
+        }
+
+        if (xDataArray && yDataArray) {
+
+            for (let varCount in xDataArray) {
+
+                let dataHolder = [];
+
+                for (let count = 0; count <= xDataArray[varCount].length; count++) {
+                    if (typeof yDataArray[varCount] && yDataArray[varCount][count] !== 'undefined') {
+                        dataHolder.push({ x: xDataArray[varCount][count], y: yDataArray[varCount][count] });
+                    }
+                }
+                chartData.push({ data: dataHolder, pointBackgroundColor: chartPointColors[varCount] });
             }
-            console.log(chartData);
+
             t.pushNewChartData(chartType, chartData);
 
 
@@ -1852,7 +1852,6 @@ export default class Interpreter {
 
     async startReading() {
 
-        console.log(Date.now());
         while (true) {
             const { value, done } = await reader.read();
             if (value) {
@@ -1861,7 +1860,6 @@ export default class Interpreter {
                 //This could be something like adc0:adc1:adc2:adc3... and it gets parsed here.
 
                 // var string = new TextDecoder("utf-8").decode(value);
-                //   console.log(string);
                 //var convertedValue = Array.from(new Uint8Array(value));
                 this.handleReceiveData(value);
 
@@ -1887,7 +1885,6 @@ export default class Interpreter {
 
     handleReceiveData(receivedValue) {
         var value = Array.from(new Uint8Array(receivedValue));
-        console.log(Date.now());
         for (var i in value) {
             this.gotChar(value[i]);
         }

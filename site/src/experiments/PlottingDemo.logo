@@ -5,6 +5,7 @@
 to go
   make "xDataOne []
   make "yDataOne []
+  make "yDataTwo []
   makeTopPlot
   makeBottomPlot
   pushData
@@ -21,8 +22,8 @@ end
 to makeBottomPlot
   bottom-plot
   plot-title 'Plotting Demo Bottom'
-  x-data "xDataOne
-  y-data "yDataOne
+  x-data ["xDataOne "xDataOne]
+  y-data ["yDataOne "yDataTwo]
   x-ticks 0.5
   show-plot
 end
@@ -44,6 +45,7 @@ to pushData
   repeat 25 [
     make "xDataOne se :xDataOne :count
     push "yDataOne :count
+    make "yDataTwo se :yDataTwo (:count * 2)
     make "count :count + 1
     wait 10
   ]
