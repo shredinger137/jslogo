@@ -22,8 +22,8 @@ end
 to makeBottomPlot
   bottom-plot
   plot-title 'Plotting Demo Bottom'
-  x-data ["xDataOne "xDataOne]
-  y-data ["yDataOne "yDataTwo]
+  x-data 'xDataOne'
+  y-data ['yDataOne' 'yDataTwo']
   x-ticks 0.5
   show-plot
 end

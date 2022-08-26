@@ -490,7 +490,7 @@ export default class Interpreter {
         //Logo has a peculiarity where array contents are not evaluated, so we have to replace the quotes that 
         //come around strings directly
 
-        const listenerVariables = variable.map(x => x.replace(/'|"/, ''));
+        const listenerVariables = variable.map(x => x.replace(/'|"/g, ''));
 
 
 
@@ -636,9 +636,9 @@ export default class Interpreter {
             this.setValue("_yTickSteps", null)
             this.setValue("_domain", null)
             chartOptions = {};
-        } else {
+        } 
 
-        }
+        this.updateChartData(chartType);
 
     }
 
@@ -1302,7 +1302,7 @@ export default class Interpreter {
         var xDataArray = [];
         var yDataArray = [];
 
-        //each listener variable holds an array of source variables
+        //each listener variable holds an array of source variables, not the values themselves; so we get the values here
 
         //TODO: Add typechecking; we need valid arrays for this to work
 
@@ -1343,6 +1343,23 @@ export default class Interpreter {
                 break;
         }
 
+        //if xDataArray has one value but yDataArray has more, force xDataArray to the same length by repeating
+        if (xDataArray.length == 1 && yDataArray.length > 1) {
+            for (let i = 0; i < yDataArray.length - 1; i++) {
+                xDataArray.push(xDataArray[0]);
+            }
+        }
+
+        //if yDataArray has one value but xDataArray has more, force yDataArray to the same length by repeating
+        if (yDataArray.length == 1 && xDataArray.length > 1) {
+            for (let i = 0; i < xDataArray.length - 1; i++) {
+                yDataArray.push(yDataArray[0]);
+            }
+
+            console.log(yDataArray)
+        }
+
+
         if (xDataArray && yDataArray) {
 
             for (let varCount in xDataArray) {
@@ -1352,11 +1369,12 @@ export default class Interpreter {
                 for (let count = 0; count <= xDataArray[varCount].length; count++) {
                     if (typeof yDataArray[varCount] && yDataArray[varCount][count] !== 'undefined') {
                         dataHolder.push({ x: xDataArray[varCount][count], y: yDataArray[varCount][count] });
-                    }
+                    } 
                 }
                 chartData.push({ data: dataHolder, pointBackgroundColor: chartPointColors[varCount] });
             }
-
+            console.log(chartData);
+            console.log(chartType);
             t.pushNewChartData(chartType, chartData);
 
 
