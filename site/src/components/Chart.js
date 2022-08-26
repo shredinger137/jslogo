@@ -25,23 +25,17 @@ function Chart(props) {
 
     }
 
+
     return (
         <div style={{ height: "100%", width: "100%" }}>
             {props.chartType == "single" ?
                 <>
-                    <p onClick={() => {downloadSingle()}}  style={{ fontSize: '.8rem', padding: 0, margin: 0, position: 'absolute', top: '5px', left: '5px' }}>Download chart</p>
+                    <p onClick={() => { downloadSingle() }} style={{ fontSize: '.8rem', padding: 0, margin: 0, position: 'absolute', top: '5px', left: '5px' }}>Download chart</p>
                     <Scatter
                         data={{
                             datasets:
-                                [
-                                    {
-                                        data: props.chartDataSingle
-                                    }
-
-                                ]
+                                props.chartDataSingle
                         }}
-
-
                         options={props.chartOptionsSingle}
                         redraw={true}
                         ref={chartRefSingle
@@ -57,15 +51,8 @@ function Chart(props) {
                             <Scatter
                                 data={{
                                     datasets:
-                                        [
-                                            {
-                                                data: props.chartDataTop
-                                            }
-
-                                        ]
+                                        props.chartDataTop
                                 }}
-
-
                                 options={
                                     props.chartOptionsTop}
                                 redraw={true}
@@ -77,15 +64,8 @@ function Chart(props) {
                             <Scatter
                                 data={{
                                     datasets:
-                                        [
-                                            {
-                                                data: props.chartDataBottom
-                                            }
-
-                                        ]
+                                        props.chartDataBottom
                                 }}
-
-
                                 options={props.chartOptionsBottom}
                                 redraw={true}
                                 ref={chartRefBottom}

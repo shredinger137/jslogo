@@ -7,6 +7,8 @@
 import Tokenizer from './Tokenizer';
 import turtleMath from './turtleMath';
 import { includes } from './includes';
+import { store } from '../../redux/store';
+import { selectData, clear, add } from '../../redux/reducers/packetDataSlice';
 
 //built in modulus is weird, so we redefine it to one that works better... negatives, I think, are the main issue
 Number.prototype.mod = function (n) { return ((this % n) + n) % n; }
@@ -19,9 +21,13 @@ let constants = {
     e: 2.71828,
 }
 
+const chartPointColors = ["black", "red", "blue", "yellow", "green", "teal", "purple", "orange"];
+
 export default class Interpreter {
 
     constructor(props) {
+
+        this.store = store;
 
         this.instantiatedObjects = {};
 
@@ -36,20 +42,18 @@ export default class Interpreter {
 
         this.turtleScale = 1;
 
-        this.singleChartXVariable = "";
-        this.topChartXVariable = "";
-        this.bottomChartXVariable = "";
+        this.singleChartXVariable = [];
+        this.topChartXVariable = [];
+        this.bottomChartXVariable = [];
 
-        this.singleChartYVariable = "";
-        this.topChartYVariable = "";
-        this.bottomChartYVariable = "";
+        this.singleChartYVariable = [];
+        this.topChartYVariable = [];
+        this.bottomChartYVariable = [];
 
         this.pushNewChartData = props.pushNewChartData;
 
         this.ticker = this.ticker.bind(this);
         this.isDone = this.isDone.bind(this);
-
-        this.pushToTable = props.pushToTable;
 
         this.cnvWidth = 1000;
         this.cnvHeight = 600;
@@ -475,31 +479,45 @@ export default class Interpreter {
     setChartListener(axis, variable) {
 
         var t = this;
-        //maybe make these objects, instead of a bunch of string? Might help when we expand this to be general.
+
+        //variable can be passed as a string or array; we want to treat it as an array
+        //so that we can accept multiple data sources
+
+        if (!Array.isArray(variable)) {
+            variable = [variable.replace(/'|"/g, '')];
+        }
+
+        //Logo has a peculiarity where array contents are not evaluated, so we have to replace the quotes that 
+        //come around strings directly
+
+        const listenerVariables = variable.map(x => x.replace(/'|"/g, ''));
+
+
+
 
         if (t.getValue("_chartType")) {
             if (axis == "x") {
                 //if axis is x, figure out which chart this is
                 if (t.getValue("_chartType") == "single") {
-                    t.singleChartXVariable = variable;
+                    t.singleChartXVariable = listenerVariables;
                 }
                 if (t.getValue("_chartType") == "bottom") {
-                    t.bottomChartXVariable = variable;
+                    t.bottomChartXVariable = listenerVariables;
                 }
                 if (t.getValue("_chartType") == "top") {
-                    t.topChartXVariable = variable;
+                    t.topChartXVariable = listenerVariables;
                 }
             } else {
                 //if axis isn't x, we assume it's y and check which chart this is 
                 if (t.getValue("_chartType") == "single") {
-                    t.singleChartYVariable = variable;
+                    t.singleChartYVariable = listenerVariables;
                 }
                 if (t.getValue("_chartType") == "top") {
-                    t.topChartYVariable = variable;
+                    t.topChartYVariable = listenerVariables;
 
                 }
                 if (t.getValue("_chartType") == "bottom") {
-                    t.bottomChartYVariable = variable;
+                    t.bottomChartYVariable = listenerVariables;
                 }
             }
 
@@ -618,9 +636,9 @@ export default class Interpreter {
             this.setValue("_yTickSteps", null)
             this.setValue("_domain", null)
             chartOptions = {};
-        } else {
+        } 
 
-        }
+        this.updateChartData(chartType);
 
     }
 
@@ -1064,7 +1082,7 @@ export default class Interpreter {
 
             TODO: The following commented code allows JSLogo to function without using : and " before variables. It also allow implicit delcaration
             of the form x = 5. These would be a huge asset to the program, but it was requested that we not allow the functionality. So it's sitting here,
-            commented out, until management can be convinced otherwise.
+            commented out.
 
 
             //no type declaration, no value, no current function, but followed by = - implicit declaration
@@ -1219,21 +1237,22 @@ export default class Interpreter {
 
 
     setValue(name, value) {
+
         var updateChart = false;
         var t = this;
         var chartType = [];
 
-        if (name == this.singleChartXVariable || name == this.singleChartYVariable) {
+        if (this.singleChartXVariable.includes(name) || this.singleChartYVariable.includes(name)) {
             updateChart = true;
             chartType.push("single");
         }
 
-        if (name == this.topChartXVariable || name == this.topChartYVariable) {
+        if (this.topChartXVariable.includes(name) || this.topChartYVariable.includes(name)) {
             updateChart = true;
             chartType.push("top");
         }
 
-        if (name == this.bottomChartXVariable || name == this.bottomChartYVariable) {
+        if (this.bottomChartXVariable.includes(name) || this.bottomChartYVariable.includes(name)) {
             updateChart = true;
             chartType.push("bottom");
         }
@@ -1283,37 +1302,79 @@ export default class Interpreter {
         var xDataArray = [];
         var yDataArray = [];
 
-        if (chartType == "single") {
-            xDataArray = t.getValueInternal(this.singleChartXVariable);
-            yDataArray = t.getValueInternal(this.singleChartYVariable);
-        }
-        if (chartType == "top") {
+        //each listener variable holds an array of source variables, not the values themselves; so we get the values here
 
-            xDataArray = this.getValueInternal(this.topChartXVariable);
-            yDataArray = this.getValueInternal(this.topChartYVariable);
+        //TODO: Add typechecking; we need valid arrays for this to work
 
-        }
-        if (chartType == "bottom") {
-            xDataArray = this.getValueInternal(this.bottomChartXVariable);
-            yDataArray = this.getValueInternal(this.bottomChartYVariable);
-        }
-
-        if (!xDataArray) {
-            xDataArray = [];
-        }
-
-        if (!yDataArray) {
-            yDataArray = [];
-        }
-
-        if (xDataArray) {
-            if (yDataArray) {
-                for (let count = 0; count <= xDataArray.length; count++) {
-                    if (typeof yDataArray[count] !== 'undefined') {
-                        chartData.push({ x: xDataArray[count], y: yDataArray[count] });
-                    }
+        switch (chartType) {
+            case 'single':
+                for (let variable of this.singleChartXVariable) {
+                    xDataArray.push(t.getValueInternal(variable));
                 }
+
+                for (let variable of this.singleChartYVariable) {
+                    yDataArray.push(t.getValueInternal(variable))
+                }
+                break;
+
+            case 'top':
+                for (let variable of this.topChartXVariable) {
+                    xDataArray.push(t.getValueInternal(variable));
+                }
+
+                for (let variable of this.topChartYVariable) {
+                    yDataArray.push(t.getValueInternal(variable))
+                }
+                break;
+
+            case 'bottom':
+                for (let variable of this.bottomChartXVariable) {
+                    xDataArray.push(t.getValueInternal(variable));
+                }
+
+                for (let variable of this.bottomChartYVariable) {
+                    yDataArray.push(t.getValueInternal(variable))
+                }
+                break;
+
+            default:
+                xDataArray = [];
+                yDataArray = [];
+                break;
+        }
+
+        //if xDataArray has one value but yDataArray has more, force xDataArray to the same length by repeating
+        if (xDataArray.length == 1 && yDataArray.length > 1) {
+            for (let i = 0; i < yDataArray.length - 1; i++) {
+                xDataArray.push(xDataArray[0]);
             }
+        }
+
+        //if yDataArray has one value but xDataArray has more, force yDataArray to the same length by repeating
+        if (yDataArray.length == 1 && xDataArray.length > 1) {
+            for (let i = 0; i < xDataArray.length - 1; i++) {
+                yDataArray.push(yDataArray[0]);
+            }
+
+            console.log(yDataArray)
+        }
+
+
+        if (xDataArray && yDataArray) {
+
+            for (let varCount in xDataArray) {
+
+                let dataHolder = [];
+
+                for (let count = 0; count <= xDataArray[varCount].length; count++) {
+                    if (typeof yDataArray[varCount] && yDataArray[varCount][count] !== 'undefined') {
+                        dataHolder.push({ x: xDataArray[varCount][count], y: yDataArray[varCount][count] });
+                    } 
+                }
+                chartData.push({ data: dataHolder, pointBackgroundColor: chartPointColors[varCount] });
+            }
+            console.log(chartData);
+            console.log(chartType);
             t.pushNewChartData(chartType, chartData);
 
 
@@ -1627,6 +1688,39 @@ export default class Interpreter {
     //comms js
 
 
+    getPacketColumn(column) {
+
+        let colNum;
+        let columnData = [];
+
+        switch (column) {
+            case 'type': colNum = 0; break;
+            case 'time': colNum = 1; break;
+            case 'count': colNum = 2; break;
+            case 'adc0': colNum = 3; break;
+            case 'adc1': colNum = 4; break;
+            case 'adc2': colNum = 5; break;
+            case 'adc3': colNum = 6; break;
+            case 'adc4': colNum = 7; break;
+            case 'adc5': colNum = 8; break;
+        }
+
+        let packetData = store.getState().packetData.value;
+        if (packetData && Array.isArray(packetData)) {
+            for (let packet of packetData) {
+                if (packet[colNum]) {
+                    columnData.push(packet[colNum]);
+                }
+            }
+
+        }
+
+        return columnData;
+
+
+    }
+
+
     readSensor(n) {
         this.hold = true;
         this.sendReceive([0xc0 + n], 2, this.gotsensor);
@@ -1749,6 +1843,7 @@ export default class Interpreter {
         await port.open({ baudRate: 115200 });
         reader = port.readable.getReader();
         outputStream = port.writable;
+
         document.getElementById("connectButton").style.display = "none";
         document.getElementById("disconnectButton").style.display = "inline-block";
         this.startReading();
@@ -1775,14 +1870,6 @@ export default class Interpreter {
 
     async startReading() {
 
-        //send a handshake of sorts; read ADC0, then discard the result
-        //this fixes a bug where the first read is often something like 19279, junk data
-
-        var message = new Uint8Array([0xc00])
-        const writer = outputStream.getWriter();
-        writer.write(message);
-        writer.releaseLock();
-
         while (true) {
             const { value, done } = await reader.read();
             if (value) {
@@ -1791,7 +1878,6 @@ export default class Interpreter {
                 //This could be something like adc0:adc1:adc2:adc3... and it gets parsed here.
 
                 // var string = new TextDecoder("utf-8").decode(value);
-                //   console.log(string);
                 //var convertedValue = Array.from(new Uint8Array(value));
                 this.handleReceiveData(value);
 
@@ -1822,6 +1908,8 @@ export default class Interpreter {
         }
     }
 
+
+
     gotChar(c) {
         if (this.respCount == 0) return;
         else {
@@ -1835,6 +1923,15 @@ export default class Interpreter {
         }
     }
 
+    convert(Uint8Arr) {
+        var length = Uint8Arr.length;
+
+        let buffer = Buffer.from(Uint8Arr);
+        var result = buffer.readUIntBE(0, length);
+
+        return result;
+    }
+
     pushToArray(variable, value) {
         var variableValue = this.getValueInternal(variable);
 
@@ -1846,6 +1943,10 @@ export default class Interpreter {
         }
     }
 }
+
+
+
+
 
 /************************************************************
  * 
@@ -1883,9 +1984,9 @@ prims['limits'] = {
 
 
 prims['calibrate-list'] = { nargs: 3, fcn: function (a, b, c) { return this.calibrateList(a, b, c) } }
-prims['logData'] = { nargs: 1, fcn: function (a) { this.pushToTable(a) } }
-prims['save-data'] = { nargs: 1, fcn: function (a) { this.pushToTable(a) } }
-prims['clear-data'] = { nargs: 0, fcn: function () { this.pushToTable(false) } }
+prims['logData'] = { nargs: 1, fcn: function (a) { this.store.dispatch(add(a)) } }
+prims['save-data'] = { nargs: 1, fcn: function (a) { this.store.dispatch(add(a)) } }
+prims['clear-data'] = { nargs: 0, fcn: function () { this.store.dispatch(clear()) } }
 prims['repeat'] = { nargs: 2, flow: true, fcn: function (a, b) { this.repeat(a, b); } }
 prims['forever'] = { nargs: 1, flow: true, fcn: function (a) { this.loop(a); } }
 prims['loop'] = { nargs: 1, flow: true, fcn: function (a) { this.loop(a); } }
@@ -1943,6 +2044,9 @@ prims['random2'] = { nargs: 2, fcn: function (a, b) { return this.getRandom([a, 
 prims['oneof'] = { nargs: 2, fcn: function (a, b) { return this.nextRandomDouble() < .5 ? a : b; } }
 prims['tan'] = { nargs: 1, fcn: function (a) { return Math.tan(this.getnum(a)) } }
 prims['abs'] = { nargs: 1, fcn: function (a) { return Math.abs(this.getnum(a)) } };
+
+prims['get-packet-data'] = { nargs: 0, fcn: function () { return store.getState().packetData.value } }
+prims['get-packet-col'] = { nargs: 1, fcn: function (a) { return this.getPacketColumn(a) } }
 
 
 prims['sum'] = { nargs: 2, fcn: function (a, b) { return a + b; } }
@@ -2085,7 +2189,6 @@ prims['dp9off'] = { nargs: 0, fcn: function () { this.pinOff(9); this.mwait(1); 
 prims['dp10on'] = { nargs: 0, fcn: function () { this.pinOn(10); this.mwait(1); } }
 prims['dp10off'] = { nargs: 0, fcn: function () { this.pinOff(10); this.mwait(1); } }
 prims['send'] = { nargs: 1, fnc: function (a) { this.sendl(a); this.mwait(1) } }
-
 
 prims['readADC0'] = { nargs: 0, fcn: function () { this.readSensor(0); return this.cfun; } }
 prims['readADC1'] = { nargs: 0, fcn: function () { this.readSensor(1); return this.cfun; } }

@@ -24,22 +24,16 @@ let interpreter, projects;
 //let instance = new WorkerBuilder(Worker);
 
 const App = () => {
-
-  const clickSound = new Audio ('/click.mp3');
-
-
-
   
   //const { data: user } = useUser();
   const [showNewProjectModal, setShowNewProjectModal] = useState(false);
   const [view, setView] = useState('main');
-  const [tableData, setTableData] = useState([]);
   const [code, setCode] = useState(`to go
 print 'Hello World'
 end`,);
   //pid is a placeholder
   let pid = null;
-  var editor = null;
+  let editor = null;
 
   const [projectId, setProjectId] = useState(null);
   const [horizontalOffset, setHorizontalOffset] = useState(0);
@@ -95,7 +89,6 @@ end`,);
         updateChartOptions: updateChartOptions,
         updateChartType: updateChartType,
         pushNewChartData: pushChartData,
-        pushToTable: pushToDataTable,
       }
     );
 
@@ -139,10 +132,6 @@ end`,);
     document.addEventListener('mousemove', handleDrag)
   }
 
-
-  const setDataTable = (newData) => {
-    setTableData(newData);
-  }
 
   const updateChartType = (newType) => {
     setChartType(newType);
@@ -188,19 +177,6 @@ end`,);
     }
   }
 
-  const pushToDataTable = (newDataLine) => {
-
-    clickSound.play();
-
-
-    if (newDataLine == false) {
-      setTableData([[]])
-      return;
-    }
-
-    setDataTable(DataTable => [...DataTable, newDataLine]);
-
-  }
 
   const updateCode = (newCode) => {
     setCode(newCode);
@@ -212,13 +188,11 @@ end`,);
   }
 
 
-  
-  const saveData = () => {
-    
-}
-
-
   const editorWillMount = monaco => {
+
+
+
+
     editor = monaco
     if (!monaco.languages.getLanguages().some(({ id }) => id === 'jslogo')) {
       // Register a new language
@@ -227,7 +201,11 @@ end`,);
       monaco.languages.setMonarchTokensProvider('jslogo', languageDef)
       // Set the editing configuration for the language
       monaco.languages.setLanguageConfiguration('jslogo', configuration)
+
+
     }
+
+
 
     monaco.editor.defineTheme('jslogo', {
       base: 'vs-dark',
@@ -245,13 +223,25 @@ end`,);
 
   }
 
+
+  
+
   const editorDidMount = (editor, monaco) => {
+
+
+
     editor.focus();
   }
 
 
   const options = {
-    quickSuggestions: false,
+    brackets: [
+      ["{", "}"], ["[", "]"], ["(", ")",]
+    ],
+    comments: {
+      lineComment: ";",
+    },
+    quickSuggestionsDelay: 500,
     selectOnLineNumbers: true,
     automaticLayout: true,
     minimap: {
@@ -268,7 +258,7 @@ end`,);
         setProjectId={setProjectId}
       />
       <div style={{ height: "20px" }}></div>
-      <div className="main">
+      <div className="main-container">
         {showNewProjectModal ?
           <NewProjectModal
             toggleModal={toggleShowNewProjectModal}
@@ -337,8 +327,6 @@ end`,);
             <DataTable
               projectId={projectId}
               pid={pid}
-              tableData={tableData}
-              setTableData={setDataTable}
             />
           </div>
         </div>

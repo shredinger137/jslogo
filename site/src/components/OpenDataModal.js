@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { config } from '../config';
+import { store } from '../redux/store';
+import { load } from '../redux/reducers/packetDataSlice';
 
 const OpenDataModal = (props) => {
 
@@ -25,7 +27,7 @@ const OpenDataModal = (props) => {
         axios.get(`${config.apiUrl}/data/${props.pid}/${index}`, {
         }).then(response => {
             if (response && response.data) {
-                props.setTableData(response.data);
+                store.dispatch(load(response.data));
                 props.toggleModal();
             }
         })

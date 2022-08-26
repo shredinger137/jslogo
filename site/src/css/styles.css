@@ -2,6 +2,14 @@
 * {
     box-sizing: border-box;
   }
+
+
+  .monaco-editor .suggest-widget .monaco-list .monaco-list-rows .monaco-list-row {
+   
+       display: flex;
+        flex-direction: row;
+      
+  }
   
   html,
   body {
@@ -75,7 +83,7 @@
   }
   
   
-  .main {
+  .main-container {
     flex: 1;
     overflow-x: hidden;
     overflow-y: auto;
@@ -93,6 +101,7 @@
     word-wrap: break-word;
   }
 
+  
 
 	.menu {
     padding-right: 20px;

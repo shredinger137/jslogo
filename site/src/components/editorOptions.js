@@ -1,6 +1,5 @@
 /* eslint eqeqeq: "off", no-useless-escape: "off", no-throw-literal: "off", no-use-before-define: "off" */
 
-//KNOWN ISSUE: The syntax highlighter will not process keywords with dashes in them.
 
 export const options = {
   lineNumbers: false,
@@ -10,9 +9,10 @@ export const options = {
 }
 
 // This config defines how the language is displayed in the editor.
-//Note: hyphens aren't valid here. That means if you want hyphenated words to work as keywords you have to add both halves.
-//Obviously that means invalid commands will still turn blue. Not much to be done about it.
+//Note: hyphens aren't valid as keywords, they need to be added below that
 
+
+//For the sake of auto-complete we're leaving the hyphenated ones under keywords
 export const languageDef = {
   defaultToken: "",
   number: /\d+(\.\d+)?/,
@@ -78,11 +78,11 @@ export const languageDef = {
     "turtle",
     'limits',
     'ticks',
-    'label',
     'title',
     'se',
     'seth',
-    'clear'
+    'clear',
+    'y-label'
   ],
   operators: [
     '=', '>', '<', '!', '~', '?', ':', '==', '<=', '>=', '!=',
@@ -112,7 +112,6 @@ export const languageDef = {
       [/\s+/, "white"],
       [/;.*$/, 'comment'],
       [/;.*$/, 'comment'],
-      [/\/\/.*$/, 'comment']
     ],
     numbers: [
       [/[0-9]/, "number"],
@@ -136,9 +135,11 @@ export const languageDef = {
 
 // This config defines the editor's behavior.
 export const configuration = {
+
   comments: {
     lineComment: ";",
   },
+
   brackets: [
     ["{", "}"], ["[", "]"], ["(", ")",]
   ],

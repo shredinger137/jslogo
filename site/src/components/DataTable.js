@@ -1,16 +1,19 @@
 /* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off", no-use-before-define: "off" */
 
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import firebase from 'firebase/app';
 //we need firebase because we're saving data files to the cloud, and we want to authorize people
 import axios from 'axios';
 import { config } from '../config';
 import OpenDataModal from './OpenDataModal';
-
-
+import { useAppSelector } from '../redux/hooks';
+import { store } from '../redux/store';
+import { load } from '../redux/reducers/packetDataSlice';
+import { selectData } from '../redux/reducers/packetDataSlice'
 
 function DataTable(props) {
 
+    const packetData = useAppSelector(selectData);
     const [dataModalOpen, setDataModalOpen] = useState(false);
 
     const toggleModal = () => {
@@ -25,8 +28,6 @@ function DataTable(props) {
 
     }
 
-
-
     function importData() {
 
         //In the current version of packets we expect 9 columns - Type, Time, ADC 0 - 5, Checksum. Even if all the sensors aren't used,
@@ -38,7 +39,7 @@ function DataTable(props) {
         const file = input.files[0];
         var fileReader = new FileReader();
 
-        fileReader.onload = function (fileLoadedEvent, context) {
+        fileReader.onload = function (fileLoadedEvent) {
             var textFromFileLoaded = fileLoadedEvent.target.result;
             var textInLines = textFromFileLoaded.split("\n"); //create an array of lines
             textInLines.shift(); //remove header; we assume it exists but should probably check
@@ -48,8 +49,7 @@ function DataTable(props) {
                 parsedFile.push(lineData);
             }
 
-            props.setTableData(parsedFile);
-
+            store.dispatch(load(parsedFile))
         }
 
         fileReader.readAsText(file, "UTF-8");
@@ -59,11 +59,9 @@ function DataTable(props) {
     function exportData() {
         var filename = "data.csv";
         var textToSave = "Type,Time,Count,ADC0,ADC1,ADC2,ADC3,ADC4,ADC5,CHCK\n";
-        console.log(props.tableData);
-        if (props.tableData) {
-            for (var dataLine of props.tableData) {
+        if (packetData) {
+            for (var dataLine of packetData) {
                 for (var i = 0; i < dataLine.length; i++) {
-                    console.log("for", i);
                     if (i == 0) {
                         textToSave += dataLine[0];
                     } else {
@@ -93,9 +91,9 @@ function DataTable(props) {
 
             axios.post(`${config.apiUrl}/data/${props.projectId}`, {
                 authorization: idToken,
-                data: props.tableData,
+                data: packetData,
             }).then((response) => {
-                console.log(response)
+
             }).catch((err) => { console.log(err) })
 
 
@@ -106,14 +104,14 @@ function DataTable(props) {
     let row = 0;
     return (
         <div style={{ overflow: "scroll", height: "100%", width: "100%" }}>
-            {dataModalOpen ? <OpenDataModal toggleModal={toggleModal} pid={props.projectId} setTableData={props.setTableData}/> : null}
-            <span onClick={exportData.bind(this)} style={{cursor: 'pointer'}}>Export</span>
+            {dataModalOpen ? <OpenDataModal toggleModal={toggleModal} pid={props.projectId} /> : null}
+            <span onClick={exportData.bind(this)} style={{ cursor: 'pointer' }}>Export</span>
             <input id="loadData" type="file" accept=".csv, .pac" onChange={() => importData()} style={{ display: "none" }} />
             <span onClick={pickFile} style={{ marginLeft: "20px", cursor: 'pointer' }}>Import</span>
-            {props.projectId && props.tableData ?
+            {props.projectId && packetData ?
                 <>
                     <span onClick={saveToCloud} style={{ marginLeft: "20px", cursor: 'pointer' }}>Save</span>
-                    <span onClick={() => {toggleModal()}} style={{ marginLeft: "20px", cursor: 'pointer' }}>Open</span>
+                    <span onClick={() => { toggleModal() }} style={{ marginLeft: "20px", cursor: 'pointer' }}>Open</span>
                 </>
                 :
                 <>
@@ -139,8 +137,8 @@ function DataTable(props) {
                     </tr>
                 </thead>
                 <tbody style={{ textAlign: 'center' }}>
-                    {props.tableData.map(dataLine => {
-                        //hack to stop getting warnings about matching keys when time is the same (less than a second)
+                    {packetData.map(dataLine => {
+                        //added to stop getting warnings about matching keys when time is the same (less than a second)
                         row++;
                         return (
                             <tr key={`${dataLine[0]}row${row}`}>
