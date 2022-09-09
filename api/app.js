@@ -162,6 +162,34 @@ app.patch("/project/:pid", function (req, res) {
 })
 
 
+app.patch("/project/:pid/title", function (req, res) {
+
+
+    admin
+        .auth()
+        .verifyIdToken(req.body.authorization)
+        .then((decodedToken) => {
+            const uid = decodedToken.uid;
+            projectFunctions.doesUserHavePermission(uid, req.params.pid, 'write').then((permissions) => {
+                if (permissions == true) {
+
+                    projectFunctions.updateTitle(req.params.pid, req.body.title).then(response => {
+                        res.sendStatus(200);
+                    })
+                }
+                else {
+                    res.sendStatus(210)
+                }
+            })
+        })
+        .catch((error) => {
+            res.sendStatus(500);
+            console.log(error);
+        });
+
+})
+
+
 
 app.delete("/project/:pid", function (req, res) {
     admin

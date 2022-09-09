@@ -223,6 +223,30 @@ function Header(props) {
     }
 
 
+    const saveTitle = () => {
+        var projectTitle = document.getElementById("projectTitle").value;
+        firebase.auth().currentUser.getIdToken(false).then(idToken => {
+
+            if (projectId) {
+
+                //not the first time - update an existing
+                axios.patch(`${config.apiUrl}/project/${projectId}/title`, {
+                    userId: user.uid,
+                    title: projectTitle,
+                    projectId: projectId,
+                    authorization: idToken
+                }).then((response) => {
+                    //handle response
+                    getUserProjects();
+                }).catch((error) => {
+                    console.log(error)
+                })
+
+
+            }
+        })
+    }
+
     const saveToCloud = () => {
 
         if (user) {
@@ -254,6 +278,7 @@ function Header(props) {
                         props.setProjectId(response.data);
                         setProjectId(response.data);;
                         getUserProjects();
+                        window.history.pushState({}, '', `/pr${response.data}`)
                     })
 
 
@@ -300,6 +325,7 @@ function Header(props) {
                     .then(response => {
                         setProjectId(null)
                         getUserProjects();
+                        window.history.pushState({}, '', '/')
                     })
             })
         }
@@ -339,6 +365,7 @@ function Header(props) {
                         setProjectLastSaved('Saved ' + convertDate(response.data.saved) || null)
                         setProjectId(response.data.projectId);
                         props.setProjectId(response.data.projectId);
+                        window.history.pushState({}, '', `/pr${response.data.projectId}`)
                         if (response.data.ownerDisplayName) {
                             setProjectAuthor(response.data.ownerDisplayName);
                         } else {
@@ -403,7 +430,7 @@ function Header(props) {
             <span id="dummyClickToClearPid" style={{ display: 'none' }} onClick={() => { setProjectId(null); setProjectLastSaved(null) }} ></span>
             <span id="dummyClickToClearAuthor" style={{ display: 'none' }} onClick={() => { setProjectAuthor(null) }}></span>
             <div style={titleStyle}>
-                <input type="text" id="projectTitle" defaultValue="Untitled" style={titleInputStyle} maxLength="22"></input>
+                <input type="text" id="projectTitle" defaultValue="Untitled" style={titleInputStyle} maxLength="22" onBlur={ () => {saveTitle()}  }></input>
                 <span style={{
                     position: "absolute",
                     left: "4px",

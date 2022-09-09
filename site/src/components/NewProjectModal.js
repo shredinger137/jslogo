@@ -28,6 +28,8 @@ const OpenDataModal = (props) => {
                 props.toggleModal();
             }
         }
+
+        window.history.pushState({}, '', '/')
     }
 
     return (

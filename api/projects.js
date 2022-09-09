@@ -90,6 +90,17 @@ module.exports = {
         }
     },
 
+    updateTitle: async (projectId, newTitle) => {
+        if (dbConnection) {
+            dbConnection.collection("projects").updateOne({ projectId: projectId }, { $set: {title: newTitle} }, function (err, result) {
+                if (err) throw err;
+                else return true;
+
+            }
+            )
+        }
+    },
+
     updateProjectEntry: async (projectObject, projectId) => {
 
         if (dbConnection) {
