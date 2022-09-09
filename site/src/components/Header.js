@@ -287,6 +287,8 @@ function Header(props) {
 
     const deleteProject = (pid) => {
 
+        //needs to clear the current pid
+
         if (user && user.uid) {
             firebase.auth().currentUser.getIdToken(false).then(idToken => {
 
@@ -296,6 +298,7 @@ function Header(props) {
                     }
                 })
                     .then(response => {
+                        setProjectId(null)
                         getUserProjects();
                     })
             })

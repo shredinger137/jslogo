@@ -5,7 +5,7 @@ import { experimentsList } from '../data/experiments.js';
 
 const OpenDataModal = (props) => {
 
-    const loadNewTemplate = (code) => {
+    const loadNewTemplate = (code, view) => {
 
         //the code is a static file, so we need to load the content and apply it
         var request = new XMLHttpRequest();
@@ -20,6 +20,11 @@ const OpenDataModal = (props) => {
 
                 document.getElementById("dummyClickToClearPid").click();
                 document.getElementById('dummyClickToClearAuthor').click();
+
+                if(view){
+                    props.setView(view);
+                }
+
                 props.toggleModal();
             }
         }
@@ -36,7 +41,7 @@ const OpenDataModal = (props) => {
                         <div
                             style={{ cursor: 'pointer' }}
                             key={item.name}
-                            onClick={() => { loadNewTemplate(item.code) }}>
+                            onClick={() => { loadNewTemplate(item.code, item.view || null) }}>
                             {item.name}
                         </div>
                     ))}
