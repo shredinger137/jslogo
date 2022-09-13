@@ -79,6 +79,7 @@ function Header(props) {
     const [projectAuthor, setProjectAuthor] = useState(null);
     const [recoveryEntry, setRecoveryEntry] = useState(false);
     const [projectLastSaved, setProjectLastSaved] = useState(false);
+    const [lastUsername, setLastUsername] = useState(null);
 
     //On mount, check to see if a project is defined in the URL.
     //All links have the format /pr${projectId}, so we check if 'pr' is the start of it and take the rest.
@@ -90,6 +91,9 @@ function Header(props) {
 
     useEffect(() => {
 
+        //get stored username if there is one
+        setLastUsername(localStorage.getItem('username'));
+
         if (window.location.pathname.substring(1) && window.location.pathname.substring(1, 3) === "pr") {
             setProjectId(window.location.pathname.substring(3));
 
@@ -98,7 +102,7 @@ function Header(props) {
             }).then(response => {
                 if (response && response.data && response.data.code && response.data.title) {
                     props.updateCode(response.data.code);
-                    document.getElementById('projectTitle').value = response.data.title;
+                    //   document.getElementById('projectTitle').value = response.data.title;
                     setProjectId(response.data.projectId);
                     setProjectAuthor(response.data.ownerDisplayName);
 
@@ -118,7 +122,14 @@ function Header(props) {
     //run getUserProjects if user changes; meaning, we want to wait until the login loads
     //this is also where we check for recovery files
     useEffect(() => {
-        getUserProjects();
+
+        //if user is logged in, save displayname and load cloud projects
+        if (user && user.displayName) {
+            localStorage.setItem("username", user.displayName);
+            getUserProjects();
+        }
+
+
         projects.getRecoverEntry().then(recoveryProject => {
 
 
@@ -409,28 +420,60 @@ function Header(props) {
 
 
 
+    //The render mehtod for user:
+    /*
+        If user is undefined, that means it's loading; either show the lastUsername if it exists, or nothing since it's pending
+        Next section: if 'user' exists, show the correct user and make the button work
+        Last: if user == null or false, that means it's definitely not a signed in user, so show login. I'm not sure which falsy value it is,
+        so that's why we use not undefined.
 
+        I'm sure this could be more elegant
+    
+    */
 
     return (
         <header className="header">
             <span style={{ width: "20px" }}></span>
+            {
+                user === undefined && lastUsername ?
 
-            {user && user.displayName ?
+                    <div onClick={toggleUserMenu} tabIndex="0" onKeyDown={(e) => { if (e.key == "Enter") { toggleUserMenu() } }} className="" style={userLogoStyle}>
+                        <p>{lastUsername.substr(0, 1)}</p>
+                    </div>
+
+                    :
+
+                    <></>
+
+            }
+
+
+            {user ?
 
                 <div onClick={toggleUserMenu} tabIndex="0" onKeyDown={(e) => { if (e.key == "Enter") { toggleUserMenu() } }} className="" style={userLogoStyle}>
-                    <p>{user.displayName.substr(0, 1)}</p>
+                    <p>{user.displayName.substr(0, 1) || 'te'}</p>
                 </div>
+
                 :
-                <div style={loginStyle} >
-                    <span onClick={signIn} onKeyDown={(e) => { if (e.key == "Enter") { signIn() } }} tabIndex={0}>Login</span>
-                </div>
+                <>
+                    {
+                        user !== undefined ?
+                            <div style={loginStyle} >
+                                <span onClick={signIn} onKeyDown={(e) => { if (e.key == "Enter") { signIn() } }} tabIndex={0}>Login</span>
+                            </div>
+                            :
+                            <></>
+                    }
+
+                </>
+
 
             }
 
             <span id="dummyClickToClearPid" style={{ display: 'none' }} onClick={() => { setProjectId(null); setProjectLastSaved(null) }} ></span>
             <span id="dummyClickToClearAuthor" style={{ display: 'none' }} onClick={() => { setProjectAuthor(null) }}></span>
             <div style={titleStyle}>
-                <input type="text" id="projectTitle" defaultValue="Untitled" style={titleInputStyle} maxLength="22" onBlur={ () => {saveTitle()}  }></input>
+                <input type="text" id="projectTitle" defaultValue="Untitled" style={titleInputStyle} maxLength="22" onBlur={() => { saveTitle() }}></input>
                 <span style={{
                     position: "absolute",
                     left: "4px",
