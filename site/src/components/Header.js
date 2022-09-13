@@ -102,7 +102,7 @@ function Header(props) {
             }).then(response => {
                 if (response && response.data && response.data.code && response.data.title) {
                     props.updateCode(response.data.code);
-                    //   document.getElementById('projectTitle').value = response.data.title;
+                    document.getElementById('projectTitle').value = response.data.title;
                     setProjectId(response.data.projectId);
                     setProjectAuthor(response.data.ownerDisplayName);
 
