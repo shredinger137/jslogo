@@ -12,47 +12,57 @@ import LightAndEnergy from '../experiments/LightAndEnergyNew.logo';
 export const experimentsList = [
     {
         name: "Blank",
-        code: blank
+        code: blank,
+        view: 'main'
     },
 
     {
         name: "LEDs",
-        code: leds
+        code: leds,
+        view: 'main'
     },
 
     {
        name: "Sensors",
-       code: sensors
+       code: sensors,
+       view: 'graph'
     },
 
     {
         name: "Plotting Demo",
-        code: plottingDemo
+        code: plottingDemo,
+        view: 'graph'
      },
      {
         name: "TurtleLogo",
-        code: turtleLogo
+        code: turtleLogo,
+        view: 'main'
     },
     {
         name: "Packets",
-        code: packets
+        code: packets,
+        view: 'data'
     },
     {
         name: "Temperatures",
-        code: evaporation
+        code: evaporation,
+        view: 'graph'
 
     },
     {
         name: "Water Soil",
-        code: waterSoil
+        code: waterSoil,
+        view: 'graph'
     },
     {
         name: 'Fuel Cell',
-        code: MFC
+        code: MFC,
+        view: 'graph'
     },
     {
         name: 'Light and Energy',
-        code: LightAndEnergy
+        code: LightAndEnergy,
+        view: 'graph'
     }
 ];
 

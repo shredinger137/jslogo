@@ -37,6 +37,7 @@ function UserMenu(props) {
     const signOut = () => {
         props.projects.writePidToStorage(false);
         props.projects.writeLastCodeToLocalStorage(false)
+        localStorage.removeItem('username');
         firebase.auth().signOut();
     }
 

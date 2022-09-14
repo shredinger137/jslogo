@@ -4,133 +4,129 @@ var localDatabase = new Dexie('lbym');
 
 export default class Projects {
 
+  //all this is way c
 
   constructor(updateCode) {
     this.globalUpdateCode = updateCode;
   }
 
   async initializeDatabase() {
-    localDatabase.version(3).stores({
-      projects: '++id, name, code, projectId, date'
+    localDatabase.version(4).stores({
+      projects: '++id, name, code, projectId, date, view',
     })
   }
 
-
-
-  save() {
-
-  }
 
 
   async writeLastCodeToLocalStorage(code) {
 
-    //read the database and see if 'recover' exists; if so, get the id key
+  //read the database and see if 'recover' exists; if so, get the id key
 
-    this.getRecoverEntry().then(async function (entries) {
-      if (entries && entries.length > 0) {
+  this.getRecoverEntry().then(async function (entries) {
+    if (entries && entries.length > 0) {
 
-        //if a recovery entry exists, update it with the new code
+      //if a recovery entry exists, update it with the new code and most recent
 
-        var recoveryId = entries[0]["id"];
-        await localDatabase.projects.update(recoveryId, {
-          name: "recover",
-          code: code,
-          date: Date.now()
-        })
-      } else {
-        await localDatabase.projects.add({
-          name: 'recover',
-          code: code,
-          date: Date.now()
-        })
-      }
+      var recoveryId = entries[0]["id"];
+      await localDatabase.projects.update(recoveryId, {
+        name: "recover",
+        code: code,
+        date: Date.now()
+      })
+    } else {
+      await localDatabase.projects.add({
+        name: 'recover',
+        code: code,
+        date: Date.now()
+      })
+    }
 
-    })
+  })
 
-  }
+}
 
 
   async writePidToStorage(pid) {
-    var context = this;
+  var context = this;
 
-    //read the database and see if 'recover' exists; if so, get the id key
+  //read the database and see if 'recover' exists; if so, get the id key
 
-    this.getRecoverEntry().then(async function (entries) {
-      if (entries && entries.length > 0) {
+  this.getRecoverEntry().then(async function (entries) {
+    if (entries && entries.length > 0) {
 
-        //if a recovery entry exists, update it with the new code
-        var recoveryId = entries[0]["id"];
-        await localDatabase.projects.update(recoveryId, {
-          projectId: pid
-        }).then(context.getRecoverEntry())
-      } else {
-        await localDatabase.projects.add({
-          name: 'recover',
-          projectId: pid,
-        })
-        //if a recover entry doesn't exist, create it
+      //if a recovery entry exists, update it with the new code
+      var recoveryId = entries[0]["id"];
+      await localDatabase.projects.update(recoveryId, {
+        projectId: pid
+      }).then(context.getRecoverEntry())
+    } else {
+      await localDatabase.projects.add({
+        name: 'recover',
+        projectId: pid,
+      })
+      //if a recover entry doesn't exist, create it
 
-        //TODO
+      //TODO
 
-      }
+    }
 
-    })
+  })
 
 
-  }
+}
 
 
 
 
   async getRecoverEntry() {
-    var returnValue = false;
-    if (localDatabase && localDatabase.projects) {
-      returnValue = await localDatabase.projects.where('name').equals('recover').toArray();
-    }
-    return returnValue;
-
+  var returnValue = false;
+  if (localDatabase && localDatabase.projects) {
+    returnValue = await localDatabase.projects.where('name').equals('recover').toArray();
   }
+  return returnValue;
+
+}
 
 
 
-  saveAs(title) {
-    var filename = `${title}.txt`;
-    var textToSave = document.getElementById('procs').value;
-    var newFile = new Blob([textToSave], { type: 'plain/text' });
-    var a = document.createElement("a"),
-      url = URL.createObjectURL(newFile);
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(function () {
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-    }, 0);
+saveAs(title) {
+  var filename = `${title}.txt`;
+  var textToSave = document.getElementById('procs').value;
+  var newFile = new Blob([textToSave], { type: 'plain/text' });
+  var a = document.createElement("a"),
+    url = URL.createObjectURL(newFile);
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function () {
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  }, 0);
 
-  }
-
-
-
-  loadFile() {
-    let scopedUpdate = this.globalUpdateCode
-
-    const input = document.getElementById('load');
-    const file = input.files[0];
-    var fileReader = new FileReader()
-
-    fileReader.onload = function (fileLoadedEvent, context) {
-      var textFromFileLoaded = fileLoadedEvent.target.result;
-      scopedUpdate(textFromFileLoaded)
-      return textFromFileLoaded;
-
-   //   globalUpdateCode(textFromFileLoaded);
-      //document.getElementById("procs").value = textFromFileLoaded;
-    };
-    fileReader.readAsText(file, "UTF-8");
+}
 
 
-  }
+
+loadFile() {
+  let scopedUpdate = this.globalUpdateCode
+
+  const input = document.getElementById('load');
+  const file = input.files[0];
+  var fileReader = new FileReader()
+
+  fileReader.onload = function (fileLoadedEvent, context) {
+    var textFromFileLoaded = fileLoadedEvent.target.result;
+    scopedUpdate(textFromFileLoaded)
+    return textFromFileLoaded;
+
+    //   globalUpdateCode(textFromFileLoaded);
+    //document.getElementById("procs").value = textFromFileLoaded;
+  };
+  fileReader.readAsText(file, "UTF-8");
+
+
+}
 
 
 

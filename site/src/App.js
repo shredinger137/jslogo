@@ -261,6 +261,7 @@ end`,);
       <div className="main-container">
         {showNewProjectModal ?
           <NewProjectModal
+            setView={setView}
             toggleModal={toggleShowNewProjectModal}
             updateCode={updateCode}
           />
