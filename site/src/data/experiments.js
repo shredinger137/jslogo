@@ -19,13 +19,11 @@ export const experimentsList = [
     {
         name: "LEDs",
         code: leds,
-        view: 'main'
     },
 
     {
        name: "Sensors",
        code: sensors,
-       view: 'graph'
     },
 
     {
@@ -52,17 +50,14 @@ export const experimentsList = [
     {
         name: "Water Soil",
         code: waterSoil,
-        view: 'graph'
     },
     {
         name: 'Fuel Cell',
         code: MFC,
-        view: 'graph'
     },
     {
         name: 'Light and Energy',
         code: LightAndEnergy,
-        view: 'graph'
     }
 ];
 
