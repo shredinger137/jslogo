@@ -137,15 +137,17 @@ function Header(props) {
             if (!window.location.pathname.substr(1) || window.location.pathname.substr(1, 2) !== "pr") {
                 if (recoveryProject && recoveryProject[0]) {
 
+                    //if code has been saved, provide it in the menu
+                    if (recoveryProject[0]['code']) {
+                        setRecoveryEntry(recoveryProject[0]);
+                    }
+
                     //if there is a user (we don't care who at this time, but that might be a TODO) and a saved PID, open the PID
                     if (user && recoveryProject[0].projectId) {
                         //This item is cleared on signing out, so it's unlikely to open someone else's project. Not impossible though.
                         getSingleProject(recoveryProject[0]['projectId']);
 
-                        //if code has been saved, provide it in the menu
-                        if (recoveryProject[0]['code']) {
-                            setRecoveryEntry(recoveryProject[0]);
-                        }
+
 
                     }
 
