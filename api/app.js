@@ -1,5 +1,6 @@
 //TODO: Auth needs to be made more robust, as proper middleware. It also needs to be passed to the database functions, since we have to verify the user actually has permissions.
 
+
 var express = require("express");
 var app = express();
 var config = require("./config.js");
@@ -9,6 +10,7 @@ var admin = require('firebase-admin');
 var userAccountFunctions = require('./userAccountFunctions');
 var projectFunctions = require('./projects');
 var serviceAccount = require("./credentials.json");
+var fs = require('fs');
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
@@ -18,6 +20,7 @@ const getUserFromToken = async (token) => {
     console.log('got token');
     admin.auth().verifyIdToken(token).then((decodedToken) => { return decodedToken })
 }
+
 
 
 app.use(function (req, res, next) {
@@ -34,6 +37,7 @@ app.use(function (req, res, next) {
 });
 
 
+
 //Create a global holder for our database instance, then open the database and assign it here.
 //Note that anywhere you use this, you need to have an if(dbConnection){} conditional so that the
 //order will only attempt to run if the database connection exists. Later you might want to add a
@@ -47,7 +51,49 @@ MongoClient.connect('mongodb://localhost:27017/', { useUnifiedTopology: true, us
     console.log("Connected to database " + config.globalDbName);
 
     //things that happen on startup should happen here, after the database connects
+
+    //One time filter used to troubleshoot an issue
+    /*
+
+    dbConnection.collection('projects').find({}).toArray().then(result => {
+        console.log('got')
+        for (let entry of result) {
+            if (entry.owner) {
+
+                admin.auth().getUser(entry.owner).then(user => {
+                    if(!user){
+                        dbConnection.collection('filtered').insertOne(entry);
+                        console.log(entry)
+                    }
+                    if (user && user.providerData && user.providerData[0] && user.providerData[0].email && user.providerData[0].email.includes('bearvalley') ) {
+                        let temp = entry;
+                        temp['email'] = user.providerData[0].email;
+                        dbConnection.collection('filtered').insertOne(temp);
+                      //  console.log(`${user.providerData[0].email}`)
+                    }
+                }).catch((err) => {})
+
+            }
+        }
+
+
+    })
+*/
+
 })
+
+
+//starting version of some basic logging; this will be moved to a cloud database and given a better way to access later on maybe
+//not sure if cloudwatch is correct, but probably worth looking into
+
+const writeToLog = async (user, event) => {
+    console.log('write')
+    dbConnection.collection('lbym-log').insertOne({
+        date: Date.now(),
+        user: user,
+        event: event
+    });
+}
 
 
 //We get a login post, saying a login happened. Check if the authorization token matches the expected UID. Check if user is already in the database. If it is, cool. If not, create an entry.
@@ -57,7 +103,6 @@ app.get("/ping", function (req, res) {
 });
 
 app.post("/login/:id", function (req, res) {
-    console.log("login");
     if (req.params.id && req.body && req.body.authorization) {
 
         admin
@@ -76,18 +121,21 @@ app.post("/login/:id", function (req, res) {
                                 email: req.body.email
                             }
 
-                            userAccountFunctions.createUserEntry(userObject).then(
-                                res.sendStatus(200)
+                            userAccountFunctions.createUserEntry(userObject).then(() => {
+                                res.sendStatus(200);
+                                writeToLog(req.params.id, 'log in success');
+                            }
                             );
                         }
                     })
                 }
                 else {
                     console.log("token mismatch")
+                    writeToLog(req.params.id, 'login failed with token mismatch');
                 }
             })
             .catch((error) => {
-                // Handle error
+                writeToLog(req.params.id, `login failed with error ${error}`);
             });
     }
 })
@@ -115,6 +163,7 @@ app.post("/project", function (req, res) {
                 }).then(response => {
                     console.log(response)
                     res.send(newProjectId)
+                    writeToLog(uid, `created new project ${newProjectId}`);
 
                 })
             }
@@ -147,6 +196,7 @@ app.patch("/project/:pid", function (req, res) {
                         req.params.pid
                     ).then(response => {
                         res.sendStatus(200);
+                        writeToLog(uid, `saved project ${req.params.pid}`);
                     })
                 }
                 else {
@@ -156,7 +206,7 @@ app.patch("/project/:pid", function (req, res) {
         })
         .catch((error) => {
             res.sendStatus(500);
-            console.log(error);
+            writeToLog(uid, `saving project ${req.params.pid} failed with ${error}`)
         });
 
 })
@@ -197,10 +247,11 @@ app.delete("/project/:pid", function (req, res) {
         .verifyIdToken(req.headers.authorization)
         .then((decodedToken) => {
             const uid = decodedToken.uid;
-            //we need to verify owner on the other side
+            //TODO: Check auth
 
             projectFunctions.deleteProject(req.params.pid, uid).then(response => {
                 res.sendStatus(200);
+                writeToLog(uid, `delete project ${req.params.pid}`);
             })
 
         })
@@ -339,7 +390,8 @@ app.get("/projects/:pid", function (req, res) {
 
     if (req.params.pid) {
         projectFunctions.getProject(req.params.pid).then(response => {
-            res.send(response)
+            res.send(response);
+            writeToLog(req.params.id, `opened project ${req.params.pid}`);
         })
     }
 })

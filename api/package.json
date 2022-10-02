@@ -9,6 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.178.0",
+    "aws-sdk": "^2.1223.0",
     "express": "^4.17.1",
     "firebase-admin": "^9.4.2",
     "mongodb": "^3.7.3"
