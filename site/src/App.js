@@ -24,7 +24,7 @@ let interpreter, projects;
 //let instance = new WorkerBuilder(Worker);
 
 const App = () => {
-  
+
   //const { data: user } = useUser();
   const [showNewProjectModal, setShowNewProjectModal] = useState(false);
   const [view, setView] = useState('main');
@@ -35,6 +35,7 @@ end`,);
   let pid = null;
   let editor = null;
 
+  const [onlineStatus, setOnlineStatus] = useState(true);
   const [projectId, setProjectId] = useState(null);
   const [horizontalOffset, setHorizontalOffset] = useState(0);
   const [chartType, setChartType] = useState('');
@@ -79,6 +80,9 @@ end`,);
       }
     };
     */
+
+
+
 
     console.log("Serial API Check:", checkIfSerialCapable());
 
@@ -224,7 +228,7 @@ end`,);
   }
 
 
-  
+
 
   const editorDidMount = (editor, monaco) => {
 
@@ -257,6 +261,7 @@ end`,);
         updateCode={updateCode}
         setProjectId={setProjectId}
       />
+
       <div style={{ height: "20px" }}></div>
       <div className="main-container">
         {showNewProjectModal ?

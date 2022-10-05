@@ -11,7 +11,7 @@ function UserMenu(props) {
 
     useEffect(() => {
         setProjectList(props.projectList);
-    }, [props.projectList]);
+    }, [props.projectList, props.networkError]);
 
 
     const menuStyle = {
@@ -62,6 +62,7 @@ function UserMenu(props) {
         <div style={menuStyle}>
 
             <h4 onClick={signOut} style={textStyle}>Sign Out</h4>
+            {props.networkError ? <p style={{color: 'darkred', fontSize: '1rem'}}>Network error:<br />unable to load projects</p> : null}
             {
                 projectList.map((project) =>
                     <div className="project" key={project.title} style={{ marginTop: "5px", padding: "5px" }}>

@@ -16,11 +16,6 @@ admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
 });
 
-const getUserFromToken = async (token) => {
-    console.log('got token');
-    admin.auth().verifyIdToken(token).then((decodedToken) => { return decodedToken })
-}
-
 
 
 app.use(function (req, res, next) {
@@ -86,12 +81,12 @@ MongoClient.connect('mongodb://localhost:27017/', { useUnifiedTopology: true, us
 //starting version of some basic logging; this will be moved to a cloud database and given a better way to access later on maybe
 //not sure if cloudwatch is correct, but probably worth looking into
 
-const writeToLog = async (user, event) => {
-    console.log('write')
+const writeToLog = async (user, event, level) => {
     dbConnection.collection('lbym-log').insertOne({
         date: Date.now(),
         user: user,
-        event: event
+        event: event,
+        level: level
     });
 }
 
@@ -114,6 +109,7 @@ app.post("/login/:id", function (req, res) {
                     userAccountFunctions.doesUserExist(uid).then(result => {
                         if (result) {
                             res.sendStatus(200);
+                            writeToLog(req.params.id, 'log in success', 'info');
                         } else {
                             var userObject = {
                                 uid: uid,
@@ -123,7 +119,7 @@ app.post("/login/:id", function (req, res) {
 
                             userAccountFunctions.createUserEntry(userObject).then(() => {
                                 res.sendStatus(200);
-                                writeToLog(req.params.id, 'log in success');
+                                writeToLog(req.params.id, 'log in success, new account', 'info');
                             }
                             );
                         }
@@ -131,11 +127,11 @@ app.post("/login/:id", function (req, res) {
                 }
                 else {
                     console.log("token mismatch")
-                    writeToLog(req.params.id, 'login failed with token mismatch');
+                    writeToLog(req.params.id, 'login failed with token mismatch', 'warning');
                 }
             })
             .catch((error) => {
-                writeToLog(req.params.id, `login failed with error ${error}`);
+                writeToLog(req.params.id, `login failed with error ${error}`, 'error');
             });
     }
 })
@@ -163,7 +159,7 @@ app.post("/project", function (req, res) {
                 }).then(response => {
                     console.log(response)
                     res.send(newProjectId)
-                    writeToLog(uid, `created new project ${newProjectId}`);
+                    writeToLog(uid, `created new project ${newProjectId}`, 'info');
 
                 })
             }
@@ -172,7 +168,7 @@ app.post("/project", function (req, res) {
             }
         })
         .catch((error) => {
-            // Handle error
+            writeToLog(req.params.id, `new project save failed with error ${error}`, 'error');
         });
 })
 
@@ -196,7 +192,7 @@ app.patch("/project/:pid", function (req, res) {
                         req.params.pid
                     ).then(response => {
                         res.sendStatus(200);
-                        writeToLog(uid, `saved project ${req.params.pid}`);
+                        writeToLog(uid, `saved project ${req.params.pid}`, 'info');
                     })
                 }
                 else {
@@ -206,7 +202,7 @@ app.patch("/project/:pid", function (req, res) {
         })
         .catch((error) => {
             res.sendStatus(500);
-            writeToLog(uid, `saving project ${req.params.pid} failed with ${error}`)
+            writeToLog(uid, `saving project ${req.params.pid} failed with ${error}`, 'error')
         });
 
 })
@@ -234,7 +230,7 @@ app.patch("/project/:pid/title", function (req, res) {
         })
         .catch((error) => {
             res.sendStatus(500);
-            console.log(error);
+            writeToLog(req.params.id, `title update failed on ${req.params.pid} with ${error}`, 'error');
         });
 
 })
@@ -251,12 +247,12 @@ app.delete("/project/:pid", function (req, res) {
 
             projectFunctions.deleteProject(req.params.pid, uid).then(response => {
                 res.sendStatus(200);
-                writeToLog(uid, `delete project ${req.params.pid}`);
+                writeToLog(uid, `delete project ${req.params.pid}`, 'info');
             })
 
         })
         .catch((error) => {
-            // Handle error
+            writeToLog(req.params.id, `delete pid ${req.params.pid} failed with ${error}`, 'error');
         });
 
 })
@@ -291,7 +287,7 @@ app.get("/user-projects/:uid", function (req, res) {
 
             })
             .catch((error) => {
-                // Handle error
+                writeToLog(req.params.uid, `project list requested for ${req.params.uid}. failed with ${error}`, 'error');
             });
 
     }
@@ -316,6 +312,7 @@ app.post("/data/:pid", function (req, res) {
             }
             )
     } else {
+        
         res.send('error');
     }
 
@@ -335,7 +332,7 @@ app.get("/data/:pid/:index", async function (req, res) {
     }
 
     catch {
-        console.log(err);
+        writeToLog(req.params.uid, `project list requested for ${req.params.uid}. failed with ${error}`, 'error');
         return false;
     }
 
@@ -391,7 +388,7 @@ app.get("/projects/:pid", function (req, res) {
     if (req.params.pid) {
         projectFunctions.getProject(req.params.pid).then(response => {
             res.send(response);
-            writeToLog(req.params.id, `opened project ${req.params.pid}`);
+            writeToLog(req.params.id, `opened project ${req.params.pid}`, 'info');
         })
     }
 })

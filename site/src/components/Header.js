@@ -80,6 +80,7 @@ function Header(props) {
     const [recoveryEntry, setRecoveryEntry] = useState(false);
     const [projectLastSaved, setProjectLastSaved] = useState(false);
     const [lastUsername, setLastUsername] = useState(null);
+    const [networkError, setNetworkError] = useState(false);
 
     //On mount, check to see if a project is defined in the URL.
     //All links have the format /pr${projectId}, so we check if 'pr' is the start of it and take the rest.
@@ -109,7 +110,7 @@ function Header(props) {
                 } else {
                     console.log("error")
                 }
-            })
+            }).catch((err) => {console.log(err)})
         }
     },
         []
@@ -223,7 +224,7 @@ function Header(props) {
                         displayName: result.user.displayName,
                         email: result.user.email,
                         authorization: idToken
-                    })
+                    }).catch((err) => {console.log(err)})
                 })
             }
         });
@@ -292,7 +293,7 @@ function Header(props) {
                         setProjectId(response.data);;
                         getUserProjects();
                         window.history.pushState({}, '', `/pr${response.data}`)
-                    })
+                    }).catch((err) => {console.log(err); setProjectLastSaved('Error saving')})
 
 
                 } else {
@@ -339,7 +340,7 @@ function Header(props) {
                         setProjectId(null)
                         getUserProjects();
                         window.history.pushState({}, '', '/')
-                    })
+                    }).catch((err) => {console.log(err)})
             })
         }
     }
@@ -388,7 +389,7 @@ function Header(props) {
                     } else {
                         console.log("error")
                     }
-                })
+                }).catch((err) => {console.log(err)})
 
             })
 
@@ -414,7 +415,7 @@ function Header(props) {
                         }
 
 
-                    })
+                    }).catch((err) => {console.log('err'); setNetworkError(true)})
             })
         }
     }
@@ -422,7 +423,7 @@ function Header(props) {
 
 
 
-    //The render mehtod for user:
+    //The render method for user:
     /*
         If user is undefined, that means it's loading; either show the lastUsername if it exists, or nothing since it's pending
         Next section: if 'user' exists, show the correct user and make the button work
@@ -536,6 +537,7 @@ function Header(props) {
                             deleteProject={deleteProject.bind(this)}
                             projectList={projectList}
                             showMenu={userMenuShow}
+                            networkError={networkError}
 
                         />
                     </div>
