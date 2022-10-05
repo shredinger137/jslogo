@@ -1356,7 +1356,6 @@ export default class Interpreter {
                 yDataArray.push(yDataArray[0]);
             }
 
-            console.log(yDataArray)
         }
 
 
@@ -1373,8 +1372,7 @@ export default class Interpreter {
                 }
                 chartData.push({ data: dataHolder, pointBackgroundColor: chartPointColors[varCount] });
             }
-            console.log(chartData);
-            console.log(chartType);
+
             t.pushNewChartData(chartType, chartData);
 
 
