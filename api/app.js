@@ -45,36 +45,6 @@ MongoClient.connect('mongodb://localhost:27017/', { useUnifiedTopology: true, us
     connectedToDatabase = true;
     console.log("Connected to database " + config.globalDbName);
 
-    //things that happen on startup should happen here, after the database connects
-
-    //One time filter used to troubleshoot an issue
-    /*
-
-    dbConnection.collection('projects').find({}).toArray().then(result => {
-        console.log('got')
-        for (let entry of result) {
-            if (entry.owner) {
-
-                admin.auth().getUser(entry.owner).then(user => {
-                    if(!user){
-                        dbConnection.collection('filtered').insertOne(entry);
-                        console.log(entry)
-                    }
-                    if (user && user.providerData && user.providerData[0] && user.providerData[0].email && user.providerData[0].email.includes('bearvalley') ) {
-                        let temp = entry;
-                        temp['email'] = user.providerData[0].email;
-                        dbConnection.collection('filtered').insertOne(temp);
-                      //  console.log(`${user.providerData[0].email}`)
-                    }
-                }).catch((err) => {})
-
-            }
-        }
-
-
-    })
-*/
-
 })
 
 
@@ -157,7 +127,6 @@ app.post("/project", function (req, res) {
                     saved: Date.now(),
                     created: Date.now()
                 }).then(response => {
-                    console.log(response)
                     res.send(newProjectId)
                     writeToLog(uid, `created new project ${newProjectId}`, 'info');
 
@@ -312,7 +281,7 @@ app.post("/data/:pid", function (req, res) {
             }
             )
     } else {
-        
+
         res.send('error');
     }
 

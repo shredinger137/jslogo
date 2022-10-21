@@ -11,6 +11,18 @@ MongoClient.connect('mongodb://localhost:27017/', { useUnifiedTopology: true, us
 
 })
 
+//TODO: This will become part of the interface file as we move to the next database. 
+
+const writeToLog = async (user, event, level) => {
+    dbConnection.collection('lbym-log').insertOne({
+        date: Date.now(),
+        user: user,
+        event: event,
+        level: level
+    });
+}
+
+
 
 
 
@@ -45,7 +57,7 @@ module.exports = {
     //create a project entry and associate it with the user
     //associate it by adding a 'ownedProjects' property to the user - doesn't exist here yet
 
-    //TODO: no error handling - this returns true regardless of truthiness
+    //TODO: no error handling - this returns true regardless
 
     //Also we don't check if the ID already exists.
 
@@ -55,7 +67,7 @@ module.exports = {
             if (err) throw err;
             else {
 
-                //TODO: This isn't a relational database so stop treating it like one.
+                //TODO: This isn't a relational database so stop treating it like one. Maybe add an index to projects?
                 dbConnection.collection("users").updateOne({ uid: projectObject.owner }, { $push: { ownedProjects: projectObject.projectId } }, { upsert: true })
                 if (err) throw err;
                 return true;
@@ -92,8 +104,11 @@ module.exports = {
 
     updateTitle: async (projectId, newTitle) => {
         if (dbConnection) {
-            dbConnection.collection("projects").updateOne({ projectId: projectId }, { $set: {title: newTitle} }, function (err, result) {
-                if (err) throw err;
+            dbConnection.collection("projects").updateOne({ projectId: projectId }, { $set: { title: newTitle } }, function (err, result) {
+                if (err){
+                    writeToLog(null, `update title of ${projectId} failed with ${err}`, 'error' );
+                    throw err;
+                }
                 else return true;
 
             }
@@ -105,7 +120,11 @@ module.exports = {
 
         if (dbConnection) {
             dbConnection.collection("projects").updateOne({ projectId: projectId }, { $set: projectObject }, function (err, result) {
-                if (err) throw err;
+                if (err) {
+                    writeToLog(null, `update project ${projectId} failed with ${err}`, 'error' );
+                    throw err;
+                    
+                }
                 else return true;
 
             }
@@ -118,7 +137,7 @@ module.exports = {
     deleteProject: async (projectId, uid) => {
         if (dbConnection) {
 
-            dbConnection.collection("projects").deleteOne({ projectId: projectId }, function (err, result) {
+            dbConnection.collection("projects").updateOne({ projectId: projectId }, {$set: {active: false}}, function (err, result) {
                 if (err) throw err;
                 else {
                     dbConnection.collection("users").updateOne({ uid: uid }, { $pull: { ownedProjects: projectId } })
@@ -129,13 +148,15 @@ module.exports = {
     },
 
     getUserProjects: async (uid) => {
+        writeToLog(uid, 'requested user projects', 'info');
         if (dbConnection) {
             try {
-                var userProjects = await dbConnection.collection("projects").find({ owner: uid }, { projection: { _id: 0, title: 1, projectId: 1, dataIndex: 1, saved: 1 } }).sort({ created: -1 }).toArray();
+                var userProjects = await dbConnection.collection("projects").find({ owner: uid, active: {$ne: false} }, { projection: { _id: 0, title: 1, projectId: 1, dataIndex: 1, saved: 1 } }).sort({ created: -1 }).toArray();
             }
 
             catch {
                 console.log(err);
+                writeToLog(uid, `requested user projects failed with ${err}`, 'error');
                 return false;
             }
 
