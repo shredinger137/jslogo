@@ -21,7 +21,6 @@ function UserMenu(props) {
         paddingRight: '35px',
         paddingLeft: '5px',
         fontSize: "1.2rem",
-        cursor: "pointer",
         zIndex: 999,
         overflowY: 'auto',
         paddingBottom: '25px'
@@ -62,16 +61,20 @@ function UserMenu(props) {
         <div style={menuStyle}>
 
             <h4 onClick={signOut} style={textStyle}>Sign Out</h4>
-            {props.networkError ? <p style={{color: 'darkred', fontSize: '1rem'}}>Network error:<br />unable to load projects</p> : null}
+            {props.networkError ? <p style={{ color: 'darkred', fontSize: '1rem' }}>Network error:<br />unable to load projects</p> : null}
             {
                 projectList.map((project) =>
-                    <div className="project" key={project.title} style={{ marginTop: "5px", padding: "5px" }}>
-                        <span key={`${project.title}span`}
-                            onClick={() => { props.getSingleProject(project.projectId) }}
-                            style={{ marginRight: "10px" }}>{project.title}</span><br />
+                    <div className="project" key={project.title} style={{ marginTop: "10px", padding: "5px" }}>
+                        <div style={{ paddingBottom: "5px", cursor: 'pointer' }}
+                            onClick={() => { props.getSingleProject(project.projectId) }}>
+                            <span key={`${project.title}span`}
 
-                        <span key={`${project.title}del`} style={{ marginRight: "10px", fontSize: "1rem" }} onClick={() => { props.deleteProject(project.projectId) }}>[delete]</span>
-                        <span key={`${project.title}copy`} style={{ fontSize: "1rem", marginRight: '10px' }} onClick={() => { copyProjectLink(`${project.projectId}`) }}>[copy link]</span>
+                                style={{ marginRight: "10px" }}>{project.title}
+                            </span>
+                        </div>
+
+                        <span key={`${project.title}del`} style={{ marginRight: "10px", fontSize: "1rem", cursor: 'pointer' }} onClick={() => { props.deleteProject(project.projectId) }}>[delete]</span>
+                        <span key={`${project.title}copy`} style={{ fontSize: "1rem", marginRight: '10px', cusor: 'pointer' }} onClick={() => { copyProjectLink(`${project.projectId}`) }}>[copy link]</span>
 
                     </div>
 
