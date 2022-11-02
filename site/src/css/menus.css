@@ -7,6 +7,13 @@
     height: 20px;
 }
 
+.delete-confirmation {
+    background-color: #1AA38F;
+    width: 100%;
+    min-height: 80vh;
+    height: 100%;
+}
+
 .disabled {
     color: gray;
 }

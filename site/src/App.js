@@ -20,6 +20,11 @@ import 'firebase/auth';
 //import Worker from './components/logoWorker';
 
 
+import { useAppSelector } from './redux/hooks';
+import { store } from './redux/store';
+import { set, clear, selectProjectId } from './redux/reducers/projectIdSlice';
+
+
 let interpreter, projects;
 //let instance = new WorkerBuilder(Worker);
 
@@ -31,12 +36,10 @@ const App = () => {
   const [code, setCode] = useState(`to go
 print 'Hello World'
 end`,);
-  //pid is a placeholder
-  let pid = null;
+  let projectId = useAppSelector(selectProjectId);
+  let setProjectId = (pid) => store.dispatch(set(pid));
   let editor = null;
 
-  const [onlineStatus, setOnlineStatus] = useState(true);
-  const [projectId, setProjectId] = useState(null);
   const [horizontalOffset, setHorizontalOffset] = useState(0);
   const [chartType, setChartType] = useState('');
   const [chartDataSingle, setChartDataSingle] = useState([]);
@@ -332,7 +335,6 @@ end`,);
           <div id="dataFrame" className={view == "data" ? null : "hide"} style={{ height: "100%", width: "100%" }}>
             <DataTable
               projectId={projectId}
-              pid={pid}
             />
           </div>
         </div>

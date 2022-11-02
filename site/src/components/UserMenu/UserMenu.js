@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import firebase from 'firebase/app'
 import 'firebase/auth'
-import '../css/menus.css'
+import '../../css/menus.css'
+import DeleteConfirmation from './DeleteConfirmation'
+import Project from './Project';
 
 function UserMenu(props) {
 
@@ -25,6 +27,8 @@ function UserMenu(props) {
         overflowY: 'auto',
         paddingBottom: '25px'
     }
+
+
 
     const textStyle = {
         paddingTop: 0,
@@ -64,20 +68,13 @@ function UserMenu(props) {
             {props.networkError ? <p style={{ color: 'darkred', fontSize: '1rem' }}>Network error:<br />unable to load projects</p> : null}
             {
                 projectList.map((project) =>
-                    <div className="project" key={project.title} style={{ marginTop: "10px", padding: "5px" }}>
-                        <div style={{ paddingBottom: "5px", cursor: 'pointer' }}
-                            onClick={() => { props.getSingleProject(project.projectId) }}>
-                            <span key={`${project.title}span`}
-
-                                style={{ marginRight: "10px" }}>{project.title}
-                            </span>
-                        </div>
-
-                        <span key={`${project.title}del`} style={{ marginRight: "10px", fontSize: "1rem", cursor: 'pointer' }} onClick={() => { props.deleteProject(project.projectId) }}>[delete]</span>
-                        <span key={`${project.title}copy`} style={{ fontSize: "1rem", marginRight: '10px', cusor: 'pointer' }} onClick={() => { copyProjectLink(`${project.projectId}`) }}>[copy link]</span>
-
-                    </div>
-
+                    <Project
+                        key={`${project.projectId}wrapper`}
+                        project={project}
+                        copyProjectLink={copyProjectLink}
+                        getSingleProject={props.getSingleProject}
+                        deleteProject={props.deleteProject}
+                    />
                 )
             }
 
@@ -92,7 +89,6 @@ function UserMenu(props) {
                     :
                     null
             }
-
         </div>
 
     )

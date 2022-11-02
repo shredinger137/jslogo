@@ -13,7 +13,7 @@ import firebase from 'firebase/app'
 import 'firebase/auth'
 import { useAuth, useUser } from 'reactfire';
 import axios from 'axios';
-import UserMenu from './UserMenu';
+import UserMenu from './UserMenu/UserMenu';
 import { config } from '../config';
 
 import saveIcon from '../images/cloud-save.png';
