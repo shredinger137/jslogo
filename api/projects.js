@@ -154,7 +154,7 @@ module.exports = {
                 var userProjects = await dbConnection.collection("projects").find({ owner: uid, active: {$ne: false} }, { projection: { _id: 0, title: 1, projectId: 1, dataIndex: 1, saved: 1 } }).sort({ created: -1 }).toArray();
             }
 
-            catch {
+            catch (err) {
                 console.log(err);
                 writeToLog(uid, `requested user projects failed with ${err}`, 'error');
                 return false;
