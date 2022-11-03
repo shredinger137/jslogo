@@ -336,10 +336,16 @@ function Header(props) {
                         authorization: idToken
                     }
                 })
-                    .then(response => {
-                        setProjectId(null)
+                    .then(response => 
+                        //we should check that the response is correct. TODO.
+                        {
+                        if(projectId == pid){
+                            setProjectId(null);
+                            window.history.pushState({}, '', '/');
+                        }
+
                         getUserProjects();
-                        window.history.pushState({}, '', '/')
+
                     }).catch((err) => {console.log(err)})
             })
         }
