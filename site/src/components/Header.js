@@ -23,6 +23,10 @@ import newWindowIcon from '../images/new-window.png';
 import newProjectIcon from '../images/newProject.png';
 import uploadIcon from '../images/upload.png';
 
+import { useAppSelector } from '../redux/hooks';
+import { set, clear, selectProjectId } from '../redux/reducers/projectIdSlice';
+import { store } from '../redux/store';
+
 
 function Header(props) {
 
@@ -72,9 +76,9 @@ function Header(props) {
     const { data: user } = useUser();
     const reactAuth = useAuth();
 
+    const projectId = useAppSelector(selectProjectId);
 
     const [projectList, setProjectList] = useState([]);
-    const [projectId, setProjectId] = useState(null);
     const [userMenuShow, setUserMenuShow] = useState(false);
     const [projectAuthor, setProjectAuthor] = useState(null);
     const [recoveryEntry, setRecoveryEntry] = useState(false);
@@ -87,7 +91,7 @@ function Header(props) {
     //This way you can still use URLs like /settings or whatever in the future, you just can't start them with pr.
 
     //Also start the process that will check if we're online or not.
-
+    //store.dispatch(load(parsedFile))
 
 
     useEffect(() => {
@@ -96,21 +100,20 @@ function Header(props) {
         setLastUsername(localStorage.getItem('username'));
 
         if (window.location.pathname.substring(1) && window.location.pathname.substring(1, 3) === "pr") {
-            setProjectId(window.location.pathname.substring(3));
-
+            store.dispatch(set(window.location.pathname.substring(3)));
 
             axios.get(`${config.apiUrl}/projects/${window.location.pathname.substring(3)}`, {
             }).then(response => {
                 if (response && response.data && response.data.code && response.data.title) {
                     props.updateCode(response.data.code);
                     document.getElementById('projectTitle').value = response.data.title;
-                    setProjectId(response.data.projectId);
+                    store.dispatch(set(response.data.projectId));
                     setProjectAuthor(response.data.ownerDisplayName);
 
                 } else {
                     console.log("error")
                 }
-            }).catch((err) => {console.log(err)})
+            }).catch((err) => { console.log(err) })
         }
     },
         []
@@ -224,7 +227,7 @@ function Header(props) {
                         displayName: result.user.displayName,
                         email: result.user.email,
                         authorization: idToken
-                    }).catch((err) => {console.log(err)})
+                    }).catch((err) => { console.log(err) })
                 })
             }
         });
@@ -240,6 +243,7 @@ function Header(props) {
     const saveTitle = () => {
         var projectTitle = document.getElementById("projectTitle").value;
         firebase.auth().currentUser.getIdToken(false).then(idToken => {
+
 
             if (projectId) {
 
@@ -283,17 +287,14 @@ function Header(props) {
                     }).then((response) => {
 
                         //We're being very confident and assuming that the response is a valid ID
-                        //in the future you'll want to add error handling here, or at least validation
+                        //in the future you'll want to add error handling here and validation
                         //TODO
 
-                        //TODO: We're lifting up state instead of keeping it here, but there will be 
-                        //repetition until this is done.
                         setProjectLastSaved('Saved ' + convertDate(Date.now()))
-                        props.setProjectId(response.data);
-                        setProjectId(response.data);;
+                        store.dispatch(set(response.data));
                         getUserProjects();
                         window.history.pushState({}, '', `/pr${response.data}`)
-                    }).catch((err) => {console.log(err); setProjectLastSaved('Error saving')})
+                    }).catch((err) => { console.log(err); setProjectLastSaved('Error saving') })
 
 
                 } else {
@@ -336,17 +337,17 @@ function Header(props) {
                         authorization: idToken
                     }
                 })
-                    .then(response => 
-                        //we should check that the response is correct. TODO.
-                        {
-                        if(projectId == pid){
-                            setProjectId(null);
+                    .then(response =>
+                    //we should check that the response is correct. TODO.
+                    {
+                        if (projectId == pid) {
+                            store.dispatch(clear())
                             window.history.pushState({}, '', '/');
                         }
 
                         getUserProjects();
 
-                    }).catch((err) => {console.log(err)})
+                    }).catch((err) => { console.log(err) })
             })
         }
     }
@@ -383,8 +384,7 @@ function Header(props) {
                             titleElement.value = response.data.title;
                         }
                         setProjectLastSaved('Saved ' + convertDate(response.data.saved) || null)
-                        setProjectId(response.data.projectId);
-                        props.setProjectId(response.data.projectId);
+                        store.dispatch(set(response.data.projectId))
                         window.history.pushState({}, '', `/pr${response.data.projectId}`)
                         if (response.data.ownerDisplayName) {
                             setProjectAuthor(response.data.ownerDisplayName);
@@ -395,7 +395,7 @@ function Header(props) {
                     } else {
                         console.log("error")
                     }
-                }).catch((err) => {console.log(err)})
+                }).catch((err) => { console.log(err) })
 
             })
 
@@ -421,7 +421,7 @@ function Header(props) {
                         }
 
 
-                    }).catch((err) => {console.log('err'); setNetworkError(true)})
+                    }).catch((err) => { console.log('err'); setNetworkError(true) })
             })
         }
     }
@@ -476,10 +476,9 @@ function Header(props) {
 
                 </>
 
-
             }
 
-            <span id="dummyClickToClearPid" style={{ display: 'none' }} onClick={() => { setProjectId(null); setProjectLastSaved(null) }} ></span>
+            <span id="dummyClickToClearPid" style={{ display: 'none' }} onClick={() => { store.dispatch(clear()); setProjectLastSaved(null) }} ></span>
             <span id="dummyClickToClearAuthor" style={{ display: 'none' }} onClick={() => { setProjectAuthor(null) }}></span>
             <div style={titleStyle}>
                 <input type="text" id="projectTitle" defaultValue="Untitled" style={titleInputStyle} maxLength="22" onBlur={() => { saveTitle() }}></input>

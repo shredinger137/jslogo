@@ -251,6 +251,8 @@ app.get("/user-projects/:uid", function (req, res) {
                     })
 
 
+                } else {
+                    writeToLog(req.params.uid, `project list requested for ${req.params.uid}. failed with wrong uid (${uid})`, 'error');
                 }
 
 

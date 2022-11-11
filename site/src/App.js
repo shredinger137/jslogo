@@ -1,6 +1,4 @@
 /* eslint eqeqeq: "off", no-extend-native: "off", no-throw-literal: "off", no-use-before-define: "off", react-hooks/exhaustive-deps: off */
-
-
 import React, { useEffect, useState } from 'react';
 import './css/styles.css';
 import './css/layout.css';
@@ -19,12 +17,6 @@ import 'firebase/auth';
 //import WorkerBuilder from './components/worker-builder';
 //import Worker from './components/logoWorker';
 
-
-import { useAppSelector } from './redux/hooks';
-import { store } from './redux/store';
-import { set, clear, selectProjectId } from './redux/reducers/projectIdSlice';
-
-
 let interpreter, projects;
 //let instance = new WorkerBuilder(Worker);
 
@@ -36,8 +28,7 @@ const App = () => {
   const [code, setCode] = useState(`to go
 print 'Hello World'
 end`,);
-  let projectId = useAppSelector(selectProjectId);
-  let setProjectId = (pid) => store.dispatch(set(pid));
+
   let editor = null;
 
   const [horizontalOffset, setHorizontalOffset] = useState(0);
@@ -262,7 +253,6 @@ end`,);
         toggleNewProjectModal={toggleShowNewProjectModal}
         interpreter={interpreter}
         updateCode={updateCode}
-        setProjectId={setProjectId}
       />
 
       <div style={{ height: "20px" }}></div>
@@ -333,9 +323,7 @@ end`,);
 
           </div>
           <div id="dataFrame" className={view == "data" ? null : "hide"} style={{ height: "100%", width: "100%" }}>
-            <DataTable
-              projectId={projectId}
-            />
+            <DataTable />
           </div>
         </div>
         <Terminal

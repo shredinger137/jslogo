@@ -9,11 +9,13 @@ import OpenDataModal from './OpenDataModal';
 import { useAppSelector } from '../redux/hooks';
 import { store } from '../redux/store';
 import { load } from '../redux/reducers/packetDataSlice';
+import { selectProjectId } from '../redux/reducers/projectIdSlice';
 import { selectData } from '../redux/reducers/packetDataSlice'
 
 function DataTable(props) {
 
     const packetData = useAppSelector(selectData);
+    const projectId = useAppSelector(selectProjectId);
     const [dataModalOpen, setDataModalOpen] = useState(false);
 
     const toggleModal = () => {
@@ -89,7 +91,7 @@ function DataTable(props) {
     const saveToCloud = () => {
         firebase.auth().currentUser.getIdToken(false).then(idToken => {
 
-            axios.post(`${config.apiUrl}/data/${props.projectId}`, {
+            axios.post(`${config.apiUrl}/data/${projectId}`, {
                 authorization: idToken,
                 data: packetData,
             }).then((response) => {
@@ -104,11 +106,11 @@ function DataTable(props) {
     let row = 0;
     return (
         <div style={{ overflow: "scroll", height: "100%", width: "100%" }}>
-            {dataModalOpen ? <OpenDataModal toggleModal={toggleModal} pid={props.projectId} /> : null}
+            {dataModalOpen ? <OpenDataModal toggleModal={toggleModal} pid={projectId} /> : null}
             <span onClick={exportData.bind(this)} style={{ cursor: 'pointer' }}>Export</span>
             <input id="loadData" type="file" accept=".csv, .pac" onChange={() => importData()} style={{ display: "none" }} />
             <span onClick={pickFile} style={{ marginLeft: "20px", cursor: 'pointer' }}>Import</span>
-            {props.projectId && packetData ?
+            {projectId && packetData ?
                 <>
                     <span onClick={saveToCloud} style={{ marginLeft: "20px", cursor: 'pointer' }}>Save</span>
                     <span onClick={() => { toggleModal() }} style={{ marginLeft: "20px", cursor: 'pointer' }}>Open</span>
@@ -119,8 +121,6 @@ function DataTable(props) {
                     <span style={{ marginLeft: "20px", color: 'gray' }}>Open</span>
                 </>
             }
-
-            <span style={{ marginLeft: "20px" }}>{props.pid ? 'Save' : null}</span>
             <table style={{ width: "80%" }}>
                 <thead style={{ textAlign: "center" }}>
                     <tr>
