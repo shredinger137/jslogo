@@ -137,43 +137,42 @@ function Header(props) {
         projects.getRecoverEntry().then(recoveryProject => {
 
 
-            //make sure we're not at a project URL
-            if (!window.location.pathname.substr(1) || window.location.pathname.substr(1, 2) !== "pr") {
-                if (recoveryProject && recoveryProject[0]) {
 
-                    //if code has been saved, provide it in the menu
-                    if (recoveryProject[0]['code']) {
-                        setRecoveryEntry(recoveryProject[0]);
-                    }
+            if (recoveryProject && recoveryProject[0]) {
 
-                    //if there is a user (we don't care who at this time, but that might be a TODO) and a saved PID, open the PID
-                    if (user && recoveryProject[0].projectId) {
-                        //This item is cleared on signing out, so it's unlikely to open someone else's project. Not impossible though.
-                        getSingleProject(recoveryProject[0]['projectId']);
+                //if code has been saved, provide it in the menu
+                if (recoveryProject[0]['code']) {
+                    setRecoveryEntry(recoveryProject[0]);
+                }
 
+                //if there is a user (we don't care who at this time, but that might be a TODO) and a saved PID, open the PID
+                if (user && recoveryProject[0].projectId) {
+                    //This item is cleared on signing out, so it's unlikely to open someone else's project. Not impossible though.
+                    getSingleProject(recoveryProject[0]['projectId']);
 
-
-                    }
-
-                    //if user isn't logged in and code exists, open it
-                    if (!user && recoveryProject[0]['code']) {
-                        props.updateCode(recoveryProject[0]['code'])
-                        props.updateCode(recoveryProject[0]['code'])
-                        document.getElementById("projectTitle").value = "Recovered"
-                    }
-
-                    //if user is logged in, code exists, but cloud project wasn't open, load the code
-                    if (user && recoveryProject[0]['code'] && !recoveryProject[0]['projectId']) {
-                        props.updateCode(recoveryProject[0]['code'])
-                        props.updateCode(recoveryProject[0]['code'])
-                        document.getElementById("projectTitle").value = "Recovered"
-                    }
 
 
                 }
-                //note: this runs on user change, which includes signing out, so it switches to 'recovery' mode. Which is a little weird.
-                //Maybe TODO
+
+                //if user isn't logged in and code exists, and we're not at a project URL, open recovery entry
+                if (!user && recoveryProject[0]['code'] && window.location.pathname?.substr(1, 2) !== "pr") {
+                    props.updateCode(recoveryProject[0]['code'])
+                    props.updateCode(recoveryProject[0]['code'])
+                    document.getElementById("projectTitle").value = "Recovered"
+                }
+
+                //if user is logged in, code exists, but cloud project wasn't open, load the code
+                if (user && recoveryProject[0]['code'] && !recoveryProject[0]['projectId'] && window.location.pathname?.substr(1, 2) !== "pr") {
+                    props.updateCode(recoveryProject[0]['code'])
+                    props.updateCode(recoveryProject[0]['code'])
+                    document.getElementById("projectTitle").value = "Recovered"
+                }
+
+
             }
+            //note: this runs on user change, which includes signing out, so it switches to 'recovery' mode. Which is a little weird.
+            //Maybe TODO
+
         });
 
     },

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import firebase from 'firebase/app'
 import 'firebase/auth'
 import '../../css/menus.css'
-import DeleteConfirmation from './DeleteConfirmation'
 import Project from './Project';
 
 function UserMenu(props) {
@@ -64,7 +63,13 @@ function UserMenu(props) {
     return (
         <div style={menuStyle}>
 
-            <h4 onClick={signOut} style={textStyle}>Sign Out</h4>
+            <h4 onClick={signOut} style={{
+                paddingTop: 0,
+                lineHeight: "1rem",
+                marginBlockStart: "1em",
+                marginBlockEnd: "1em",
+                cursor: 'pointer'
+            }}>Sign Out</h4>
             {props.networkError ? <p style={{ color: 'darkred', fontSize: '1rem' }}>Network error:<br />unable to load projects</p> : null}
             {
                 projectList.map((project) =>

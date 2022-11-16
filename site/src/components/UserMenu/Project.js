@@ -13,10 +13,6 @@ const Project = (props) => {
     });
   }
 
-  const deleteProject = () => {
-   
-  }
-
   return (
     <>
       {
@@ -37,7 +33,7 @@ const Project = (props) => {
           </div >
           :
           < div className="project" style={{ marginTop: "10px", padding: "4px", border: '1px solid red', backgroundColor: 'rgba(0, 0, 0, .2)'  }}>
-            <div style={{ paddingBottom: "5px"}}>
+            <div style={{ paddingBottom: "5px", zIndex: 999}}>
               <span key={`${props.project.title}prompt`}
 
                 style={{ marginRight: "10px" }}>Delete?
