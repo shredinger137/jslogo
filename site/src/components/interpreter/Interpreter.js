@@ -587,7 +587,7 @@ export default class Interpreter {
 
 
         if (this.getValueInternal("_yLabel")) {
-            chartOptions.scales.yAxes.scaleLabel[0].labelString = (this.getValueInternal("_yLabel"));
+            chartOptions.scales.yAxes[0].scaleLabel.labelString = (this.getValueInternal("_yLabel"));
         }
 
         var rangeSetting = this.getValueInternal("_range");
