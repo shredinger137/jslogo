@@ -1,6 +1,10 @@
+const AWS = require('aws-sdk');
+var crypto = require('crypto');
+
 var MongoClient = require('mongodb').MongoClient, Server = require('mongodb').Server;
 var config = require("./config.js");
 var express = require("express");
+
 
 var dbConnection = null;
 MongoClient.connect('mongodb://localhost:27017/', { useUnifiedTopology: true, useNewUrlParser: true }, function (err, client) {
@@ -10,6 +14,10 @@ MongoClient.connect('mongodb://localhost:27017/', { useUnifiedTopology: true, us
     console.log("Connected to database " + config.globalDbName);
 
 })
+
+//Initialize AWS setup
+AWS.config.update(config.awsSettings);
+const docClient = new AWS.DynamoDB.DocumentClient();
 
 //TODO: This will become part of the interface file as we move to the next database. 
 
@@ -22,208 +30,236 @@ const writeToLog = async (user, event, level) => {
     });
 }
 
-
-
-
-
-
 module.exports = {
 
-    doesUserHavePermission: async (uid, pid, action) => {
-        //for now we're just going to make this 'is the user owner'; TODO in the future is to have permissions attached to projects
+    //projectId comes from app.js
 
-        if (dbConnection) {
-            try {
-                var projectData = await dbConnection.collection("projects").findOne({ projectId: pid }, { projection: { _id: 0, owner: 1 } });
-            }
+    newProjectEntry: async (projectData) => {
+        projectData['active'] = true;
 
-            catch {
-                console.log(err);
-                return false;
-            }
+        var params = {
+            TableName: 'lbym-projects',
+            Item: projectData,
+            ReturnValues: 'ALL_OLD',
+        };
 
-            finally {
-                if (projectData && projectData.owner && projectData.owner == uid) {
-                    return true;
-                }
-
-                return false;
-            }
-
+        try {
+            const response = await docClient.put(params).promise();
+            return true;
         }
 
-    },
-
-    //create a project entry and associate it with the user
-    //associate it by adding a 'ownedProjects' property to the user - doesn't exist here yet
-
-    //TODO: no error handling - this returns true regardless
-
-    //Also we don't check if the ID already exists.
-
-    newProjectEntry: async (projectObject) => {
-
-        dbConnection.collection("projects").insertOne(projectObject, function (err, result) {
-            if (err) throw err;
-            else {
-
-                //TODO: This isn't a relational database so stop treating it like one. Maybe add an index to projects?
-                dbConnection.collection("users").updateOne({ uid: projectObject.owner }, { $push: { ownedProjects: projectObject.projectId } }, { upsert: true })
-                if (err) throw err;
-                return true;
-
-            }
-
-        }
-        )
-
-        return true;
-    },
-
-    saveDataRun: async (projectId, data) => {
-
-        if (dbConnection) {
-
-            dbConnection.collection("projects").updateOne({ projectId: projectId }, {
-                $push: {
-                    collectedData:
-                    {
-                        date: Date.now(),
-                        data: data
-                    }
-                }
-            }, function (err, result) {
-                if (err) throw err;
-                else return true;
-
-            }
-            )
-            syncSaveDataIndex(projectId);
-        }
-    },
-
-    updateTitle: async (projectId, newTitle) => {
-        if (dbConnection) {
-            dbConnection.collection("projects").updateOne({ projectId: projectId }, { $set: { title: newTitle } }, function (err, result) {
-                if (err){
-                    writeToLog(null, `update title of ${projectId} failed with ${err}`, 'error' );
-                    throw err;
-                }
-                else return true;
-
-            }
-            )
-        }
-    },
-
-    updateProjectEntry: async (projectObject, projectId) => {
-
-        if (dbConnection) {
-            dbConnection.collection("projects").updateOne({ projectId: projectId }, { $set: projectObject }, function (err, result) {
-                if (err) {
-                    writeToLog(null, `update project ${projectId} failed with ${err}`, 'error' );
-                    throw err;
-                    
-                }
-                else return true;
-
-            }
-            )
-        }
-
-        return true;
-    },
-
-    deleteProject: async (projectId, uid) => {
-        if (dbConnection) {
-
-            dbConnection.collection("projects").updateOne({ projectId: projectId }, {$set: {active: false}}, function (err, result) {
-                if (err) throw err;
-                else {
-                    dbConnection.collection("users").updateOne({ uid: uid }, { $pull: { ownedProjects: projectId } })
-                }
-            })
-
+        catch (err) {
+            writeToLog(projectData?.projectOwner, `save new project failed with ${err}`, 'error');
+            return false;
         }
     },
 
     getUserProjects: async (uid) => {
+
         writeToLog(uid, 'requested user projects', 'info');
-        if (dbConnection) {
-            try {
-                var userProjects = await dbConnection.collection("projects").find({ owner: uid, active: {$ne: false} }, { projection: { _id: 0, title: 1, projectId: 1, dataIndex: 1, saved: 1 } }).sort({ created: -1 }).toArray();
-            }
 
-            catch (err) {
-                console.log(err);
-                writeToLog(uid, `requested user projects failed with ${err}`, 'error');
-                return false;
-            }
 
-            finally {
-                return userProjects;
-            }
+        const params = {
+            TableName: 'lbym-projects',
+            KeyConditionExpression: 'projectOwner = :projectOwner',
+            FilterExpression: 'active = :true',
+            ExpressionAttributeValues: {
+              ':projectOwner': uid,
+              ':true': true
+            },
+            IndexName: 'projectOwner-index'
+          };
 
+        try {
+            const data = await docClient.query(params).promise();
+            console.log(data);
+            return data.Items;
+        }
+
+        catch (err) {
+            console.log(err)
         }
     },
 
     getProject: async (projectId) => {
-        if (dbConnection) {
-            try {
-                var projectData = await dbConnection.collection("projects").findOne({ projectId: projectId }, { projection: { _id: 0 } });
-            }
 
-            catch (err) {
-                console.log(err);
-                console.log(projectId);
-                return false;
-            }
+        let params = {
+            Key: {
+                "projectId": projectId
+            },
+            TableName: "lbym-projects"
+        }
 
-            finally {
 
-                try {
-                    var projectUser = await dbConnection.collection("users").findOne({ uid: projectData.owner });
-                }
+        try {
+            const data = await docClient.get(params).promise();
+            return data?.Item;
+        }
 
-                catch (err) {
-                    console.log(err);
-                    return false;
-                }
-
-                finally {
-                    if (projectUser) { projectData['ownerDisplayName'] = projectUser.displayName }
-                }
-
-                return projectData;
-            }
-
+        catch (err) {
+            console.log(err)
         }
     },
 
 
-}
+
+    doesUserHavePermission: async (uid, projectId, action) => {
+        //for now we're just going to make this 'is the user owner'; TODO in the future is to have permissions attached to projects
 
 
-const syncSaveDataIndex = (pid) => {
+        //temp TODO: always true for current dev work; obviously it shouldn't in the future
+        return true;
+    },
 
-    if (dbConnection) {
+
+    saveDataRun: async (projectId, data) => {
+        console.log(projectId)
+        var params = {
+            TableName: 'lbym-saved-data',
+            Item: {
+                projectId: projectId,
+                date: Date.now(),
+                data: data,
+                dataId: crypto.randomUUID()
+            },
+            ReturnValues: 'ALL_OLD',
+        };
+
+        try {
+            const response = await docClient.put(params).promise();
+            return true;
+        }
+
+        catch (err) {
+            console.log(err)
+            return false;
+        }
+
+    },
+
+    getDataRuns: async (projectId) => {
+        let params = {
+            KeyConditionExpression: 'projectId = :projectId',
+            ExpressionAttributeValues: {
+                ':projectId': projectId
+            },
+            TableName: "lbym-saved-data",
+            IndexName: 'projectId-index'
+        }
+
+        try {
+            const data = await docClient.query(params).promise();
+            console.log(data.Items)
+            return data.Items;
+        }
+
+        catch (err) {
+            console.log(err)
+        }
+
+    },
+
+    getSingleData: async (dataId) => {
+        console.log(dataId)
+        let params = {
+            Key: {
+                "dataId": dataId
+            },
+            TableName: "lbym-saved-data"
+        }
 
 
-        dbConnection.collection("projects").findOne({ projectId: pid }, { projection: { _id: 0, collectedData: 1 } }, function (err, result) {
-            if (err) throw err;
-            if (result && typeof result == 'object' && result.collectedData) {
-                let dataIndex = [];
-                for (let entry of result.collectedData) {
-                    if (entry && entry.date) {
-                        dataIndex.push(entry.date);
-                    }
-                }
+        try {
+            const data = await docClient.get(params).promise();
+            return data?.Item;
+        }
 
-                dbConnection.collection("projects").updateOne({ projectId: pid }, { $set: { dataIndex: dataIndex } }, function (err, result) {
-                    if (err) throw err;
-                })
+        catch (err) {
+            console.log(err);
+            return false;
+        }
+    },
 
+    updateTitle: async (projectId, newTitle) => {
+        let params = {
+            Key: {
+                "projectId": projectId
+            },
+            UpdateExpression: "set title = :title",
+            ExpressionAttributeValues: { ':title': newTitle },
+            TableName: "lbym-projects"
+        }
+
+        try {
+            const data = await docClient.update(params).promise();
+            return true;
+        }
+
+        catch (err) {
+            console.log(err)
+            return false;
+        }
+
+    },
+
+
+    updateProjectEntry: async (projectObject, projectId) => {
+
+        //we have to specify fields in DynamoDB; to avoid that, generate a list from the object provided
+
+        let updateExpression = 'set';
+        let expressionAttributeNames = {};
+        let expressionValues = {};
+
+        for (const prop in projectObject) {
+            updateExpression += ` #${prop} = :${prop} ,`;
+            expressionAttributeNames['#' + prop] = prop;
+            expressionValues[':' + prop] = projectObject[prop];
+        }
+
+        //remove trailing comma
+        updateExpression = updateExpression.slice(0, -1);
+
+
+        let params = {
+            Key: {
+                "projectId": projectId
+            },
+            UpdateExpression: updateExpression,
+            ExpressionAttributeNames: expressionAttributeNames,
+            ExpressionAttributeValues: expressionValues,
+            TableName: "lbym-projects"
+        }
+
+        try {
+            const data = await docClient.update(params).promise();
+            return true;
+        }
+
+        catch (err) {
+            console.log(err)
+            return false;
+        }
+    },
+
+    deleteProject: async (projectId, uid) => {
+        let params = {
+            TableName: 'lbym-projects',
+            Key: {
+                projectId: projectId
             }
-        })
-    }
+        }
+
+        try {
+            await docClient.delete(params).promise();
+            return true;
+        }
+
+        catch {
+            console.log(err)
+            return false;
+        }
+
+    },
+
 }

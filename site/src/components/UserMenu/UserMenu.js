@@ -27,15 +27,6 @@ function UserMenu(props) {
         paddingBottom: '25px'
     }
 
-
-
-    const textStyle = {
-        paddingTop: 0,
-        lineHeight: "1rem",
-        marginBlockStart: "1em",
-        marginBlockEnd: "1em",
-    }
-
     const signOut = () => {
         props.projects.writePidToStorage(false);
         props.projects.writeLastCodeToLocalStorage(false)

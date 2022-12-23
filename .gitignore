@@ -8,6 +8,7 @@ node_modules
 credentials.json
 .env
 aws-config.js
+config.js
 
 # testing
 /coverage

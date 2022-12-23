@@ -30,3 +30,19 @@ deploy_production_api:
       url: app.lbym.org
   only:
       - master
+
+
+deploy_test_api:
+  stage: deployapi
+  before_script:
+    - cd api
+  script:
+      - echo "Deploying Dynamo Test API server"
+      - npm install
+      - cp /repos/lbym-app/config/aws-config.config ./config.js
+      - cp -R ./* /repos/lbym-app/api-dynamotest/
+  environment:
+      name: production
+      url: dynamo.lbym.org
+  only:
+      - dynamodb

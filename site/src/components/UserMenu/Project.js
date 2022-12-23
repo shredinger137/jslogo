@@ -1,12 +1,10 @@
 import React, { useState } from 'react'
-import { deleteProject } from '../interface/api'
-
 const Project = (props) => {
 
   const [deleting, setDeleting] = useState(false);
 
-  const copyProjectLink = async (pid) => {
-    var data = `${process.env.REACT_APP_BASE_URL}/pr${pid}`;
+  const copyProjectLink = async (projectId) => {
+    var data = `${process.env.REACT_APP_BASE_URL}/pr${projectId}`;
     navigator.clipboard.writeText(data).then(function () {
     }, function () {
       console.error("Unable to write to clipboard");
@@ -33,7 +31,7 @@ const Project = (props) => {
           </div >
           :
           < div className="project" style={{ marginTop: "10px", padding: "4px", border: '1px solid red', backgroundColor: 'rgba(0, 0, 0, .2)'  }}>
-            <div style={{ paddingBottom: "5px", zIndex: 999}}>
+            <div style={{ paddingBottom: "5px"}}>
               <span key={`${props.project.title}prompt`}
 
                 style={{ marginRight: "10px" }}>Delete?
@@ -41,8 +39,6 @@ const Project = (props) => {
             </div>
             <span style={{ marginRight: "10px", fontSize: "1rem", cursor: 'pointer' }} onClick={() => { props.deleteProject(props.project.projectId) }}>[delete]</span>
             <span style={{ fontSize: "1rem", marginRight: '10px', cursor: 'pointer' }} onClick={() => { setDeleting(false) }}>[cancel]</span>
-
-
           </div>
 
 

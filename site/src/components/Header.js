@@ -120,7 +120,7 @@ function Header(props) {
     )
 
     useEffect(() => {
-        projects.writePidToStorage(projectId)
+        projects.writePidToStorage(projectId);
     }, [projectId])
 
     //run getUserProjects if user changes; meaning, we want to wait until the login loads
@@ -243,7 +243,6 @@ function Header(props) {
         var projectTitle = document.getElementById("projectTitle").value;
         firebase.auth().currentUser.getIdToken(false).then(idToken => {
 
-
             if (projectId) {
 
                 //not the first time - update an existing
@@ -361,7 +360,6 @@ function Header(props) {
     }
 
     const getSingleProject = (openPid) => {
-
         projects.writePidToStorage(openPid);
 
         setUserMenuShow(false);
@@ -415,7 +413,6 @@ function Header(props) {
                     .then(response => {
                         //we believe that response.data is an array of projects; this should do something different if there's an error
                         if (response && response.data && Array.isArray(response.data)) {
-
                             setProjectList(response.data)
                         }
 

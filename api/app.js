@@ -11,6 +11,8 @@ var userAccountFunctions = require('./userAccountFunctions');
 var projectFunctions = require('./projects');
 var serviceAccount = require("./credentials.json");
 var fs = require('fs');
+var crypto = require('crypto');
+
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
@@ -117,11 +119,11 @@ app.post("/project", function (req, res) {
         .then((decodedToken) => {
             const uid = decodedToken.uid;
             if (req.body.userId == uid) {
-                var newProjectId = Math.random().toString(36).slice(2);
+                let newProjectId = crypto.randomUUID().replace(/-/g, '').slice(0, 16);
 
                 projectFunctions.newProjectEntry({
                     projectId: newProjectId,
-                    owner: uid,
+                    projectOwner: uid,
                     title: req.body.title,
                     code: req.body.code,
                     saved: Date.now(),
@@ -265,6 +267,7 @@ app.get("/user-projects/:uid", function (req, res) {
 
 })
 
+
 app.post("/data/:pid", function (req, res) {
 
     if (req.body && req.body.data && req.params && req.params.pid && req.body.authorization) {
@@ -290,65 +293,17 @@ app.post("/data/:pid", function (req, res) {
 })
 
 
-app.get("/data/:pid/:index", async function (req, res) {
-
-    //TODO: This is bad structure. We want to convert this to objects, not arrays, so that we can search by index.
-    //It might be better to create a 'data' collection rather than nest it in projects, and have data objects belong
-    //to projects via a table instead. This will work well when we switch to a relational database.
-
-    //get single data instance
-    let results = null;
-    try {
-        results = await dbConnection.collection('projects').findOne({ projectId: req.params.pid }, { projection: { _id: 0, collectedData: 1 } });
-    }
-
-    catch {
-        writeToLog(req.params.uid, `project list requested for ${req.params.uid}. failed with ${error}`, 'error');
-        return false;
-    }
-
-    //todo: put return after finally (as above so below)
-
-    finally {
-        let data = null;
-
-        if (results && results.collectedData && Array.isArray(results.collectedData)) {
-            for (let entry of results.collectedData) {
-                if (entry.date == req.params.index && entry.data) {
-                    data = entry.data;
-                }
-            }
-            res.send(data)
-        } else {
-            res.send(false);
-        }
-    }
-
-
+app.get("/data/single/:index", async function (req, res) {
+    projectFunctions.getSingleData(req.params.index).then(response => {
+        res.send(response);
+    })
 })
 
 app.get("/data/:pid", async function (req, res) {
 
-
-    let results = null;
-    try {
-        results = await dbConnection.collection('projects').findOne({ projectId: req.params.pid }, { projection: { _id: 0, dataIndex: 1 } });
-    }
-
-    catch {
-        console.log(err);
-        return false;
-    }
-
-    finally {
-        if (results && results.dataIndex) {
-            res.send(results.dataIndex)
-        } else {
-            res.send(false);
-        }
-    }
-
-
+    projectFunctions.getDataRuns(req.params.pid).then(response => {
+        res.send(response);
+    })
 })
 
 

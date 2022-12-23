@@ -15,7 +15,8 @@ const OpenDataModal = (props) => {
         axios.get(`${config.apiUrl}/data/${props.pid}`, {
         }).then(response => {
             if (response && response.data && Array.isArray(response.data)) {
-                setAvailableData(response.data)
+                setAvailableData(response.data);
+                console.log(response.data);
             }
         })
 
@@ -24,10 +25,11 @@ const OpenDataModal = (props) => {
     )
 
     const getData = (index) => {
-        axios.get(`${config.apiUrl}/data/${props.pid}/${index}`, {
+        axios.get(`${config.apiUrl}/data/single/${index}`, {
         }).then(response => {
             if (response && response.data) {
-                store.dispatch(load(response.data));
+
+                store.dispatch(load(response.data.data));
                 props.toggleModal();
             }
         })
@@ -57,8 +59,8 @@ const OpenDataModal = (props) => {
                 <br />
                 <div>
                     {availableData.map(item => (
-                        <div style={{marginBottom: '10px', cursor: 'pointer'}} key={item} onClick={() => { getData(item) }}>
-                            {convertDate(item)}<br />
+                        <div style={{marginBottom: '10px', cursor: 'pointer'}} key={item.date} onClick={() => { getData(item.dataId) }}>
+                            {convertDate(item.date)}<br />
                         </div>
                     ))}
                 </div>
